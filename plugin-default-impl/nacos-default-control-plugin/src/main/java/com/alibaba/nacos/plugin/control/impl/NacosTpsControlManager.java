@@ -136,7 +136,7 @@ public class NacosTpsControlManager extends TpsControlManager {
          * get format string "2021-01-16 17:20:21" of timestamp.
          *
          * @param timeStamp timestamp milliseconds.
-         * @return
+         * @return string of timestamp with format 'yyyy-MM-dd HH:mm:ss'.
          */
         public String getTimeFormatOfSecond(long timeStamp) {
             String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(timeStamp));

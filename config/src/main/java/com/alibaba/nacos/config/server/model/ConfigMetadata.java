@@ -28,6 +28,14 @@ public class ConfigMetadata {
     
     private List<ConfigExportItem> metadata;
     
+    public List<ConfigExportItem> getMetadata() {
+        return metadata;
+    }
+    
+    public void setMetadata(List<ConfigExportItem> metadata) {
+        this.metadata = metadata;
+    }
+    
     public static class ConfigExportItem {
         
         private String group;
@@ -89,22 +97,13 @@ public class ConfigMetadata {
                 return false;
             }
             ConfigExportItem that = (ConfigExportItem) o;
-            return Objects.equals(group, that.group) && Objects.equals(dataId, that.dataId) && Objects
-                    .equals(desc, that.desc) && Objects.equals(type, that.type) && Objects
-                    .equals(appName, that.appName);
+            return Objects.equals(group, that.group) && Objects.equals(dataId, that.dataId) && Objects.equals(desc,
+                    that.desc) && Objects.equals(type, that.type) && Objects.equals(appName, that.appName);
         }
         
         @Override
         public int hashCode() {
             return Objects.hash(group, dataId, desc, type, appName);
         }
-    }
-    
-    public List<ConfigExportItem> getMetadata() {
-        return metadata;
-    }
-    
-    public void setMetadata(List<ConfigExportItem> metadata) {
-        this.metadata = metadata;
     }
 }

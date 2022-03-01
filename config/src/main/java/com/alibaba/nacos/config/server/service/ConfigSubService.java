@@ -205,7 +205,7 @@ public class ConfigSubService {
      * @param params params.
      * @param url    url.
      * @param type   type.
-     * @return
+     * @return result of job.
      */
     public static Object runSingleJob(String ip, Map<String, String> params, String url, Type type) {
         try {
@@ -266,7 +266,7 @@ public class ConfigSubService {
      *
      * @param listenerCheckResult listenerCheckResult.
      * @param sampleResults       sampleResults.
-     * @return
+     * @return result of listener check.
      */
     public ListenerCheckResult mergeListenerCheckResult(ListenerCheckResult listenerCheckResult,
             List<ListenerCheckResult> sampleResults, int expectSize) {

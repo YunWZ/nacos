@@ -19,6 +19,7 @@ package com.alibaba.nacos.common.spi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,9 +54,8 @@ class NacosServiceLoaderTest {
         SpiTestImpl.newInstanceException = true;
         try {
             NacosServiceLoader.newServiceInstances(SpiTestInterface.class);
-        } catch (ServiceLoaderException e) {
-            assertEquals(SpiTestImpl.class, e.getClazz());
-            assertEquals("Can not load class `" + SpiTestImpl.class.getName() + "` by SPI ", e.getMessage());
+        } catch (RuntimeException e) {
+            assertEquals(InvocationTargetException.class, e.getCause().getClass());
         }
     }
 }

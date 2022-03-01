@@ -30,6 +30,12 @@
     
     <dependencies>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-properties-migrator</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nacos-config</artifactId>
             <version>${project.version}</version>
@@ -59,6 +65,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nacos-k8s-sync</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>gson</artifactId>
+                    <groupId>com.google.code.gson</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         
         <!-- log -->

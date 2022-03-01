@@ -310,7 +310,7 @@ public final class CollectionUtils {
      *
      * @param firstList  first list.
      * @param secondList second list.
-     * @return
+     * @return true if all elements are equal.
      */
     public static boolean isListEqual(List<String> firstList, List<String> secondList) {
         if (firstList == null && secondList == null) {

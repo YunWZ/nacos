@@ -39,21 +39,21 @@ public abstract class RemoteTpsCheckRequestParser {
      *
      * @param request request.
      * @param meta    meta.
-     * @return
+     * @return tps check request.
      */
     public abstract TpsCheckRequest parse(Request request, RequestMeta meta);
     
     /**
      * get point name.
      *
-     * @return
+     * @return name of point.
      */
     public abstract String getPointName();
     
     /**
      * get name.
      *
-     * @return
+     * @return name of parser of remote tps check request.
      */
     public abstract String getName();
 }

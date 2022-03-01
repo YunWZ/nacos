@@ -82,7 +82,7 @@ public class RpcServerTlsConfigFactory implements RpcTlsConfigFactory {
      *
      * @param properties properties
      * @param prefix     prefix
-     * @return
+     * @return RpcServerTlsConfig.
      */
     public RpcServerTlsConfig createServerTlsConfig(Properties properties, String prefix) {
         RpcServerTlsConfig tlsConfig = new RpcServerTlsConfig();

@@ -174,7 +174,7 @@ public class ExternalConfigInfoPersistServiceImpl implements ConfigInfoPersistSe
      * @param srcUser           user
      * @param configInfo        config info
      * @param configAdvanceInfo advance info
-     * @return
+     * @return result of config operate.
      */
     public ConfigOperateResult insertOrUpdate(String srcIp, String srcUser, ConfigInfo configInfo,
             Map<String, Object> configAdvanceInfo) {

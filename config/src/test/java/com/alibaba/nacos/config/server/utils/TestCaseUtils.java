@@ -33,7 +33,7 @@ public class TestCaseUtils {
     /**
      * create mocked transaction template with transact ability.
      *
-     * @return
+     * @return transaction template.
      */
     public static TransactionTemplate createMockTransactionTemplate() {
         JdbcTransactionManager transactionManager = Mockito.mock(JdbcTransactionManager.class);
@@ -48,7 +48,7 @@ public class TestCaseUtils {
     /**
      * create mocked transaction template with transact ability.
      *
-     * @return
+     * @return holder of generated key.
      */
     public static GeneratedKeyHolder createGeneratedKeyHolder(long wantedId) {
         GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();

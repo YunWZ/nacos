@@ -26,14 +26,14 @@ public interface ConnectionMetricsCollector {
     /**
      * get collector name.
      *
-     * @return
+     * @return name of current collector.
      */
     String getName();
     
     /**
      * get total count.
      *
-     * @return
+     * @return total count.
      */
     int getTotalCount();
     
@@ -41,7 +41,7 @@ public interface ConnectionMetricsCollector {
      * get count for ip.
      *
      * @param ip ip.
-     * @return
+     * @return count of target ip.
      */
     int getCountForIp(String ip);
 }

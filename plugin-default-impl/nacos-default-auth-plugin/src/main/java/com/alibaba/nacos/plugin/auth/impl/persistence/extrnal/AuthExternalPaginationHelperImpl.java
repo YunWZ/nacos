@@ -249,7 +249,7 @@ public class AuthExternalPaginationHelperImpl<E> implements AuthPaginationHelper
      * Get handler adapter.
      *
      * @param dataSourceType data source type.
-     * @return
+     * @return page handler adapter.
      */
     protected PageHandlerAdapter getHandlerAdapter(String dataSourceType) {
         List<PageHandlerAdapter> handlerAdapters = PageHandlerAdapterFactory.getInstance().getHandlerAdapters();

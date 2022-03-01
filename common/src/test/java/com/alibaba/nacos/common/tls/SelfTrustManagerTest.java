@@ -22,12 +22,12 @@ import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.io.IOException;
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,14 +43,15 @@ class SelfTrustManagerTest {
     }
     
     @Test
-    void testTrustManagerSuccess() throws CertificateException {
+    void testTrustManagerSuccess() throws CertificateException, IOException {
         URL url = SelfTrustManagerTest.class.getClassLoader().getResource("test-tls-cert.pem");
+        //URL url = ResourceUtils.getResourceUrl(null,"test-tls-cert.pem");
         String path = url.getPath();
         TrustManager[] actual = SelfTrustManager.trustManager(true, path);
         assertNotNull(actual);
         assertEquals(1, actual.length);
         assertTrue(actual[0] instanceof X509TrustManager);
-        assertFalse(actual[0].getClass().getCanonicalName().startsWith("com.alibaba.nacos"));
+        assertNull(actual[0].getClass().getCanonicalName());
         X509TrustManager x509TrustManager = (X509TrustManager) actual[0];
         X509Certificate[] certificates = x509TrustManager.getAcceptedIssuers();
         assertNotNull(certificates);

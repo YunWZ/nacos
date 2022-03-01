@@ -291,7 +291,8 @@ public class ParamUtil {
      * simply env name if name is too long.
      *
      * @param envName env name.
-     * @return
+     * @return origin env name if envName length less 50 characters。 Otherwise, return the first 50 characters of the
+     * original string with its md5 value.
      */
     public static String simplyEnvNameIfOverLimit(String envName) {
         if (StringUtils.isNotBlank(envName) && envName.length() > MAX_ENV_NAME_LENGTH) {

@@ -31,8 +31,6 @@ import java.util.Map;
  */
 public class ParamUtils {
     
-    private static char[] validChars = new char[] {'_', '-', '.', ':'};
-    
     private static final int TAG_MAX_LEN = 16;
     
     private static final int TENANT_MAX_LEN = 128;
@@ -50,6 +48,8 @@ public class ParamUtils {
     private static final String SCHEMA = "schema";
     
     private static final String ENCRYPTED_DATA_KEY = "encryptedDataKey";
+    
+    private static char[] validChars = new char[] {'_', '-', '.', ':'};
     
     /**
      * Whitelist checks that valid parameters can only contain letters, Numbers, and characters in validChars, and

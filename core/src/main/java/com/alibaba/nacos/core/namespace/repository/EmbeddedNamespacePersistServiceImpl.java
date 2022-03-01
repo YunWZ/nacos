@@ -51,9 +51,9 @@ import static com.alibaba.nacos.core.namespace.repository.NamespaceRowMapperInje
 @Service("embeddedOtherPersistServiceImpl")
 public class EmbeddedNamespacePersistServiceImpl implements NamespacePersistService {
     
-    private DataSourceService dataSourceService;
-    
     private final DatabaseOperate databaseOperate;
+    
+    private DataSourceService dataSourceService;
     
     private MapperManager mapperManager;
     

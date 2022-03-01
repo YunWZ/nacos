@@ -240,7 +240,7 @@ public class PropertyUtil implements ApplicationContextInitializer<ConfigurableA
     
     /**
      * control whether persist beta and tag to old model.
-     * @return
+     * @return true if using gray compatible model.
      */
     public static boolean isGrayCompatibleModel() {
         return grayCompatibleModel;

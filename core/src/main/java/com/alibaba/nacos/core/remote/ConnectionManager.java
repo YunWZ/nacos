@@ -36,7 +36,7 @@ import com.alibaba.nacos.sys.env.EnvUtil;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -74,7 +74,7 @@ public class ConnectionManager {
      * if monitor detail.
      *
      * @param clientIp clientIp.
-     * @return
+     * @return true if clientIp has been traced.
      */
     public boolean traced(String clientIp) {
         ConnectionControlRule connectionControlRule = ControlManagerCenter.getInstance().getConnectionControlManager()

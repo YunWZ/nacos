@@ -383,4 +383,7 @@ class NacosConfigServiceTest {
             nacosConfigService.shutDown();
         });
     }
+    
+    public void testTestGetServerStatus() {
+    }
 }

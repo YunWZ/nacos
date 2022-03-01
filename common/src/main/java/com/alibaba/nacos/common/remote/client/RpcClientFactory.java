@@ -171,7 +171,8 @@ public class RpcClientFactory {
      * @param threadPoolMaxSize  threadPoolSize.
      * @param labels             tables.
      * @param tlsConfig          tlsConfig.
-     * @return
+     * @return the current (existing or computed) rpc client associated with the specified clientName, or null if the
+     * computed value is null
      */
     public static RpcClient createClusterClient(String clientName, ConnectionType connectionType,
             Integer threadPoolCoreSize, Integer threadPoolMaxSize, Map<String, String> labels,

@@ -62,11 +62,11 @@ import static com.alibaba.nacos.config.server.service.repository.ConfigRowMapper
 @Service("externalConfigInfoBetaPersistServiceImpl")
 public class ExternalConfigInfoBetaPersistServiceImpl implements ConfigInfoBetaPersistService {
     
-    private DataSourceService dataSourceService;
-    
     protected JdbcTemplate jt;
     
     protected TransactionTemplate tjt;
+    
+    private DataSourceService dataSourceService;
     
     private MapperManager mapperManager;
     

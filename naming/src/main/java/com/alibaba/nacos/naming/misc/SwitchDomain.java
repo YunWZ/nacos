@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
  * @author nacos
  */
 @Component
+@SuppressWarnings("PMD.LowerCamelCaseVariableNamingRule")
 public class SwitchDomain implements Record, Cloneable {
     
     private static final long serialVersionUID = 7619505097145337232L;

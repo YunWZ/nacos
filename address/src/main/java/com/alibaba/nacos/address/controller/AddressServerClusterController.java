@@ -25,6 +25,7 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.alibaba.nacos.api.naming.pojo.healthcheck.AbstractHealthChecker;
 import com.alibaba.nacos.api.naming.utils.NamingUtils;
+import com.alibaba.nacos.auth.annotation.Secured;
 import com.alibaba.nacos.common.utils.InternetAddressUtil;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.naming.core.ClusterOperator;
@@ -43,6 +44,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
+
+import static com.alibaba.nacos.address.constant.AddressServerConstants.REOUSRCE_PREFIX;
 
 /**
  * Address server cluster controller.
@@ -84,6 +87,7 @@ public class AddressServerClusterController {
      * @return result of create new cluster
      */
     @RequestMapping(value = "", method = RequestMethod.POST)
+    @Secured(resource = REOUSRCE_PREFIX + "as")
     public ResponseEntity<String> postCluster(@RequestParam(required = false) String product,
             @RequestParam(required = false) String cluster, @RequestParam(name = "ips") String ips) {
         
@@ -94,16 +98,17 @@ public class AddressServerClusterController {
         //2. prepare the response name for product and cluster to client
         String rawProductName = addressServerManager.getRawProductName(product);
         String rawClusterName = addressServerManager.getRawClusterName(cluster);
-        Loggers.ADDRESS_LOGGER.info("put cluster node,the cluster name is " + cluster + "; the product name=" + product
-                + "; the ip list=" + ips);
+        Loggers.ADDRESS_LOGGER.info(
+                "put cluster node,the cluster name is " + cluster + "; the product name=" + product + "; the ip list="
+                        + ips);
         ResponseEntity<String> responseEntity;
         try {
             String serviceName = addressServerGeneratorManager.generateNacosServiceName(productName);
             
             Result result = registerCluster(serviceName, rawProductName, clusterName, ips);
             if (InternetAddressUtil.checkOK(result.getCheckResult())) {
-                responseEntity = ResponseEntity
-                        .ok("product=" + rawProductName + ",cluster=" + rawClusterName + "; put success with size="
+                responseEntity = ResponseEntity.ok(
+                        "product=" + rawProductName + ",cluster=" + rawClusterName + "; put success with size="
                                 + result.getSize());
             } else {
                 responseEntity = ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getCheckResult());
@@ -135,8 +140,8 @@ public class AddressServerClusterController {
         String[] ipArray = addressServerManager.splitIps(ips);
         String checkResult = InternetAddressUtil.checkIPs(ipArray);
         if (InternetAddressUtil.checkOK(checkResult)) {
-            List<Instance> instanceList = addressServerGeneratorManager
-                    .generateInstancesByIps(serviceName, productName, clusterName, ipArray);
+            List<Instance> instanceList = addressServerGeneratorManager.generateInstancesByIps(serviceName, productName,
+                    clusterName, ipArray);
             for (Instance instance : instanceList) {
                 instanceOperator.registerInstance(Constants.DEFAULT_NAMESPACE_ID, serviceName, instance);
             }
@@ -153,6 +158,7 @@ public class AddressServerClusterController {
      * @return delete result (the cluster information is return if success, exception information is return if  fail)
      */
     @RequestMapping(value = "", method = RequestMethod.DELETE)
+    @Secured(resource = REOUSRCE_PREFIX + "as")
     public ResponseEntity<String> deleteCluster(@RequestParam(required = false) String product,
             @RequestParam(required = false) String cluster, @RequestParam String ips) {
         //1. prepare the storage name for product and cluster
@@ -169,8 +175,8 @@ public class AddressServerClusterController {
             String serviceName = addressServerGeneratorManager.generateNacosServiceName(productName);
             String serviceWithoutGroup = NamingUtils.getServiceName(serviceName);
             String groupName = NamingUtils.getGroupName(serviceName);
-            Optional<com.alibaba.nacos.naming.core.v2.pojo.Service> service = com.alibaba.nacos.naming.core.v2.ServiceManager
-                    .getInstance().getSingletonIfExist(Constants.DEFAULT_NAMESPACE_ID, groupName, serviceWithoutGroup);
+            Optional<com.alibaba.nacos.naming.core.v2.pojo.Service> service = com.alibaba.nacos.naming.core.v2.ServiceManager.getInstance()
+                    .getSingletonIfExist(Constants.DEFAULT_NAMESPACE_ID, groupName, serviceWithoutGroup);
             
             if (!service.isPresent()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("product=" + rawProductName + " not found.");
@@ -183,8 +189,8 @@ public class AddressServerClusterController {
             String[] ipArray = addressServerManager.splitIps(ips);
             String checkResult = InternetAddressUtil.checkIPs(ipArray);
             if (InternetAddressUtil.checkOK(checkResult)) {
-                List<Instance> instanceList = addressServerGeneratorManager
-                        .generateInstancesByIps(serviceName, rawProductName, clusterName, ipArray);
+                List<Instance> instanceList = addressServerGeneratorManager.generateInstancesByIps(serviceName,
+                        rawProductName, clusterName, ipArray);
                 for (Instance each : instanceList) {
                     instanceOperator.removeInstance(Constants.DEFAULT_NAMESPACE_ID, serviceName, each);
                 }

@@ -165,7 +165,7 @@ public interface ConfigInfoTagPersistService {
      * @param dataId dataId.
      * @param group  group.
      * @param tenant tenant.
-     * @return
+     * @return all config tags.
      */
     List<String> findConfigInfoTags(final String dataId, final String group, final String tenant);
 }

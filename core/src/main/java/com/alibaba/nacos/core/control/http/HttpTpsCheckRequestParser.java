@@ -19,8 +19,8 @@
 package com.alibaba.nacos.core.control.http;
 
 import com.alibaba.nacos.plugin.control.tps.request.TpsCheckRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * http tps check request parser.
@@ -42,21 +42,21 @@ public abstract class HttpTpsCheckRequestParser {
      * parse tps check request.
      *
      * @param httpServletRequest http request.
-     * @return
+     * @return tps check request.
      */
     public abstract TpsCheckRequest parse(HttpServletRequest httpServletRequest);
     
     /**
      * get point name.
      *
-     * @return
+     * @return name of point.
      */
     public abstract String getPointName();
     
     /**
      * get name.
      *
-     * @return
+     * @return name of parser of http tps check request.
      */
     public abstract String getName();
     

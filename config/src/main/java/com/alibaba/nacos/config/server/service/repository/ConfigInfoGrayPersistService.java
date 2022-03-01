@@ -195,7 +195,7 @@ public interface ConfigInfoGrayPersistService {
      * @param dataId dataId.
      * @param group  group.
      * @param tenant tenant.
-     * @return
+     * @return all config grays.
      */
     List<String> findConfigInfoGrays(final String dataId, final String group, final String tenant);
 }

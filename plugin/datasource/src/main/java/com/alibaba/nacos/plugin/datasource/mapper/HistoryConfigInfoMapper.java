@@ -93,7 +93,7 @@ public interface HistoryConfigInfoMapper extends Mapper {
      * WHERE data_id = ? AND group_id = ? AND tenant_id = ? ORDER BY nid DESC limit ?,?
      *
      * @param context pageNo
-     * @return
+     * @return mapper result.
      */
     MapperResult pageFindConfigHistoryFetchRows(MapperContext context);
     

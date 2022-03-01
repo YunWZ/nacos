@@ -45,7 +45,7 @@ public class CacheDirUtil {
      *
      * @param namespace  namespace.
      * @param properties nacosClientProperties.
-     * @return
+     * @return namespace cache directory path.
      */
     public static String initCacheDir(String namespace, NacosClientProperties properties) {
         

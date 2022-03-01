@@ -287,7 +287,7 @@ public class ConfigRocksDbDiskService implements ConfigDiskService {
     /**
      * get suit formal buffer size.
      *
-     * @return
+     * @return buffer size.
      */
     @SuppressWarnings("PMD.UndefineMagicConstantRule")
     private long getSuitFormalCacheSizeMB(String dir) {

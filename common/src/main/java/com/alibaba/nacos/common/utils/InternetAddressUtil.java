@@ -210,7 +210,7 @@ public class InternetAddressUtil {
      * remove brackets "[]".
      *
      * @param str is ipv6 address
-     * @return
+     * @return ipv6 address without []
      */
     public static String removeBrackets(String str) {
         if (StringUtils.isBlank(str)) {

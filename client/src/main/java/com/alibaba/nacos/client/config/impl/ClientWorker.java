@@ -1300,7 +1300,7 @@ public class ClientWorker implements Closeable {
         /**
          * check server is health.
          *
-         * @return
+         * @return true if server is health.
          */
         public boolean isHealthServer() {
             try {

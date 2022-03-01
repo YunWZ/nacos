@@ -39,18 +39,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ReflectUtilsTest {
     
+    public static final int DEFAULT_SIZE = 2;
+    
     List<String> listStr;
     
     @BeforeEach
     void before() {
-        listStr = new ArrayList<>(2);
+        listStr = new ArrayList<>(DEFAULT_SIZE);
     }
     
     @Test
     void testGetFieldValue() {
         Object elementData = ReflectUtils.getFieldValue(listStr, "elementData");
         assertTrue(elementData instanceof Object[]);
-        assertEquals(2, ((Object[]) elementData).length);
+        assertEquals(DEFAULT_SIZE, ((Object[]) elementData).length);
     }
     
     @Test

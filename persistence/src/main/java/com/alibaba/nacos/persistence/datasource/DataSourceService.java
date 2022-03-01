@@ -16,10 +16,10 @@
 
 package com.alibaba.nacos.persistence.datasource;
 
-import java.io.IOException;
-
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import java.io.IOException;
 
 /**
  * Datasource interface.
@@ -71,16 +71,16 @@ public interface DataSourceService {
     String getCurrentDbUrl();
     
     /**
-     * Get heath information.
+     * Get health information.
      *
-     * @return heath info.
+     * @return health info.
      */
     String getHealth();
     
     /**
      * Get current db type.
      *
-     * @return
+     * @return type of data source.
      */
     String getDataSourceType();
     

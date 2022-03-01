@@ -20,7 +20,6 @@ import com.alibaba.nacos.plugin.auth.exception.AccessException;
 import com.alibaba.nacos.plugin.auth.impl.token.impl.CachedJwtTokenManager;
 import com.alibaba.nacos.plugin.auth.impl.token.impl.JwtTokenManager;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUser;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -34,8 +33,6 @@ import java.lang.reflect.Field;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 
 /**
  * TokenManagerDelegateTest.
@@ -61,7 +58,7 @@ class TokenManagerDelegateTest {
     @Mock
     private NacosUser user;
     
-    @BeforeEach
+/*    @BeforeEach
     void setUp() throws Exception {
         tokenManagerDelegate = new TokenManagerDelegate();
         injectObject("jwtTokenManager", jwtTokenManager);
@@ -73,7 +70,7 @@ class TokenManagerDelegateTest {
         when(cachedJwtTokenManager.parseToken(anyString())).thenReturn(user);
         when(cachedJwtTokenManager.createToken(anyString())).thenReturn("token");
         when(cachedJwtTokenManager.createToken(authentication)).thenReturn("token");
-    }
+    }*/
     
     @Test
     void testCreateToken1() throws AccessException {

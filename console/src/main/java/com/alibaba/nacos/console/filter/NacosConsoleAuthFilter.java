@@ -22,7 +22,7 @@ import com.alibaba.nacos.console.config.NacosConsoleAuthConfig;
 import com.alibaba.nacos.core.auth.AbstractWebAuthFilter;
 import com.alibaba.nacos.core.code.ControllerMethodsCache;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Nacos Console web auth filter.

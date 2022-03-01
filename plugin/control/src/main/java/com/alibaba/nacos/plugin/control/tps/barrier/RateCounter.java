@@ -50,7 +50,7 @@ public abstract class RateCounter {
      *
      * @param timestamp timestamp.
      * @param count     count.
-     * @return
+     * @return count with {@param count}
      */
     public abstract long add(long timestamp, long count);
 
@@ -60,7 +60,7 @@ public abstract class RateCounter {
      * @param timestamp timestamp
      * @param countDelta count
      * @param upperLimit upperLimit
-     * @return
+     * @return true if the addition was successful.
      */
     public abstract boolean tryAdd(long timestamp, long countDelta, long upperLimit);
 
@@ -68,7 +68,7 @@ public abstract class RateCounter {
      * get count of the second of timestamp.
      *
      * @param timestamp timestamp.
-     * @return
+     * @return count.
      */
     public abstract long getCount(long timestamp);
     
@@ -80,7 +80,7 @@ public abstract class RateCounter {
      * get trim mills of second.
      *
      * @param timeStamp timestamp milliseconds.
-     * @return
+     * @return timeStamp without milliseconds.
      */
     public static long getTrimMillsOfMinute(long timeStamp) {
         String millString = String.valueOf(timeStamp);
@@ -92,7 +92,7 @@ public abstract class RateCounter {
      * get trim mills of second.
      *
      * @param timeStamp timestamp milliseconds.
-     * @return
+     * @return timeStamp without milliseconds.
      */
     public static long getTrimMillsOfSecond(long timeStamp) {
         String millString = String.valueOf(timeStamp);
@@ -104,7 +104,7 @@ public abstract class RateCounter {
      * get trim mills of second.
      *
      * @param timeStamp timestamp milliseconds.
-     * @return
+     * @return imeStamp without milliseconds.
      */
     public static long getTrimMillsOfHour(long timeStamp) {
         String millString = String.valueOf(timeStamp);

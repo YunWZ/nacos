@@ -30,7 +30,7 @@ import com.alibaba.nacos.config.server.service.repository.ConfigInfoTagPersistSe
 import com.alibaba.nacos.persistence.model.Page;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import static com.alibaba.nacos.config.server.utils.LogUtil.DEFAULT_LOG;
 

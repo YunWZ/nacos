@@ -175,7 +175,7 @@ public abstract class BaseGrpcServer extends BaseRpcServer {
     /**
      * get source for the request.
      *
-     * @return
+     * @return which request sources are allowed by the current server.
      */
     protected abstract String getSource();
     

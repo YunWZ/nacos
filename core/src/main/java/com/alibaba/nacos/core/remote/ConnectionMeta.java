@@ -361,7 +361,7 @@ public class ConnectionMeta {
     /**
      * check block greater than the specific time.
      * @param timeMillsSeconds check times.
-     * @return
+     * @return true if time out.
      */
     public boolean pushQueueBlockTimesLastOver(long timeMillsSeconds) {
         return this.lastPushQueueBlockTime - this.firstPushQueueBlockTime > timeMillsSeconds;

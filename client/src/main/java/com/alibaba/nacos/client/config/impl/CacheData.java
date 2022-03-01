@@ -514,10 +514,10 @@ public class CacheData {
     }
     
     /**
-     * 1.first add listener.default is false;need to check. 2.receive config change notify,set false;need to check.
+     * 1.first add listener. default is false;need to check. 2.receive config change notify,set false;need to check.
      * 3.last listener is remove,set to false;need to check
      *
-     * @return
+     * @return true if cached config is consistent with server.
      */
     public boolean isConsistentWithServer() {
         return isConsistentWithServer.get();

@@ -96,14 +96,14 @@ public abstract class TpsControlManager {
     /**
      * get points.
      *
-     * @return
+     * @return map of points.
      */
     public abstract Map<String, TpsBarrier> getPoints();
     
     /**
      * get rules.
      *
-     * @return
+     * @return map of rules.
      */
     public abstract Map<String, TpsControlRule> getRules();
     
@@ -126,7 +126,7 @@ public abstract class TpsControlManager {
     /**
      * get control manager name.
      *
-     * @return
+     * @return name of control manager.
      */
     public abstract String getName();
 }

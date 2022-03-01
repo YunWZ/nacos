@@ -459,7 +459,7 @@ public class DefaultGrpcClientConfig implements GrpcClientConfig {
          * set tlsConfig.
          *
          * @param tlsConfig tls of client.
-         * @return
+         * @return current builder
          */
         public Builder setTlsConfig(RpcClientTlsConfig tlsConfig) {
             this.tlsConfig = tlsConfig;

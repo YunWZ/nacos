@@ -29,7 +29,7 @@ import com.alibaba.nacos.api.naming.pojo.ServiceInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.util.Collections;
 import java.util.List;
@@ -86,7 +86,7 @@ class ServiceListTest_ITCase {
         naming.subscribe(serviceName, new EventListener() {
             @Override
             public void onEvent(Event event) {
-                
+            
             }
         });
         

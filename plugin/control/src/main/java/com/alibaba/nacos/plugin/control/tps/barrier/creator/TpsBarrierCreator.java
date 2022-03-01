@@ -28,7 +28,7 @@ public interface TpsBarrierCreator {
     /**
      * get name.
      *
-     * @return
+     * @return name of tps barrier.
      */
     String getName();
     
@@ -36,7 +36,7 @@ public interface TpsBarrierCreator {
      * create tps barrier.
      *
      * @param pointName pointName.
-     * @return
+     * @return tps barries.
      */
     TpsBarrier createTpsBarrier(String pointName);
 }

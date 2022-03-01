@@ -40,9 +40,9 @@ public final class TaskManager extends NacosDelayTaskExecuteEngine implements Ta
     
     private static final Logger LOGGER = LogUtil.DEFAULT_LOG;
     
-    private String name;
-    
     Condition notEmpty = this.lock.newCondition();
+    
+    private String name;
     
     public TaskManager(String name) {
         super(name, 32, LOGGER, 100L);

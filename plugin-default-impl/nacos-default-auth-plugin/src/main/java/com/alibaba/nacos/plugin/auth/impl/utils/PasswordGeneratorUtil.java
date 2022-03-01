@@ -41,7 +41,7 @@ public class PasswordGeneratorUtil {
     
     /**
      * generateRandomPassword.
-     * @return
+     * @return password
      */
     public static String generateRandomPassword() {
         SecureRandom random = new SecureRandom();

@@ -64,9 +64,9 @@ import static com.alibaba.nacos.config.server.service.repository.ConfigRowMapper
 @Service("embeddedHistoryConfigInfoPersistServiceImpl")
 public class EmbeddedHistoryConfigInfoPersistServiceImpl implements HistoryConfigInfoPersistService {
     
-    private DataSourceService dataSourceService;
-    
     private final DatabaseOperate databaseOperate;
+    
+    private DataSourceService dataSourceService;
     
     private MapperManager mapperManager;
     

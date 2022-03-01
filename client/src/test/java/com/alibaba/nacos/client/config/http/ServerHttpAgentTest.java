@@ -209,7 +209,7 @@ class ServerHttpAgentTest {
         assertThrows(NacosException.class, () -> {
             when(nacosRestTemplate.<String>get(eq(SERVER_ADDRESS_1 + "/test"), any(HttpClientConfig.class),
                     any(Header.class), any(Query.class), eq(String.class))).thenThrow(new ConnectException(),
-                    new SocketTimeoutException(), new NacosException());
+                        new SocketTimeoutException(), new NacosException());
             serverHttpAgent.httpGet("/test", Collections.emptyMap(), Collections.emptyMap(), "UTF-8", 1000);
         });
     }
@@ -261,7 +261,7 @@ class ServerHttpAgentTest {
         assertThrows(NacosException.class, () -> {
             when(nacosRestTemplate.<String>postForm(eq(SERVER_ADDRESS_1 + "/test"), any(HttpClientConfig.class),
                     any(Header.class), anyMap(), eq(String.class))).thenThrow(new ConnectException(),
-                    new SocketTimeoutException(), new NacosException());
+                        new SocketTimeoutException(), new NacosException());
             serverHttpAgent.httpPost("/test", Collections.emptyMap(), Collections.emptyMap(), "UTF-8", 1000);
         });
     }
@@ -313,7 +313,7 @@ class ServerHttpAgentTest {
         assertThrows(NacosException.class, () -> {
             when(nacosRestTemplate.<String>delete(eq(SERVER_ADDRESS_1 + "/test"), any(HttpClientConfig.class),
                     any(Header.class), any(Query.class), eq(String.class))).thenThrow(new ConnectException(),
-                    new SocketTimeoutException(), new NacosException());
+                        new SocketTimeoutException(), new NacosException());
             serverHttpAgent.httpDelete("/test", Collections.emptyMap(), Collections.emptyMap(), "UTF-8", 1000);
         });
     }

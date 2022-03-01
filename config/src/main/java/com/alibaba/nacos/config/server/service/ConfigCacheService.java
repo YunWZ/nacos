@@ -593,7 +593,7 @@ public class ConfigCacheService {
      * try config read lock with spin of try get lock times.
      *
      * @param groupKey group key of config.
-     * @return
+     * @return A negative number indicates failure; an integer indicates success; zero indicates that groupKey does not exist.
      */
     public static int tryConfigReadLock(String groupKey) {
         

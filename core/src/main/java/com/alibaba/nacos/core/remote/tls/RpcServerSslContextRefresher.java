@@ -30,14 +30,14 @@ public interface RpcServerSslContextRefresher {
      * listener current rpc server and do something on ssl context change.
      *
      * @param baseRpcServer rpc server.
-     * @return
+     * @return ssl context change aware.
      */
     SslContextChangeAware refresh(BaseRpcServer baseRpcServer);
     
     /**
      * refresher name.
      *
-     * @return
+     * @return name of rpc server ssl context refresher.
      */
     String getName();
 }

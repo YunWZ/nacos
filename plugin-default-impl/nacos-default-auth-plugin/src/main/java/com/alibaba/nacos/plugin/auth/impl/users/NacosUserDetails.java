@@ -72,3 +72,4 @@ public class NacosUserDetails implements UserDetails {
         return true;
     }
 }
+

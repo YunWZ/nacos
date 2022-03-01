@@ -92,7 +92,7 @@ public class DumpRequest {
      * @param tenant         tenant.
      * @param lastModifiedTs lastModifiedTs.
      * @param sourceIp       sourceIp.
-     * @return
+     * @return dump request.
      */
     public static DumpRequest create(String dataId, String group, String tenant, long lastModifiedTs, String sourceIp) {
         DumpRequest dumpRequest = new DumpRequest();

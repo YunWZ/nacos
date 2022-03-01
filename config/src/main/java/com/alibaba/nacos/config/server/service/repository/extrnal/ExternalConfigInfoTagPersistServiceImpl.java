@@ -64,11 +64,11 @@ import static com.alibaba.nacos.config.server.service.repository.ConfigRowMapper
 @Service("externalConfigInfoTagPersistServiceImpl")
 public class ExternalConfigInfoTagPersistServiceImpl implements ConfigInfoTagPersistService {
     
-    private DataSourceService dataSourceService;
-    
     protected JdbcTemplate jt;
     
     protected TransactionTemplate tjt;
+    
+    private DataSourceService dataSourceService;
     
     private MapperManager mapperManager;
     

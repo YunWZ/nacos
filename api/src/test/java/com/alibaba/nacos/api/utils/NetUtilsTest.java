@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings({"checkstyle:AbbreviationAsWordInName"})
 class NetUtilsTest {
     
     @AfterEach
@@ -42,7 +43,7 @@ class NetUtilsTest {
     }
     
     @Test
-    void testLocalIpWithSpecifiedIp() {
+    void testLocalIpWithSpecifiedIP() {
         System.setProperty("com.alibaba.nacos.client.local.ip", "10.2.8.8");
         assertEquals("10.2.8.8", NetUtils.localIP());
         System.setProperty("com.alibaba.nacos.client.local.ip", "10.2.8.9");
@@ -50,7 +51,7 @@ class NetUtilsTest {
     }
     
     @Test
-    void testLocalIpWithPreferHostname() throws Exception {
+    void testLocalIPWithPreferHostname() throws Exception {
         InetAddress inetAddress = invokeGetInetAddress();
         String hostname = inetAddress.getHostName();
         System.setProperty("com.alibaba.nacos.client.local.preferHostname", "true");
@@ -58,14 +59,14 @@ class NetUtilsTest {
     }
     
     @Test
-    void testLocalIpWithoutPreferHostname() throws Exception {
+    void testLocalIPWithoutPreferHostname() throws Exception {
         InetAddress inetAddress = invokeGetInetAddress();
         String ip = inetAddress.getHostAddress();
         assertEquals(ip, NetUtils.localIP());
     }
     
     @Test
-    void testLocalIpWithException() throws Exception {
+    void testLocalIPWithException() throws Exception {
         Field field = System.class.getDeclaredField("props");
         field.setAccessible(true);
         Properties properties = (Properties) field.get(null);

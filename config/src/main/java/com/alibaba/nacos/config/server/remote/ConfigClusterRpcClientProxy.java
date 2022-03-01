@@ -41,14 +41,14 @@ public class ConfigClusterRpcClientProxy {
     /**
      * sync config change request.
      *
-     * @param member  member of server.
-     * @param request request of config change sync.
+     * @param member   member of server.
+     * @param request  request of config change sync.
      * @param callBack callBack of config change sync.
      * @throws NacosException exception.
      */
     public void syncConfigChange(Member member, ConfigChangeClusterSyncRequest request, RequestCallBack callBack)
             throws NacosException {
-    
+        
         clusterRpcClientProxy.asyncRequest(member, request, callBack);
         
     }

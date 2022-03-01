@@ -96,7 +96,7 @@ public class ConfigChangePluginManager {
      * Dynamic get any pluginServiceImpl.
      *
      * @param serviceType plugin service type.
-     * @return
+     * @return config change plugin service.
      */
     public Optional<ConfigChangePluginService> findPluginServiceImpl(String serviceType) {
         return Optional.ofNullable(CONFIG_CHANGE_PLUGIN_SERVICE_MAP.get(serviceType));
@@ -106,7 +106,7 @@ public class ConfigChangePluginManager {
      * Dynamic add new ConfigChangeService.
      *
      * @param configChangePluginService ConfigChangeService.
-     * @return
+     * @return always return true.
      */
     public static synchronized boolean join(ConfigChangePluginService configChangePluginService) {
         CONFIG_CHANGE_PLUGIN_SERVICE_MAP
@@ -119,7 +119,7 @@ public class ConfigChangePluginManager {
      * Get the plugin service queue of the pointcut method.
      *
      * @param pointcutName pointcut method name,detail see {@link ConfigChangePointCutTypes}.
-     * @return
+     * @return config change plugin services.
      */
     public static List<ConfigChangePluginService> findPluginServicesByPointcut(
             ConfigChangePointCutTypes pointcutName) {

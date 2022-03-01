@@ -72,6 +72,8 @@ public enum FileTypeEnum {
      */
     PROPERTIES("properties", MediaType.TEXT_PLAIN);
     
+    private static final FileTypeEnum[] VALUES = FileTypeEnum.values();
+    
     /**
      * File type corresponding to file extension.
      */
@@ -92,19 +94,11 @@ public enum FileTypeEnum {
         this.contentType = contentType;
     }
     
-    public String getFileType() {
-        return this.fileType;
-    }
-    
-    public String getContentType() {
-        return contentType;
-    }
-    
     /**
      * Get the corresponding FileTypeEnum by file extension or fileType. If not found FileTypeEnum.TEXT is returned
      *
      * @param extOrFileType file extension or fileType
-     * @return
+     * @return target file type, default is {@link FileTypeEnum#TEXT}
      */
     public static FileTypeEnum getFileTypeEnumByFileExtensionOrFileType(String extOrFileType) {
         if (StringUtils.isNotBlank(extOrFileType)) {
@@ -118,5 +112,11 @@ public enum FileTypeEnum {
         return FileTypeEnum.TEXT;
     }
     
-    private static final FileTypeEnum[] VALUES = FileTypeEnum.values();
+    public String getFileType() {
+        return this.fileType;
+    }
+    
+    public String getContentType() {
+        return contentType;
+    }
 }

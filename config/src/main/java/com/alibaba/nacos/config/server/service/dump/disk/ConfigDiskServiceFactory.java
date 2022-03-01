@@ -32,7 +32,7 @@ public class ConfigDiskServiceFactory {
     /**
      * get disk service.
      *
-     * @return
+     * @return config disk service.
      */
     public static ConfigDiskService getInstance() {
         if (configDiskService == null) {

@@ -65,11 +65,11 @@ import static com.alibaba.nacos.config.server.service.repository.ConfigRowMapper
 @Service("externalHistoryConfigInfoPersistServiceImpl")
 public class ExternalHistoryConfigInfoPersistServiceImpl implements HistoryConfigInfoPersistService {
     
-    private DataSourceService dataSourceService;
-    
     protected JdbcTemplate jt;
     
     protected TransactionTemplate tjt;
+    
+    private DataSourceService dataSourceService;
     
     private MapperManager mapperManager;
     

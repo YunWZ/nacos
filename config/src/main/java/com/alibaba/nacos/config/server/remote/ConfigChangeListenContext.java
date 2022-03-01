@@ -127,7 +127,7 @@ public class ConfigChangeListenContext {
             return;
         }
         for (Map.Entry<String, String> groupKey : listenKeys.entrySet()) {
-
+            
             Set<String> connectionIds = groupKeyContext.get(groupKey.getKey());
             if (CollectionUtils.isNotEmpty(connectionIds)) {
                 connectionIds.remove(connectionId);
@@ -137,7 +137,7 @@ public class ConfigChangeListenContext {
             } else {
                 groupKeyContext.remove(groupKey.getKey());
             }
-
+            
         }
         connectionIdContext.remove(connectionId);
     }

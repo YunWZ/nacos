@@ -28,7 +28,7 @@ public interface FailoverDataSource {
     /**
      * Get current disaster recovery switch.
      *
-     * @return
+     * @return failover switch.
      */
     FailoverSwitch getSwitch();
     

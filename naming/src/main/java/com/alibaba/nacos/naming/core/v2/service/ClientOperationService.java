@@ -33,6 +33,7 @@ import java.util.Map;
  *
  * @author xiweng.yy
  */
+@SuppressWarnings("PMD.AvoidDoubleOrFloatEqualCompareRule")
 public interface ClientOperationService {
     
     /**

@@ -34,10 +34,9 @@ import com.alibaba.nacos.core.utils.Loggers;
 import com.alibaba.nacos.plugin.control.ControlManagerCenter;
 import com.alibaba.nacos.plugin.control.tps.TpsControlManager;
 import com.alibaba.nacos.plugin.control.tps.request.TpsCheckRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -56,9 +55,19 @@ public class RpcConfigChangeNotifier extends Subscriber<LocalDataChangeEvent> {
     
     private static final String POINT_CONFIG_PUSH_FAIL = "CONFIG_PUSH_FAIL";
     
-    TpsControlManager tpsControlManager = ControlManagerCenter.getInstance().getTpsControlManager();
+    private TpsControlManager tpsControlManager = ControlManagerCenter.getInstance().getTpsControlManager();
     
-    public RpcConfigChangeNotifier() {
+    private ConfigChangeListenContext configChangeListenContext;
+    
+    private RpcPushService rpcPushService;
+    
+    private ConnectionManager connectionManager;
+    
+    public RpcConfigChangeNotifier(ConfigChangeListenContext configChangeListenContext, RpcPushService rpcPushService,
+            ConnectionManager connectionManager) {
+        this.configChangeListenContext = configChangeListenContext;
+        this.rpcPushService = rpcPushService;
+        this.connectionManager = connectionManager;
         NotifyCenter.registerSubscriber(this);
     }
     
@@ -69,15 +78,6 @@ public class RpcConfigChangeNotifier extends Subscriber<LocalDataChangeEvent> {
         tpsControlManager.registerTpsPoint(POINT_CONFIG_PUSH_FAIL);
         
     }
-    
-    @Autowired
-    ConfigChangeListenContext configChangeListenContext;
-    
-    @Autowired
-    private RpcPushService rpcPushService;
-    
-    @Autowired
-    private ConnectionManager connectionManager;
     
     /**
      * adaptor to config module ,when server side config change ,invoke this method.

@@ -63,7 +63,7 @@ public class RequestHandlerRegistry implements ApplicationListener<ContextRefres
      *
      * @param type   type.
      * @param source source.
-     * @return
+     * @return true if allowed.
      */
     public boolean checkSourceInvokeAllowed(String type, String source) {
         if (sourceRegistry.containsKey(type) && !sourceRegistry.get(type).contains(source)) {

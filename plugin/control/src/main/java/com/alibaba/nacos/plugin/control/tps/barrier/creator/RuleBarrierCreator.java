@@ -33,7 +33,7 @@ public interface RuleBarrierCreator {
      * @param pointName pointName.
      * @param ruleName  ruleName.
      * @param period    period.
-     * @return
+     * @return rule barrier.
      */
     RuleBarrier createRuleBarrier(String pointName, String ruleName, TimeUnit period);
     

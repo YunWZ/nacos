@@ -40,7 +40,7 @@ public interface PageHandlerAdapter {
      * @param arg      arguments.
      * @param pageNo   page number.
      * @param pageSize page size.
-     * @return
+     * @return offset fetch result.
      */
     OffsetFetchResult addOffsetAndFetchNext(String fetchSql, Object[] arg, int pageNo, int pageSize);
 }

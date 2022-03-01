@@ -83,7 +83,6 @@ public class ConfigChangeClusterSyncRequestHandler
      * if notified from old server,try to migrate and transfer gray model.
      *
      * @param configChangeSyncRequest request.
-     * @return
      */
     private void checkCompatity(ConfigChangeClusterSyncRequest configChangeSyncRequest) {
         if (PropertyUtil.isGrayCompatibleModel() && StringUtils.isBlank(configChangeSyncRequest.getGrayName())) {

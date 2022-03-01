@@ -31,7 +31,7 @@ import com.alibaba.nacos.persistence.model.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
