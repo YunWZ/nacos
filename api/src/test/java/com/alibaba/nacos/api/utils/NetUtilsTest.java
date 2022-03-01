@@ -41,7 +41,7 @@ public class NetUtilsTest {
     public void testLocalIP() {
         System.setProperty("com.alibaba.nacos.client.naming.local.ip", "10.2.7.8");
         System.setProperty("com.alibaba.nacos.client.local.ip", "10.2.8.8");
-        assertEquals("10.2.8.8", NetUtils.localIP());
+        assertEquals("10.2.8.8", NetUtils.localIp());
     }
 
     @Test
@@ -53,7 +53,7 @@ public class NetUtilsTest {
         String hostname = inetAddress.getHostName();
 
         System.setProperty("com.alibaba.nacos.client.local.preferHostname", "true");
-        assertEquals(hostname, NetUtils.localIP());
+        assertEquals(hostname, NetUtils.localIp());
     }
 
 }

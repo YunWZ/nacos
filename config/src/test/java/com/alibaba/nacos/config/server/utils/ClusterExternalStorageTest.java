@@ -44,6 +44,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ClusterExternalStorageTest {
     
+    PropertyUtil propertyUtil = new PropertyUtil();
+    
     @InjectMocks
     private DynamicDataSource dataSource;
     
@@ -55,8 +57,6 @@ public class ClusterExternalStorageTest {
     @Mock
     private ExternalDataSourceServiceImpl basicDataSourceService;
     
-    PropertyUtil propertyUtil = new PropertyUtil();
-    
     @Before
     public void setUp() throws Exception {
         environment = new MockEnvironment();
@@ -64,7 +64,7 @@ public class ClusterExternalStorageTest {
         dataSource = DynamicDataSource.getInstance();
         ReflectionTestUtils.setField(dataSource, "localDataSourceService", localDataSourceService);
         ReflectionTestUtils.setField(dataSource, "basicDataSourceService", basicDataSourceService);
-       
+        
     }
     
     @Test
@@ -77,12 +77,12 @@ public class ClusterExternalStorageTest {
         
         // 模拟初始化
         propertyUtil.initialize(null);
-
+        
         Assert.assertFalse(EnvUtil.getStandaloneMode());
         Assert.assertTrue(PropertyUtil.isUseExternalDB());
         Assert.assertTrue(dataSource.getDataSource() instanceof ExternalDataSourceServiceImpl);
     }
-
+    
     @Test
     public void test006WithClusterAndMysqlDatabase() {
         // 模拟设置环境06：指定集群，指定数据库mysql，UseExternalDB是true，数据库类型是mysql
@@ -90,15 +90,15 @@ public class ClusterExternalStorageTest {
         environment.setProperty(PropertiesConstant.DATASOURCE_PLATFORM_PROPERTY_OLD, "mysql");
         EnvUtil.setIsStandalone(Boolean.getBoolean(Constants.STANDALONE_MODE_PROPERTY_NAME));
         PropertyUtil.setEmbeddedStorage(EnvUtil.getStandaloneMode());
-    
+        
         // 模拟初始化
         propertyUtil.initialize(null);
-
+        
         Assert.assertFalse(EnvUtil.getStandaloneMode());
         Assert.assertTrue(PropertyUtil.isUseExternalDB());
         Assert.assertTrue(dataSource.getDataSource() instanceof ExternalDataSourceServiceImpl);
     }
-
+    
     @Test
     public void test007WithClusterAndDerbyDatabase() {
         // 模拟设置环境07：指定集群，指定数据库derby，UseExternalDB是false，数据库类型是derby
@@ -109,12 +109,12 @@ public class ClusterExternalStorageTest {
         
         // 模拟初始化
         propertyUtil.initialize(null);
-
+        
         Assert.assertFalse(EnvUtil.getStandaloneMode());
         Assert.assertFalse(PropertyUtil.isUseExternalDB());
         Assert.assertTrue(dataSource.getDataSource() instanceof LocalDataSourceServiceImpl);
     }
-
+    
     @Test
     public void test008WithClusterAndOtherDatabase() {
         // 模拟设置环境08: 指定集群，指定数据库其他，UseExternalDB是true，数据库类型是其他
@@ -125,10 +125,10 @@ public class ClusterExternalStorageTest {
         
         // 模拟初始化
         propertyUtil.initialize(null);
-
+        
         Assert.assertFalse(EnvUtil.getStandaloneMode());
         Assert.assertTrue(PropertyUtil.isUseExternalDB());
         Assert.assertTrue(dataSource.getDataSource() instanceof ExternalDataSourceServiceImpl);
     }
-
+    
 }

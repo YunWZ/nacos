@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
  * @author Nacos
  */
 public class NotifySingleService {
+    
     private static final Logger LOGGER = LogUtil.FATAL_LOG;
     
     static class NotifyTaskProcessorWrapper extends NotifyTaskProcessor {
@@ -72,21 +73,20 @@ public class NotifySingleService {
                 this.isSuccess = PROCESSOR.process(this);
             } catch (Exception e) { // never goes here, but in case (never interrupts this notification thread)
                 this.isSuccess = false;
-                LogUtil.NOTIFY_LOG
-                        .error("[notify-exception] target:{} dataid:{} group:{} ts:{}", target, getDataId(), getGroup(),
-                                getLastModified());
-                LogUtil.NOTIFY_LOG.debug("[notify-exception] target:{} dataid:{} group:{} ts:{}",
-                        target, getDataId(), getGroup(), getLastModified(), e);
+                LogUtil.NOTIFY_LOG.error("[notify-exception] target:{} dataid:{} group:{} ts:{}", target, getDataId(),
+                        getGroup(), getLastModified());
+                LogUtil.NOTIFY_LOG.debug("[notify-exception] target:{} dataid:{} group:{} ts:{}", target, getDataId(),
+                        getGroup(), getLastModified(), e);
             }
             
             if (!this.isSuccess) {
-                LogUtil.NOTIFY_LOG
-                        .error("[notify-retry] target:{} dataid:{} group:{} ts:{}", target, getDataId(), getGroup(),
-                                getLastModified());
+                LogUtil.NOTIFY_LOG.error("[notify-retry] target:{} dataid:{} group:{} ts:{}", target, getDataId(),
+                        getGroup(), getLastModified());
                 try {
                     ((ScheduledThreadPoolExecutor) executor).schedule(this, 500L, TimeUnit.MILLISECONDS);
                 } catch (Exception e) { // The notification failed, but at the same time, the node was offline
-                    LOGGER.warn("[notify-thread-pool] cluster remove node {}, current thread was tear down.", target, e);
+                    LOGGER.warn("[notify-thread-pool] cluster remove node {}, current thread was tear down.", target,
+                            e);
                 }
             }
         }

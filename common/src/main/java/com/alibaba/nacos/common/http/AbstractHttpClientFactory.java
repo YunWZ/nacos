@@ -72,9 +72,9 @@ public abstract class AbstractHttpClientFactory implements HttpClientFactory {
         
         // enable ssl
         initTls((sslContext, hostnameVerifier) -> {
-            clientRequest.setSSLContext(loadSSLContext());
-            clientRequest.replaceSSLHostnameVerifier(hostnameVerifier);
-        }, filePath -> clientRequest.setSSLContext(loadSSLContext()));
+            clientRequest.setSslContext(loadSslContext());
+            clientRequest.replaceSslHostnameVerifier(hostnameVerifier);
+        }, filePath -> clientRequest.setSslContext(loadSslContext()));
         
         return new NacosRestTemplate(assignLogger(), clientRequest);
     }
@@ -181,7 +181,7 @@ public abstract class AbstractHttpClientFactory implements HttpClientFactory {
         final HostnameVerifier hv = HttpsURLConnection.getDefaultHostnameVerifier();
         final SelfHostnameVerifier selfHostnameVerifier = new SelfHostnameVerifier(hv);
         
-        initTlsBiFunc.accept(loadSSLContext(), selfHostnameVerifier);
+        initTlsBiFunc.accept(loadSslContext(), selfHostnameVerifier);
         
         if (tlsChangeListener != null) {
             try {
@@ -195,7 +195,7 @@ public abstract class AbstractHttpClientFactory implements HttpClientFactory {
     }
     
     @SuppressWarnings("checkstyle:abbreviationaswordinname")
-    protected synchronized SSLContext loadSSLContext() {
+    protected synchronized SSLContext loadSslContext() {
         if (!TlsSystemConfig.tlsEnable) {
             return null;
         }

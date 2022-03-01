@@ -51,6 +51,7 @@ import java.util.HashMap;
  *
  * @author <a href="mailto:liaochuntao@live.com">liaochuntao</a>
  */
+@SuppressWarnings("PMD.LowerCamelCaseVariableNamingRule")
 public class EnvUtil {
     
     public static final String STANDALONE_MODE_ALONE = "standalone";

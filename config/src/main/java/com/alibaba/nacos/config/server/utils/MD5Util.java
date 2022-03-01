@@ -16,13 +16,13 @@
 
 package com.alibaba.nacos.config.server.utils;
 
+import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.config.server.constant.Constants;
 import com.alibaba.nacos.config.server.service.ConfigCacheService;
 import com.alibaba.nacos.core.utils.StringPool;
-import com.alibaba.nacos.common.utils.StringUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +45,10 @@ import static com.alibaba.nacos.config.server.constant.Constants.WORD_SEPARATOR;
  */
 @SuppressWarnings("PMD.ClassNamingShouldBeCamelRule")
 public class MD5Util {
+    
+    static final char WORD_SEPARATOR_CHAR = (char) 2;
+    
+    static final char LINE_SEPARATOR_CHAR = (char) 1;
     
     /**
      * Compare Md5.
@@ -188,10 +192,6 @@ public class MD5Util {
         }
         return count;
     }
-    
-    static final char WORD_SEPARATOR_CHAR = (char) 2;
-    
-    static final char LINE_SEPARATOR_CHAR = (char) 1;
     
 }
 

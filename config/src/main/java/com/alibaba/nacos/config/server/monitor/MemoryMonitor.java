@@ -32,21 +32,20 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class MemoryMonitor {
     
+    private static final long DELAY_SECONDS = 10;
+    
     @Autowired
     public MemoryMonitor(AsyncNotifyService notifySingleService) {
         
         ConfigExecutor.scheduleConfigTask(new PrintMemoryTask(), DELAY_SECONDS, DELAY_SECONDS, TimeUnit.SECONDS);
         
-        ConfigExecutor
-                .scheduleConfigTask(new PrintGetConfigResponeTask(), DELAY_SECONDS, DELAY_SECONDS, TimeUnit.SECONDS);
+        ConfigExecutor.scheduleConfigTask(new PrintGetConfigResponeTask(), DELAY_SECONDS, DELAY_SECONDS,
+                TimeUnit.SECONDS);
         
-        ConfigExecutor
-                .scheduleConfigTask(new ThreadTaskQueueMonitorTask(notifySingleService), DELAY_SECONDS, DELAY_SECONDS,
-                        TimeUnit.SECONDS);
+        ConfigExecutor.scheduleConfigTask(new ThreadTaskQueueMonitorTask(notifySingleService), DELAY_SECONDS,
+                DELAY_SECONDS, TimeUnit.SECONDS);
         
     }
-    
-    private static final long DELAY_SECONDS = 10;
     
     /**
      * reset some metrics to 0 every day.

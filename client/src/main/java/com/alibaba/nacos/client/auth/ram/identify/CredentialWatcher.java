@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Nacos
  */
+@SuppressWarnings({"PMD.MethodTooLongRule", "PMD.LowerCamelCaseVariableNamingRule"})
 public class CredentialWatcher {
     
     private static final Logger SPAS_LOGGER = LogUtils.logger(CredentialWatcher.class);
@@ -59,8 +60,8 @@ public class CredentialWatcher {
         this.serviceInstance = serviceInstance;
         loadCredential(true);
         
-        executor = ExecutorFactory
-                .newSingleScheduledExecutorService(new NameThreadFactory("com.alibaba.nacos.client.auth.ram.identify.watcher"));
+        executor = ExecutorFactory.newSingleScheduledExecutorService(
+                new NameThreadFactory("com.alibaba.nacos.client.auth.ram.identify.watcher"));
         
         executor.scheduleWithFixedDelay(new Runnable() {
             private long modified = 0;
@@ -140,8 +141,8 @@ public class CredentialWatcher {
             try {
                 propertiesIS = new FileInputStream(propertyPath);
             } catch (FileNotFoundException e) {
-                if (appName != null && !appName.equals(IdentifyConstants.CREDENTIAL_DEFAULT) && propertyPath
-                        .equals(IdentifyConstants.CREDENTIAL_PATH + appName)) {
+                if (appName != null && !appName.equals(IdentifyConstants.CREDENTIAL_DEFAULT) && propertyPath.equals(
+                        IdentifyConstants.CREDENTIAL_PATH + appName)) {
                     propertyPath = IdentifyConstants.CREDENTIAL_PATH + IdentifyConstants.CREDENTIAL_DEFAULT;
                     continue;
                 }
@@ -171,8 +172,9 @@ public class CredentialWatcher {
             try {
                 properties.load(propertiesIS);
             } catch (IOException e) {
-                SPAS_LOGGER.error("[26] Unable to load credential file, appName:" + appName
-                        + "Unable to load credential file " + propertyPath, e);
+                SPAS_LOGGER.error(
+                        "[26] Unable to load credential file, appName:" + appName + "Unable to load credential file "
+                                + propertyPath, e);
                 propertyPath = null;
                 return;
             } finally {
@@ -225,9 +227,8 @@ public class CredentialWatcher {
         
         Credentials credential = new Credentials(accessKey, secretKey, tenantId);
         if (!credential.valid()) {
-            SPAS_LOGGER
-                    .warn("[1] Credential file missing required property {} Credential file missing {} or {}", appName,
-                            IdentifyConstants.ACCESS_KEY, IdentifyConstants.SECRET_KEY);
+            SPAS_LOGGER.warn("[1] Credential file missing required property {} Credential file missing {} or {}",
+                    appName, IdentifyConstants.ACCESS_KEY, IdentifyConstants.SECRET_KEY);
             propertyPath = null;
             // return;
         }

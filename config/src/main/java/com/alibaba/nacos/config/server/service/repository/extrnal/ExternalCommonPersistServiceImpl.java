@@ -52,11 +52,11 @@ import static com.alibaba.nacos.config.server.service.repository.RowMapperManage
 @Service("externalOtherPersistServiceImpl")
 public class ExternalCommonPersistServiceImpl implements CommonPersistService {
     
-    private DataSourceService dataSourceService;
-    
     protected JdbcTemplate jt;
     
     protected TransactionTemplate tjt;
+    
+    private DataSourceService dataSourceService;
     
     private MapperManager mapperManager;
     

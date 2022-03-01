@@ -81,10 +81,12 @@ import static com.alibaba.nacos.config.server.utils.LogUtil.DEFAULT_LOG;
  *
  * @author lixiaoshuang
  */
-@SuppressWarnings({"PMD.MethodReturnWrapperTypeRule", "checkstyle:linelength"})
+@SuppressWarnings({"PMD.MethodReturnWrapperTypeRule", "checkstyle:linelength", "PMD.MethodTooLongRule"})
 @Conditional(value = ConditionOnEmbeddedStorage.class)
 @Service("embeddedConfigInfoPersistServiceImpl")
 public class EmbeddedConfigInfoPersistServiceImpl implements ConfigInfoPersistService {
+    
+    public static final String SPOT = ".";
     
     private static final String RESOURCE_CONFIG_INFO_ID = "config-info-id";
     
@@ -114,13 +116,11 @@ public class EmbeddedConfigInfoPersistServiceImpl implements ConfigInfoPersistSe
     
     private static final String TENANT = "tenant_id";
     
-    public static final String SPOT = ".";
-    
-    private DataSourceService dataSourceService;
-    
     private final DatabaseOperate databaseOperate;
     
     private final IdGeneratorManager idGeneratorManager;
+    
+    private DataSourceService dataSourceService;
     
     private MapperManager mapperManager;
     

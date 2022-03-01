@@ -50,9 +50,9 @@ import static com.alibaba.nacos.config.server.service.repository.RowMapperManage
 @Service("embeddedOtherPersistServiceImpl")
 public class EmbeddedCommonPersistServiceImpl implements CommonPersistService {
     
-    private DataSourceService dataSourceService;
-    
     private final DatabaseOperate databaseOperate;
+    
+    private DataSourceService dataSourceService;
     
     private MapperManager mapperManager;
     

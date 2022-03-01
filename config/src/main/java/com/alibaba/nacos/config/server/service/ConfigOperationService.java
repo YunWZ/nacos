@@ -22,8 +22,8 @@ import com.alibaba.nacos.api.model.v2.ErrorCode;
 import com.alibaba.nacos.common.utils.MapUtil;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.config.server.model.ConfigInfo;
-import com.alibaba.nacos.config.server.model.event.ConfigDataChangeEvent;
 import com.alibaba.nacos.config.server.model.ConfigRequestInfo;
+import com.alibaba.nacos.config.server.model.event.ConfigDataChangeEvent;
 import com.alibaba.nacos.config.server.model.form.ConfigForm;
 import com.alibaba.nacos.config.server.service.repository.ConfigInfoBetaPersistService;
 import com.alibaba.nacos.config.server.service.repository.ConfigInfoPersistService;
@@ -51,13 +51,13 @@ import java.util.Map;
 @Service
 public class ConfigOperationService {
     
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigOperationService.class);
+    
     private ConfigInfoPersistService configInfoPersistService;
     
     private ConfigInfoTagPersistService configInfoTagPersistService;
     
     private ConfigInfoBetaPersistService configInfoBetaPersistService;
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigOperationService.class);
     
     public ConfigOperationService(ConfigInfoPersistService configInfoPersistService,
             ConfigInfoTagPersistService configInfoTagPersistService,
@@ -86,8 +86,8 @@ public class ConfigOperationService {
         }
         
         final Timestamp time = TimeUtils.getCurrentTime();
-        ConfigInfo configInfo = new ConfigInfo(configForm.getDataId(), configForm.getGroup(), configForm.getNamespaceId(),
-                configForm.getAppName(), configForm.getContent());
+        ConfigInfo configInfo = new ConfigInfo(configForm.getDataId(), configForm.getGroup(),
+                configForm.getNamespaceId(), configForm.getAppName(), configForm.getContent());
         
         configInfo.setType(configForm.getType());
         configInfo.setEncryptedDataKey(encryptedDataKey);
@@ -111,11 +111,11 @@ public class ConfigOperationService {
             configInfoBetaPersistService.insertOrUpdateBeta(configInfo, configRequestInfo.getBetaIps(),
                     configRequestInfo.getSrcIp(), configForm.getSrcUser(), time, false);
             ConfigChangePublisher.notifyConfigChange(
-                    new ConfigDataChangeEvent(true, configForm.getDataId(), configForm.getGroup(), configForm.getNamespaceId(),
-                            time.getTime()));
+                    new ConfigDataChangeEvent(true, configForm.getDataId(), configForm.getGroup(),
+                            configForm.getNamespaceId(), time.getTime()));
         }
-        ConfigTraceService.logPersistenceEvent(configForm.getDataId(), configForm.getGroup(), configForm.getNamespaceId(),
-                configRequestInfo.getRequestIpApp(), time.getTime(), InetUtils.getSelfIP(),
+        ConfigTraceService.logPersistenceEvent(configForm.getDataId(), configForm.getGroup(),
+                configForm.getNamespaceId(), configRequestInfo.getRequestIpApp(), time.getTime(), InetUtils.getSelfIP(),
                 ConfigTraceService.PERSISTENCE_EVENT_PUB, configForm.getContent());
         
         return true;
@@ -134,8 +134,8 @@ public class ConfigOperationService {
         final Timestamp time = TimeUtils.getCurrentTime();
         ConfigTraceService.logPersistenceEvent(dataId, group, namespaceId, null, time.getTime(), clientIp,
                 ConfigTraceService.PERSISTENCE_EVENT_REMOVE, null);
-        ConfigChangePublisher
-                .notifyConfigChange(new ConfigDataChangeEvent(false, dataId, group, namespaceId, tag, time.getTime()));
+        ConfigChangePublisher.notifyConfigChange(
+                new ConfigDataChangeEvent(false, dataId, group, namespaceId, tag, time.getTime()));
         
         return true;
     }

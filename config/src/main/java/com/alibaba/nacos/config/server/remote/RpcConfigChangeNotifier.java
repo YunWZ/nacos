@@ -34,10 +34,10 @@ import com.alibaba.nacos.core.utils.Loggers;
 import com.alibaba.nacos.plugin.control.ControlManagerCenter;
 import com.alibaba.nacos.plugin.control.tps.TpsControlManager;
 import com.alibaba.nacos.plugin.control.tps.request.TpsCheckRequest;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -59,6 +59,15 @@ public class RpcConfigChangeNotifier extends Subscriber<LocalDataChangeEvent> {
     
     TpsControlManager tpsControlManager = ControlManagerCenter.getInstance().getTpsControlManager();
     
+    @Autowired
+    ConfigChangeListenContext configChangeListenContext;
+    
+    @Autowired
+    private RpcPushService rpcPushService;
+    
+    @Autowired
+    private ConnectionManager connectionManager;
+    
     public RpcConfigChangeNotifier() {
         NotifyCenter.registerSubscriber(this);
     }
@@ -70,15 +79,6 @@ public class RpcConfigChangeNotifier extends Subscriber<LocalDataChangeEvent> {
         tpsControlManager.registerTpsPoint(POINT_CONFIG_PUSH_FAIL);
         
     }
-    
-    @Autowired
-    ConfigChangeListenContext configChangeListenContext;
-    
-    @Autowired
-    private RpcPushService rpcPushService;
-    
-    @Autowired
-    private ConnectionManager connectionManager;
     
     /**
      * adaptor to config module ,when server side config change ,invoke this method.
@@ -140,6 +140,24 @@ public class RpcConfigChangeNotifier extends Subscriber<LocalDataChangeEvent> {
         return LocalDataChangeEvent.class;
     }
     
+    private void push(RpcPushTask retryTask) {
+        ConfigChangeNotifyRequest notifyRequest = retryTask.notifyRequest;
+        if (retryTask.isOverTimes()) {
+            Loggers.REMOTE_PUSH.warn(
+                    "push callback retry fail over times .dataId={},group={},tenant={},clientId={},will unregister client.",
+                    notifyRequest.getDataId(), notifyRequest.getGroup(), notifyRequest.getTenant(),
+                    retryTask.connectionId);
+            connectionManager.unregister(retryTask.connectionId);
+        } else if (connectionManager.getConnection(retryTask.connectionId) != null) {
+            // first time:delay 0s; second time:delay 2s; third time:delay 4s
+            ConfigExecutor.getClientConfigNotifierServiceExecutor()
+                    .schedule(retryTask, retryTask.tryTimes * 2, TimeUnit.SECONDS);
+        } else {
+            // client is already offline, ignore task.
+        }
+        
+    }
+    
     class RpcPushTask implements Runnable {
         
         ConfigChangeNotifyRequest notifyRequest;
@@ -171,7 +189,7 @@ public class RpcConfigChangeNotifier extends Subscriber<LocalDataChangeEvent> {
         public void run() {
             tryTimes++;
             TpsCheckRequest tpsCheckRequest = new TpsCheckRequest();
-           
+            
             tpsCheckRequest.setPointName(POINT_CONFIG_PUSH);
             if (!tpsControlManager.check(tpsCheckRequest).isSuccess()) {
                 push(this);
@@ -200,24 +218,6 @@ public class RpcConfigChangeNotifier extends Subscriber<LocalDataChangeEvent> {
             }
             
         }
-    }
-    
-    private void push(RpcPushTask retryTask) {
-        ConfigChangeNotifyRequest notifyRequest = retryTask.notifyRequest;
-        if (retryTask.isOverTimes()) {
-            Loggers.REMOTE_PUSH
-                    .warn("push callback retry fail over times .dataId={},group={},tenant={},clientId={},will unregister client.",
-                            notifyRequest.getDataId(), notifyRequest.getGroup(), notifyRequest.getTenant(),
-                            retryTask.connectionId);
-            connectionManager.unregister(retryTask.connectionId);
-        } else if (connectionManager.getConnection(retryTask.connectionId) != null) {
-            // first time:delay 0s; second time:delay 2s; third time:delay 4s
-            ConfigExecutor.getClientConfigNotifierServiceExecutor()
-                    .schedule(retryTask, retryTask.tryTimes * 2, TimeUnit.SECONDS);
-        } else {
-            // client is already offline, ignore task.
-        }
-        
     }
 }
 

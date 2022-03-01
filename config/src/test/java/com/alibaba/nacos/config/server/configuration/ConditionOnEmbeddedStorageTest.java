@@ -28,13 +28,13 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 
 public class ConditionOnEmbeddedStorageTest {
     
-    private ConditionOnEmbeddedStorage conditionOnEmbeddedStorage;
-    
     @Mock
     ConditionContext context;
     
     @Mock
     AnnotatedTypeMetadata metadata;
+    
+    private ConditionOnEmbeddedStorage conditionOnEmbeddedStorage;
     
     @Before
     public void init() {
@@ -46,10 +46,10 @@ public class ConditionOnEmbeddedStorageTest {
         MockedStatic<PropertyUtil> mockedStatic = Mockito.mockStatic(PropertyUtil.class);
         mockedStatic.when(PropertyUtil::isEmbeddedStorage).thenReturn(true);
         Assert.assertTrue(conditionOnEmbeddedStorage.matches(context, metadata));
-    
+        
         mockedStatic.when(PropertyUtil::isEmbeddedStorage).thenReturn(false);
         Assert.assertFalse(conditionOnEmbeddedStorage.matches(context, metadata));
-    
+        
         mockedStatic.close();
     }
     

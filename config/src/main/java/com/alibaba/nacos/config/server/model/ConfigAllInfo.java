@@ -101,7 +101,7 @@ public class ConfigAllInfo extends ConfigInfo {
     public void setEffect(String effect) {
         this.effect = effect;
     }
-
+    
     public String getSchema() {
         return schema;
     }

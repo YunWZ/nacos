@@ -54,6 +54,7 @@ import com.alibaba.nacos.plugin.datasource.mapper.HistoryConfigInfoMapper;
 import com.alibaba.nacos.plugin.datasource.mapper.TenantInfoMapper;
 import com.alibaba.nacos.plugin.encryption.handler.EncryptionHandler;
 import com.alibaba.nacos.sys.env.EnvUtil;
+import jakarta.annotation.PostConstruct;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.dao.DataAccessException;
@@ -72,7 +73,6 @@ import org.springframework.transaction.TransactionSystemException;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -106,23 +106,21 @@ import static com.alibaba.nacos.config.server.service.repository.RowMapperManage
  * @author <a href="mailto:liaochuntao@live.com">liaochuntao</a>
  * @author klw
  */
-@SuppressWarnings(value = {"PMD.MethodReturnWrapperTypeRule", "checkstyle:linelength"})
+@SuppressWarnings(value = {"PMD.MethodReturnWrapperTypeRule", "checkstyle:linelength",
+        "PMD.LowerCamelCaseVariableNamingRule", "PMD.MethodTooLongRule"})
 @Conditional(value = ConditionOnExternalStorage.class)
 @Component
 @Deprecated
 public class ExternalStoragePersistServiceImpl implements PersistService {
     
-    private DataSourceService dataSourceService;
+    /**
+     * constant variables.
+     */
+    public static final String SPOT = ".";
     
     private static final String PATTERN_STR = "*";
     
     private static final int QUERY_LIMIT_SIZE = 50;
-    
-    protected JdbcTemplate jt;
-    
-    protected TransactionTemplate tjt;
-    
-    private MapperManager mapperManager;
     
     private static final String DATA_ID = "dataId";
     
@@ -134,10 +132,13 @@ public class ExternalStoragePersistServiceImpl implements PersistService {
     
     private static final String TENANT = "tenant_id";
     
-    /**
-     * constant variables.
-     */
-    public static final String SPOT = ".";
+    protected JdbcTemplate jt;
+    
+    protected TransactionTemplate tjt;
+    
+    private DataSourceService dataSourceService;
+    
+    private MapperManager mapperManager;
     
     /**
      * init datasource.
@@ -148,8 +149,8 @@ public class ExternalStoragePersistServiceImpl implements PersistService {
         
         jt = getJdbcTemplate();
         tjt = getTransactionTemplate();
-        Boolean isDataSourceLogEnable = EnvUtil
-                .getProperty(Constants.NACOS_PLUGIN_DATASOURCE_LOG, Boolean.class, false);
+        Boolean isDataSourceLogEnable = EnvUtil.getProperty(Constants.NACOS_PLUGIN_DATASOURCE_LOG, Boolean.class,
+                false);
         mapperManager = MapperManager.instance(isDataSourceLogEnable);
     }
     
@@ -890,8 +891,7 @@ public class ExternalStoragePersistServiceImpl implements PersistService {
             ConfigTagsRelationMapper configTagsRelationMapper = mapperManager.findMapper(
                     dataSourceService.getDataSourceType(), TableConstant.CONFIG_TAGS_RELATION);
             sqlCount = configTagsRelationMapper.findConfigInfo4PageCountRows(paramsMap, tagArr.length);
-            sql = configTagsRelationMapper.findConfigInfo4PageFetchRows(paramsMap, tagArr.length, startRow,
-                    pageSize);
+            sql = configTagsRelationMapper.findConfigInfo4PageFetchRows(paramsMap, tagArr.length, startRow, pageSize);
         } else {
             ConfigInfoMapper configInfoMapper = mapperManager.findMapper(dataSourceService.getDataSourceType(),
                     TableConstant.CONFIG_INFO);

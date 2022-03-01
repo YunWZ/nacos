@@ -44,6 +44,7 @@ import java.util.Map;
  * @version $Id: GrpcBiStreamRequest.java, v 0.1 2020年09月01日 10:41 PM liuzunfei Exp $
  */
 @Service
+@SuppressWarnings("PMD.MethodTooLongRule")
 public class GrpcBiStreamRequestAcceptor extends BiRequestStreamGrpc.BiRequestStreamImplBase {
     
     @Autowired

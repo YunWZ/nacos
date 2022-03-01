@@ -21,11 +21,11 @@ import com.alibaba.nacos.config.server.service.datasource.DataSourceService;
 import com.alibaba.nacos.config.server.service.datasource.DynamicDataSource;
 import com.alibaba.nacos.core.cluster.ServerMemberManager;
 import com.alibaba.nacos.sys.utils.InetUtils;
+import jakarta.annotation.PostConstruct;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
 import java.util.Map;
 
 /**
@@ -37,8 +37,6 @@ import java.util.Map;
 @RequestMapping(Constants.HEALTH_CONTROLLER_PATH)
 public class HealthController {
     
-    private DataSourceService dataSourceService;
-    
     private static final String HEALTH_UP = "UP";
     
     private static final String HEALTH_DOWN = "DOWN";
@@ -46,6 +44,8 @@ public class HealthController {
     private static final String HEALTH_WARN = "WARN";
     
     private final ServerMemberManager memberManager;
+    
+    private DataSourceService dataSourceService;
     
     public HealthController(ServerMemberManager memberManager) {
         this.memberManager = memberManager;
@@ -72,7 +72,7 @@ public class HealthController {
             if (dbStatus.contains(HEALTH_DOWN)) {
                 sb.append("master db (").append(dbStatus.split(":")[1]).append(") down. ");
             }
-        
+            
             if (!addressServerHealthy) {
                 sb.append("address server down. ");
             }
@@ -81,14 +81,14 @@ public class HealthController {
                         .append(" is not in the serverList of address server. ");
             }
         }
-    
+        
         return sb.toString();
     }
     
     private boolean isAddressServerHealthy() {
         Map<String, Object> info = memberManager.getLookup().info();
-        return info != null && info.get("addressServerHealth") != null && Boolean
-                .parseBoolean(info.get("addressServerHealth").toString());
+        return info != null && info.get("addressServerHealth") != null && Boolean.parseBoolean(
+                info.get("addressServerHealth").toString());
     }
     
 }

@@ -86,7 +86,7 @@ public class NotifyCenter {
         
         DEFAULT_PUBLISHER_FACTORY = (cls, buffer) -> {
             try {
-                EventPublisher publisher = clazz.newInstance();
+                EventPublisher publisher = clazz.getDeclaredConstructor().newInstance();
                 publisher.init(cls, buffer);
                 return publisher;
             } catch (Throwable ex) {

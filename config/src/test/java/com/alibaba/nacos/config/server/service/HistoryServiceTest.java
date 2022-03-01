@@ -39,20 +39,13 @@ import static org.mockito.Mockito.when;
 
 /**
  * HistoryServiceTest.
+ *
  * @author dongyafei
  * @date 2022/8/11
  */
 
 @RunWith(MockitoJUnitRunner.class)
 public class HistoryServiceTest {
-    
-    private HistoryService historyService;
-    
-    @Mock
-    private HistoryConfigInfoPersistService historyConfigInfoPersistService;
-    
-    @Mock
-    private ConfigInfoPersistService configInfoPersistService;
     
     private static final String TEST_DATA_ID = "test";
     
@@ -61,6 +54,14 @@ public class HistoryServiceTest {
     private static final String TEST_TENANT = "";
     
     private static final String TEST_CONTENT = "test config";
+    
+    private HistoryService historyService;
+    
+    @Mock
+    private HistoryConfigInfoPersistService historyConfigInfoPersistService;
+    
+    @Mock
+    private ConfigInfoPersistService configInfoPersistService;
     
     @Before
     public void setUp() throws Exception {
@@ -77,23 +78,24 @@ public class HistoryServiceTest {
         configHistoryInfo.setLastModifiedTime(new Timestamp(new Date().getTime()));
         List<ConfigHistoryInfo> configHistoryInfoList = new ArrayList<>();
         configHistoryInfoList.add(configHistoryInfo);
-    
+        
         Page<ConfigHistoryInfo> page = new Page<>();
         page.setTotalCount(15);
         page.setPageNumber(1);
         page.setPagesAvailable(2);
         page.setPageItems(configHistoryInfoList);
-    
-        when(historyConfigInfoPersistService.findConfigHistory(TEST_DATA_ID, TEST_GROUP, TEST_TENANT, 1, 10)).thenReturn(page);
-    
-        Page<ConfigHistoryInfo> pageResult = historyService
-                .listConfigHistory(TEST_DATA_ID, TEST_GROUP, TEST_TENANT, 1, 10);
-    
+        
+        when(historyConfigInfoPersistService.findConfigHistory(TEST_DATA_ID, TEST_GROUP, TEST_TENANT, 1,
+                10)).thenReturn(page);
+        
+        Page<ConfigHistoryInfo> pageResult = historyService.listConfigHistory(TEST_DATA_ID, TEST_GROUP, TEST_TENANT, 1,
+                10);
+        
         verify(historyConfigInfoPersistService).findConfigHistory(TEST_DATA_ID, TEST_GROUP, TEST_TENANT, 1, 10);
-    
+        
         List<ConfigHistoryInfo> resultList = pageResult.getPageItems();
         ConfigHistoryInfo resConfigHistoryInfo = resultList.get(0);
-    
+        
         assertEquals(configHistoryInfoList.size(), resultList.size());
         assertEquals(configHistoryInfo.getDataId(), resConfigHistoryInfo.getDataId());
         assertEquals(configHistoryInfo.getGroup(), resConfigHistoryInfo.getGroup());
@@ -113,8 +115,8 @@ public class HistoryServiceTest {
         
         when(historyConfigInfoPersistService.detailConfigHistory(1L)).thenReturn(configHistoryInfo);
         
-        ConfigHistoryInfo resConfigHistoryInfo = historyService
-                .getConfigHistoryInfo(TEST_DATA_ID, TEST_GROUP, TEST_TENANT, 1L);
+        ConfigHistoryInfo resConfigHistoryInfo = historyService.getConfigHistoryInfo(TEST_DATA_ID, TEST_GROUP,
+                TEST_TENANT, 1L);
         
         verify(historyConfigInfoPersistService).detailConfigHistory(1L);
         
@@ -137,8 +139,8 @@ public class HistoryServiceTest {
         
         when(historyConfigInfoPersistService.detailPreviousConfigHistory(1L)).thenReturn(configHistoryInfo);
         
-        ConfigHistoryInfo resConfigHistoryInfo = historyService
-                .getPreviousConfigHistoryInfo(TEST_DATA_ID, TEST_GROUP, TEST_TENANT, 1L);
+        ConfigHistoryInfo resConfigHistoryInfo = historyService.getPreviousConfigHistoryInfo(TEST_DATA_ID, TEST_GROUP,
+                TEST_TENANT, 1L);
         
         verify(historyConfigInfoPersistService).detailPreviousConfigHistory(1L);
         
@@ -157,7 +159,7 @@ public class HistoryServiceTest {
         List<ConfigInfoWrapper> configInfoWrappers = Collections.singletonList(configInfoWrapper);
         
         when(configInfoPersistService.queryConfigInfoByNamespace("test")).thenReturn(configInfoWrappers);
-    
+        
         List<ConfigInfoWrapper> actualList = historyService.getConfigListByNamespace("test");
         
         verify(configInfoPersistService).queryConfigInfoByNamespace("test");

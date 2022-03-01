@@ -51,6 +51,7 @@ import static com.alibaba.nacos.sys.env.Constants.USE_ONLY_SITE_INTERFACES;
  *
  * @author Nacos
  */
+@SuppressWarnings("PMD.LowerCamelCaseVariableNamingRule")
 public class InetUtils {
     
     private static final Logger LOG = LoggerFactory.getLogger(InetUtils.class);
@@ -125,9 +126,7 @@ public class InetUtils {
     }
     
     /**
-     * Get ip address from environment
-     * System property nacos.server.ip
-     * Spring property nacos.inetutils.ip-address.
+     * Get ip address from environment System property nacos.server.ip Spring property nacos.inetutils.ip-address.
      *
      * @return ip address
      */

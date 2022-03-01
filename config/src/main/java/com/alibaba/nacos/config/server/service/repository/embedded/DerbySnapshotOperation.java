@@ -28,11 +28,12 @@ import com.alibaba.nacos.consistency.snapshot.Reader;
 import com.alibaba.nacos.consistency.snapshot.SnapshotOperation;
 import com.alibaba.nacos.consistency.snapshot.Writer;
 import com.alibaba.nacos.core.distributed.raft.utils.RaftExecutor;
+import com.alibaba.nacos.core.utils.TimerContext;
 import com.alibaba.nacos.sys.env.EnvUtil;
 import com.alibaba.nacos.sys.utils.DiskUtils;
-import com.alibaba.nacos.core.utils.TimerContext;
 import com.alipay.sofa.jraft.util.CRC64;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.nio.file.Paths;
 import java.sql.CallableStatement;
@@ -43,7 +44,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiConsumer;
 import java.util.zip.Checksum;
-import javax.sql.DataSource;
 
 /**
  * Derby Snapshot operation.
@@ -143,8 +143,8 @@ public class DerbySnapshotOperation implements SnapshotOperation {
             NotifyCenter.publishEvent(DerbyLoadEvent.INSTANCE);
             return true;
         } catch (final Throwable t) {
-            LogUtil.FATAL_LOG
-                    .error("Fail to load snapshot, path={}, file list={}, {}.", readerPath, reader.listFiles(), t);
+            LogUtil.FATAL_LOG.error("Fail to load snapshot, path={}, file list={}, {}.", readerPath, reader.listFiles(),
+                    t);
             return false;
         } finally {
             lock.unlock();

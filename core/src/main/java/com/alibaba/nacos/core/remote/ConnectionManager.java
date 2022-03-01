@@ -31,10 +31,10 @@ import com.alibaba.nacos.plugin.control.configs.ControlConfigs;
 import com.alibaba.nacos.plugin.control.connection.request.ConnectionCheckRequest;
 import com.alibaba.nacos.plugin.control.connection.response.ConnectionCheckResponse;
 import com.alibaba.nacos.plugin.control.connection.rule.ConnectionControlRule;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -210,8 +210,8 @@ public class ConnectionManager {
         }
         
         if (runtimeConnectionEjector == null) {
-            Loggers.CONNECTION
-                    .info("Fail to find connection runtime ejector for name {},use default", connectionRuntimeEjector);
+            Loggers.CONNECTION.info("Fail to find connection runtime ejector for name {},use default",
+                    connectionRuntimeEjector);
             NacosRuntimeConnectionEjector nacosRuntimeConnectionEjector = new NacosRuntimeConnectionEjector();
             nacosRuntimeConnectionEjector.setConnectionManager(this);
             runtimeConnectionEjector = nacosRuntimeConnectionEjector;

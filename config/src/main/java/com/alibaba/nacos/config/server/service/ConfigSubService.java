@@ -18,6 +18,7 @@ package com.alibaba.nacos.config.server.service;
 
 import com.alibaba.nacos.common.model.RestResult;
 import com.alibaba.nacos.common.utils.JacksonUtils;
+import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.config.server.constant.Constants;
 import com.alibaba.nacos.config.server.model.SampleResult;
 import com.alibaba.nacos.config.server.service.notify.NotifyService;
@@ -26,7 +27,6 @@ import com.alibaba.nacos.config.server.utils.LogUtil;
 import com.alibaba.nacos.core.cluster.Member;
 import com.alibaba.nacos.core.cluster.ServerMemberManager;
 import com.alibaba.nacos.sys.env.EnvUtil;
-import com.alibaba.nacos.common.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -89,8 +89,8 @@ public class ConfigSubService {
             try {
                 completionService.submit(new Job(ip.getAddress(), url, params));
             } catch (Exception e) { // Send request failed.
-                LogUtil.DEFAULT_LOG
-                        .warn("Get client info from {} with exception: {} during submit job", ip, e.getMessage());
+                LogUtil.DEFAULT_LOG.warn("Get client info from {} with exception: {} during submit job", ip,
+                        e.getMessage());
             }
         }
         // Get and merge result.
@@ -145,6 +145,45 @@ public class ConfigSubService {
         return mergeResult;
     }
     
+    public SampleResult getCollectSampleResult(String dataId, String group, String tenant, int sampleTime)
+            throws Exception {
+        List<SampleResult> resultList = new ArrayList<>();
+        String url = Constants.COMMUNICATION_CONTROLLER_PATH + "/configWatchers";
+        Map<String, String> params = new HashMap<>(5);
+        params.put("dataId", dataId);
+        params.put("group", group);
+        if (!StringUtils.isBlank(tenant)) {
+            params.put("tenant", tenant);
+        }
+        BlockingQueue<Future<SampleResult>> queue = new LinkedBlockingDeque<>(memberManager.getServerList().size());
+        CompletionService<SampleResult> completionService = new ExecutorCompletionService<>(
+                ConfigExecutor.getConfigSubServiceExecutor(), queue);
+        
+        SampleResult sampleCollectResult = new SampleResult();
+        for (int i = 0; i < sampleTime; i++) {
+            List<SampleResult> sampleResults = runCollectionJob(url, params, completionService, resultList);
+            sampleCollectResult = mergeSampleResult(sampleCollectResult, sampleResults);
+        }
+        return sampleCollectResult;
+    }
+    
+    public SampleResult getCollectSampleResultByIp(String ip, int sampleTime) {
+        List<SampleResult> resultList = new ArrayList<>(10);
+        String url = Constants.COMMUNICATION_CONTROLLER_PATH + "/watcherConfigs";
+        Map<String, String> params = new HashMap<>(50);
+        params.put("ip", ip);
+        BlockingQueue<Future<SampleResult>> queue = new LinkedBlockingDeque<>(memberManager.getServerList().size());
+        CompletionService<SampleResult> completionService = new ExecutorCompletionService<>(
+                ConfigExecutor.getConfigSubServiceExecutor(), queue);
+        
+        SampleResult sampleCollectResult = new SampleResult();
+        for (int i = 0; i < sampleTime; i++) {
+            List<SampleResult> sampleResults = runCollectionJob(url, params, completionService, resultList);
+            sampleCollectResult = mergeSampleResult(sampleCollectResult, sampleResults);
+        }
+        return sampleCollectResult;
+    }
+    
     /**
      * Query subscriber's task from every nacos server nodes.
      *
@@ -190,45 +229,6 @@ public class ConfigSubService {
                 return null;
             }
         }
-    }
-    
-    public SampleResult getCollectSampleResult(String dataId, String group, String tenant, int sampleTime)
-            throws Exception {
-        List<SampleResult> resultList = new ArrayList<>();
-        String url = Constants.COMMUNICATION_CONTROLLER_PATH + "/configWatchers";
-        Map<String, String> params = new HashMap<>(5);
-        params.put("dataId", dataId);
-        params.put("group", group);
-        if (!StringUtils.isBlank(tenant)) {
-            params.put("tenant", tenant);
-        }
-        BlockingQueue<Future<SampleResult>> queue = new LinkedBlockingDeque<>(memberManager.getServerList().size());
-        CompletionService<SampleResult> completionService = new ExecutorCompletionService<>(
-                ConfigExecutor.getConfigSubServiceExecutor(), queue);
-        
-        SampleResult sampleCollectResult = new SampleResult();
-        for (int i = 0; i < sampleTime; i++) {
-            List<SampleResult> sampleResults = runCollectionJob(url, params, completionService, resultList);
-            sampleCollectResult = mergeSampleResult(sampleCollectResult, sampleResults);
-        }
-        return sampleCollectResult;
-    }
-    
-    public SampleResult getCollectSampleResultByIp(String ip, int sampleTime) {
-        List<SampleResult> resultList = new ArrayList<>(10);
-        String url = Constants.COMMUNICATION_CONTROLLER_PATH + "/watcherConfigs";
-        Map<String, String> params = new HashMap<>(50);
-        params.put("ip", ip);
-        BlockingQueue<Future<SampleResult>> queue = new LinkedBlockingDeque<>(memberManager.getServerList().size());
-        CompletionService<SampleResult> completionService = new ExecutorCompletionService<>(
-                ConfigExecutor.getConfigSubServiceExecutor(), queue);
-        
-        SampleResult sampleCollectResult = new SampleResult();
-        for (int i = 0; i < sampleTime; i++) {
-            List<SampleResult> sampleResults = runCollectionJob(url, params, completionService, resultList);
-            sampleCollectResult = mergeSampleResult(sampleCollectResult, sampleResults);
-        }
-        return sampleCollectResult;
     }
     
 }

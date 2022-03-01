@@ -21,13 +21,13 @@ import org.junit.Test;
 import org.slf4j.Logger;
 
 public class TraceLogUtilTest {
-
+    
     @Test
     public void testRequestLog() {
-
+        
         Logger requestLog = TraceLogUtil.requestLog;
         Assert.assertTrue(requestLog instanceof Logger);
-
+        
         Logger pollingLog = TraceLogUtil.pollingLog;
         Assert.assertTrue(pollingLog instanceof Logger);
     }

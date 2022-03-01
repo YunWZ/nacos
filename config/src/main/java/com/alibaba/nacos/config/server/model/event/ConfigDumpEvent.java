@@ -51,6 +51,10 @@ public class ConfigDumpEvent extends Event {
     
     private String encryptedDataKey;
     
+    public static ConfigDumpEventBuilder builder() {
+        return new ConfigDumpEventBuilder();
+    }
+    
     public boolean isRemove() {
         return remove;
     }
@@ -145,10 +149,6 @@ public class ConfigDumpEvent extends Event {
     
     public void setEncryptedDataKey(String encryptedDataKey) {
         this.encryptedDataKey = encryptedDataKey;
-    }
-    
-    public static ConfigDumpEventBuilder builder() {
-        return new ConfigDumpEventBuilder();
     }
     
     public static final class ConfigDumpEventBuilder {

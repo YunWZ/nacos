@@ -43,13 +43,13 @@ import com.alibaba.nacos.config.server.utils.Protocol;
 import com.alibaba.nacos.config.server.utils.RequestUtil;
 import com.alibaba.nacos.config.server.utils.TimeUtils;
 import com.alibaba.nacos.plugin.encryption.handler.EncryptionHandler;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -67,6 +67,7 @@ import static com.alibaba.nacos.config.server.utils.LogUtil.PULL_LOG;
  * @author Nacos
  */
 @Service
+@SuppressWarnings("PMD.MethodTooLongRule")
 public class ConfigServletInner {
     
     private static final int TRY_GET_LOCK_TIMES = 9;
@@ -77,11 +78,11 @@ public class ConfigServletInner {
     
     private final LongPollingService longPollingService;
     
-    private  ConfigInfoPersistService configInfoPersistService;
+    private ConfigInfoPersistService configInfoPersistService;
     
-    private  ConfigInfoBetaPersistService configInfoBetaPersistService;
+    private ConfigInfoBetaPersistService configInfoBetaPersistService;
     
-    private  ConfigInfoTagPersistService configInfoTagPersistService;
+    private ConfigInfoTagPersistService configInfoTagPersistService;
     
     public ConfigServletInner(LongPollingService longPollingService, ConfigInfoPersistService configInfoPersistService,
             ConfigInfoBetaPersistService configInfoBetaPersistService,
@@ -90,6 +91,59 @@ public class ConfigServletInner {
         this.configInfoPersistService = configInfoPersistService;
         this.configInfoBetaPersistService = configInfoBetaPersistService;
         this.configInfoTagPersistService = configInfoTagPersistService;
+    }
+    
+    private static void releaseConfigReadLock(String groupKey) {
+        ConfigCacheService.releaseReadLock(groupKey);
+    }
+    
+    /**
+     * Try to add read lock.
+     *
+     * @param groupKey groupKey string value.
+     * @return 0 - No data and failed. Positive number - lock succeeded. Negative number - lock failed。
+     */
+    private static int tryConfigReadLock(String groupKey) {
+        
+        // Lock failed by default.
+        int lockResult = -1;
+        
+        // Try to get lock times, max value: 10;
+        for (int i = TRY_GET_LOCK_TIMES; i >= 0; --i) {
+            lockResult = ConfigCacheService.tryReadLock(groupKey);
+            
+            // The data is non-existent.
+            if (0 == lockResult) {
+                break;
+            }
+            
+            // Success
+            if (lockResult > 0) {
+                break;
+            }
+            
+            // Retry.
+            if (i > 0) {
+                try {
+                    Thread.sleep(1);
+                } catch (Exception e) {
+                    LogUtil.PULL_CHECK_LOG.error("An Exception occurred while thread sleep", e);
+                }
+            }
+        }
+        
+        return lockResult;
+    }
+    
+    private static boolean isUseTag(CacheItem cacheItem, String tag) {
+        if (cacheItem != null && cacheItem.tagMd5 != null && cacheItem.tagMd5.size() > 0) {
+            return StringUtils.isNotBlank(tag) && cacheItem.tagMd5.containsKey(tag);
+        }
+        return false;
+    }
+    
+    private static boolean fileNotExist(File file) {
+        return file == null || !file.exists();
     }
     
     /**
@@ -210,7 +264,8 @@ public class ConfigServletInner {
                                 lastModified = cacheItem.tagLastModifiedTs.get(autoTag);
                             }
                             if (PropertyUtil.isDirectRead()) {
-                                configInfoBase = configInfoTagPersistService.findConfigInfo4Tag(dataId, group, tenant, autoTag);
+                                configInfoBase = configInfoTagPersistService.findConfigInfo4Tag(dataId, group, tenant,
+                                        autoTag);
                             } else {
                                 file = DiskUtil.targetTagFile(dataId, group, tenant, autoTag);
                             }
@@ -283,8 +338,8 @@ public class ConfigServletInner {
                 }
                 
                 if (PropertyUtil.isDirectRead()) {
-                    Pair<String, String> pair = EncryptionHandler
-                            .decryptHandler(dataId, configInfoBase.getEncryptedDataKey(), configInfoBase.getContent());
+                    Pair<String, String> pair = EncryptionHandler.decryptHandler(dataId,
+                            configInfoBase.getEncryptedDataKey(), configInfoBase.getContent());
                     out = response.getWriter();
                     if (isV2) {
                         out.print(JacksonUtils.toJson(Result.success(pair.getSecond())));
@@ -327,9 +382,8 @@ public class ConfigServletInner {
         } else if (lockResult == 0) {
             
             // FIXME CacheItem No longer exists. It is impossible to simply calculate the push delayed. Here, simply record it as - 1.
-            ConfigTraceService
-                    .logPullEvent(dataId, group, tenant, requestIpApp, -1, ConfigTraceService.PULL_EVENT_NOTFOUND, -1,
-                            requestIp, notify && isSli);
+            ConfigTraceService.logPullEvent(dataId, group, tenant, requestIpApp, -1,
+                    ConfigTraceService.PULL_EVENT_NOTFOUND, -1, requestIp, notify && isSli);
             
             return get404Result(response, isV2);
             
@@ -341,10 +395,6 @@ public class ConfigServletInner {
         }
         
         return HttpServletResponse.SC_OK + "";
-    }
-    
-    private static void releaseConfigReadLock(String groupKey) {
-        ConfigCacheService.releaseReadLock(groupKey);
     }
     
     private String get404Result(HttpServletResponse response, boolean isV2) throws IOException {
@@ -362,61 +412,12 @@ public class ConfigServletInner {
         response.setStatus(HttpServletResponse.SC_CONFLICT);
         PrintWriter writer = response.getWriter();
         if (isV2) {
-            writer.println(JacksonUtils.toJson(Result
-                    .failure(ErrorCode.RESOURCE_CONFLICT, "requested file is being modified, please try later.")));
+            writer.println(JacksonUtils.toJson(Result.failure(ErrorCode.RESOURCE_CONFLICT,
+                    "requested file is being modified, please try later.")));
         } else {
             writer.println("requested file is being modified, please try later.");
         }
         return HttpServletResponse.SC_CONFLICT + "";
-    }
-    
-    /**
-     * Try to add read lock.
-     *
-     * @param groupKey groupKey string value.
-     * @return 0 - No data and failed. Positive number - lock succeeded. Negative number - lock failed。
-     */
-    private static int tryConfigReadLock(String groupKey) {
-        
-        // Lock failed by default.
-        int lockResult = -1;
-        
-        // Try to get lock times, max value: 10;
-        for (int i = TRY_GET_LOCK_TIMES; i >= 0; --i) {
-            lockResult = ConfigCacheService.tryReadLock(groupKey);
-            
-            // The data is non-existent.
-            if (0 == lockResult) {
-                break;
-            }
-            
-            // Success
-            if (lockResult > 0) {
-                break;
-            }
-            
-            // Retry.
-            if (i > 0) {
-                try {
-                    Thread.sleep(1);
-                } catch (Exception e) {
-                    LogUtil.PULL_CHECK_LOG.error("An Exception occurred while thread sleep", e);
-                }
-            }
-        }
-        
-        return lockResult;
-    }
-    
-    private static boolean isUseTag(CacheItem cacheItem, String tag) {
-        if (cacheItem != null && cacheItem.tagMd5 != null && cacheItem.tagMd5.size() > 0) {
-            return StringUtils.isNotBlank(tag) && cacheItem.tagMd5.containsKey(tag);
-        }
-        return false;
-    }
-    
-    private static boolean fileNotExist(File file) {
-        return file == null || !file.exists();
     }
     
 }

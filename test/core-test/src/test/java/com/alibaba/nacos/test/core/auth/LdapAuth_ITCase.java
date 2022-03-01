@@ -25,7 +25,7 @@ import org.junit.runners.Suite;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -33,7 +33,7 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ LdapAuth_ITCase.NonTlsTest.class,LdapAuth_ITCase.TlsTest.class})
+@Suite.SuiteClasses({LdapAuth_ITCase.NonTlsTest.class, LdapAuth_ITCase.TlsTest.class})
 public class LdapAuth_ITCase extends AuthBase {
     
     @LocalServerPort

@@ -59,7 +59,7 @@ public class DynamicDataSourceTest {
         
         propertyUtilMockedStatic.when(PropertyUtil::isEmbeddedStorage).thenReturn(false);
         Assert.assertTrue(dataSource.getDataSource() instanceof ExternalDataSourceServiceImpl);
-    
+        
         propertyUtilMockedStatic.close();
     }
     

@@ -29,7 +29,7 @@ public class ServiceUtilTest {
         serviceInfo.setGroupName("groupName");
         serviceInfo.setName("serviceName");
         serviceInfo.setChecksum("checkSum");
-        serviceInfo.setAllIPs(false);
+        serviceInfo.setAllIps(false);
         ServiceInfo cluster = ServiceUtil.selectInstances(serviceInfo, "cluster");
         assertNotNull(cluster);
     }

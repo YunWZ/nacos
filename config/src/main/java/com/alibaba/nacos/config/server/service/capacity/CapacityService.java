@@ -16,6 +16,7 @@
 
 package com.alibaba.nacos.config.server.service.capacity;
 
+import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.config.server.constant.CounterMode;
 import com.alibaba.nacos.config.server.model.capacity.Capacity;
 import com.alibaba.nacos.config.server.model.capacity.GroupCapacity;
@@ -25,7 +26,7 @@ import com.alibaba.nacos.config.server.utils.ConfigExecutor;
 import com.alibaba.nacos.config.server.utils.LogUtil;
 import com.alibaba.nacos.config.server.utils.PropertyUtil;
 import com.alibaba.nacos.config.server.utils.TimeUtils;
-import com.alibaba.nacos.common.utils.StringUtils;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,6 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
-import javax.annotation.PostConstruct;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -92,8 +92,8 @@ public class CapacityService {
         long lastId = 0;
         int pageSize = 100;
         while (true) {
-            List<GroupCapacity> groupCapacityList = groupCapacityPersistService
-                    .getCapacityList4CorrectUsage(lastId, pageSize);
+            List<GroupCapacity> groupCapacityList = groupCapacityPersistService.getCapacityList4CorrectUsage(lastId,
+                    pageSize);
             if (groupCapacityList.isEmpty()) {
                 break;
             }
@@ -127,8 +127,8 @@ public class CapacityService {
         long lastId = 0;
         int pageSize = 100;
         while (true) {
-            List<TenantCapacity> tenantCapacityList = tenantCapacityPersistService
-                    .getCapacityList4CorrectUsage(lastId, pageSize);
+            List<TenantCapacity> tenantCapacityList = tenantCapacityPersistService.getCapacityList4CorrectUsage(lastId,
+                    pageSize);
             if (tenantCapacityList.isEmpty()) {
                 break;
             }
@@ -295,12 +295,14 @@ public class CapacityService {
             int finalQuota = (int) (usage + defaultQuota * (1.0 * initialExpansionPercent / 100));
             if (tenant != null) {
                 tenantCapacityPersistService.updateQuota(tenant, finalQuota);
-                LogUtil.DEFAULT_LOG.warn("[capacityManagement] The usage({}) already reach the upper limit({}) when init the tenant({}), "
-                        + "automatic upgrade to ({})", usage, defaultQuota, tenant, finalQuota);
+                LogUtil.DEFAULT_LOG.warn(
+                        "[capacityManagement] The usage({}) already reach the upper limit({}) when init the tenant({}), "
+                                + "automatic upgrade to ({})", usage, defaultQuota, tenant, finalQuota);
             } else {
                 groupCapacityPersistService.updateQuota(group, finalQuota);
-                LogUtil.DEFAULT_LOG.warn("[capacityManagement] The usage({}) already reach the upper limit({}) when init the group({}), "
-                        + "automatic upgrade to ({})", usage, defaultQuota, group, finalQuota);
+                LogUtil.DEFAULT_LOG.warn(
+                        "[capacityManagement] The usage({}) already reach the upper limit({}) when init the group({}), "
+                                + "automatic upgrade to ({})", usage, defaultQuota, group, finalQuota);
             }
         }
     }

@@ -25,11 +25,11 @@ import com.alibaba.nacos.naming.consistency.ConsistencyService;
 import com.alibaba.nacos.naming.consistency.Datum;
 import com.alibaba.nacos.naming.consistency.KeyBuilder;
 import com.alibaba.nacos.naming.consistency.RecordListener;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +43,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @since 1.0.0
  */
 @Component
+@SuppressWarnings("PMD.MethodTooLongRule")
 public class SwitchManager implements RecordListener<SwitchDomain> {
     
     @Autowired

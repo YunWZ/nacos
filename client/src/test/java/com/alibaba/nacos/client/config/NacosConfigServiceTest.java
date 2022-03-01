@@ -307,4 +307,7 @@ public class NacosConfigServiceTest {
             Assert.fail();
         }
     }
+    
+    public void testTestGetServerStatus() {
+    }
 }

@@ -34,22 +34,22 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigRemoveRequestHandlerTest {
-
+    
     private ConfigRemoveRequestHandler configRemoveRequestHandler;
-
+    
     @Mock
     private ConfigInfoPersistService configInfoPersistService;
     
     @Mock
     private ConfigInfoTagPersistService configInfoTagPersistService;
-
+    
     @Before
     public void setUp() throws Exception {
         configRemoveRequestHandler = new ConfigRemoveRequestHandler(configInfoPersistService,
                 configInfoTagPersistService);
         Mockito.mockStatic(ConfigTraceService.class);
     }
-
+    
     @Test
     public void testHandle() {
         ConfigRemoveRequest configRemoveRequest = new ConfigRemoveRequest();
@@ -66,5 +66,5 @@ public class ConfigRemoveRequestHandlerTest {
             e.printStackTrace();
         }
     }
-
+    
 }

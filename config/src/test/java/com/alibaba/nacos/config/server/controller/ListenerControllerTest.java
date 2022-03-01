@@ -22,6 +22,7 @@ import com.alibaba.nacos.config.server.model.GroupkeyListenserStatus;
 import com.alibaba.nacos.config.server.model.SampleResult;
 import com.alibaba.nacos.config.server.service.ConfigSubService;
 import com.alibaba.nacos.sys.env.EnvUtil;
+import jakarta.servlet.ServletContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,8 +39,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import javax.servlet.ServletContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,11 +79,11 @@ public class ListenerControllerTest {
         when(configSubService.getCollectSampleResultByIp("localhost", 1)).thenReturn(sampleResult);
         
         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(Constants.LISTENER_CONTROLLER_PATH)
-                .param("ip", "localhost").param("all", "true")
-                .param("tenant", "test").param("sampleTime", "1");
+                .param("ip", "localhost").param("all", "true").param("tenant", "test").param("sampleTime", "1");
         
         String actualValue = mockmvc.perform(builder).andReturn().getResponse().getContentAsString();
-        GroupkeyListenserStatus groupkeyListenserStatus = JacksonUtils.toObj(actualValue, GroupkeyListenserStatus.class);
+        GroupkeyListenserStatus groupkeyListenserStatus = JacksonUtils.toObj(actualValue,
+                GroupkeyListenserStatus.class);
         Map<String, String> resultMap = groupkeyListenserStatus.getLisentersGroupkeyStatus();
         
         Assert.assertEquals(map.get("test"), resultMap.get("test"));

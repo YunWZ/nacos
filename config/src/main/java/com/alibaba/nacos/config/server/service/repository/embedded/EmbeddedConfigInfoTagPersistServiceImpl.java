@@ -52,9 +52,9 @@ import static com.alibaba.nacos.config.server.service.repository.RowMapperManage
 @Service("embeddedConfigInfoTagPersistServiceImpl")
 public class EmbeddedConfigInfoTagPersistServiceImpl implements ConfigInfoTagPersistService {
     
-    private DataSourceService dataSourceService;
-    
     private final DatabaseOperate databaseOperate;
+    
+    private DataSourceService dataSourceService;
     
     private MapperManager mapperManager;
     

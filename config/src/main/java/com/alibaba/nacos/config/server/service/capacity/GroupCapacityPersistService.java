@@ -28,6 +28,7 @@ import com.alibaba.nacos.plugin.datasource.constants.TableConstant;
 import com.alibaba.nacos.plugin.datasource.mapper.ConfigInfoMapper;
 import com.alibaba.nacos.plugin.datasource.mapper.GroupCapacityMapper;
 import com.alibaba.nacos.sys.env.EnvUtil;
+import jakarta.annotation.PostConstruct;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -35,7 +36,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -71,24 +71,9 @@ public class GroupCapacityPersistService {
     public void init() {
         this.dataSourceService = DynamicDataSource.getInstance().getDataSource();
         this.jdbcTemplate = dataSourceService.getJdbcTemplate();
-        Boolean isDataSourceLogEnable = EnvUtil.getProperty(Constants.NACOS_PLUGIN_DATASOURCE_LOG, Boolean.class, false);
+        Boolean isDataSourceLogEnable = EnvUtil.getProperty(Constants.NACOS_PLUGIN_DATASOURCE_LOG, Boolean.class,
+                false);
         this.mapperManager = MapperManager.instance(isDataSourceLogEnable);
-    }
-    
-    private static final class GroupCapacityRowMapper implements RowMapper<GroupCapacity> {
-        
-        @Override
-        public GroupCapacity mapRow(ResultSet rs, int rowNum) throws SQLException {
-            GroupCapacity groupCapacity = new GroupCapacity();
-            groupCapacity.setId(rs.getLong("id"));
-            groupCapacity.setQuota(rs.getInt("quota"));
-            groupCapacity.setUsage(rs.getInt("usage"));
-            groupCapacity.setMaxSize(rs.getInt("max_size"));
-            groupCapacity.setMaxAggrCount(rs.getInt("max_aggr_count"));
-            groupCapacity.setMaxAggrSize(rs.getInt("max_aggr_size"));
-            groupCapacity.setGroup(rs.getString("group_id"));
-            return groupCapacity;
-        }
     }
     
     public GroupCapacity getGroupCapacity(String groupId) {
@@ -128,7 +113,8 @@ public class GroupCapacityPersistService {
         return insertGroupCapacity(sql, capacity, primaryKeyGeneratedKeys);
     }
     
-    private boolean insertGroupCapacity(final String sql, final GroupCapacity capacity, String[] primaryKeyGeneratedKeys) {
+    private boolean insertGroupCapacity(final String sql, final GroupCapacity capacity,
+            String[] primaryKeyGeneratedKeys) {
         try {
             GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
             PreparedStatementCreator preparedStatementCreator = connection -> {
@@ -180,8 +166,8 @@ public class GroupCapacityPersistService {
                 TableConstant.GROUP_CAPACITY);
         String sql = groupCapacityMapper.incrementUsageByWhereQuotaEqualZero();
         try {
-            int affectRow = jdbcTemplate
-                    .update(sql, groupCapacity.getGmtModified(), groupCapacity.getGroup(), groupCapacity.getQuota());
+            int affectRow = jdbcTemplate.update(sql, groupCapacity.getGmtModified(), groupCapacity.getGroup(),
+                    groupCapacity.getQuota());
             return affectRow == 1;
         } catch (CannotGetJdbcConnectionException e) {
             FATAL_LOG.error("[db-error]", e);
@@ -277,11 +263,11 @@ public class GroupCapacityPersistService {
         }
         columnList.add("gmt_modified");
         argList.add(TimeUtils.getCurrentTime());
-    
+        
         List<String> whereList = CollectionUtils.list();
         whereList.add("group_id");
         argList.add(group);
-    
+        
         GroupCapacityMapper groupCapacityMapper = mapperManager.findMapper(dataSourceService.getDataSourceType(),
                 TableConstant.GROUP_CAPACITY);
         String sql = groupCapacityMapper.update(columnList, whereList);
@@ -381,5 +367,21 @@ public class GroupCapacityPersistService {
             throw e;
         }
         
+    }
+    
+    private static final class GroupCapacityRowMapper implements RowMapper<GroupCapacity> {
+        
+        @Override
+        public GroupCapacity mapRow(ResultSet rs, int rowNum) throws SQLException {
+            GroupCapacity groupCapacity = new GroupCapacity();
+            groupCapacity.setId(rs.getLong("id"));
+            groupCapacity.setQuota(rs.getInt("quota"));
+            groupCapacity.setUsage(rs.getInt("usage"));
+            groupCapacity.setMaxSize(rs.getInt("max_size"));
+            groupCapacity.setMaxAggrCount(rs.getInt("max_aggr_count"));
+            groupCapacity.setMaxAggrSize(rs.getInt("max_aggr_size"));
+            groupCapacity.setGroup(rs.getString("group_id"));
+            return groupCapacity;
+        }
     }
 }

@@ -25,6 +25,7 @@ import com.alibaba.nacos.core.code.RequestMappingInfo.RequestMappingInfoComparat
 import com.alibaba.nacos.core.code.condition.ParamRequestCondition;
 import com.alibaba.nacos.core.code.condition.PathRequestCondition;
 import com.alibaba.nacos.sys.env.EnvUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -36,7 +37,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;

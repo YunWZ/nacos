@@ -22,7 +22,7 @@ import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -70,7 +70,7 @@ public abstract class AbstractRequestFilter {
         ParameterizedType parameterizedType = (ParameterizedType) handlerClazz.getGenericSuperclass();
         try {
             Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-            return (Response) Class.forName(actualTypeArguments[1].getTypeName()).newInstance();
+            return (Response) Class.forName(actualTypeArguments[1].getTypeName()).getDeclaredConstructor().newInstance();
             
         } catch (Exception e) {
             throw new NacosException(NacosException.SERVER_ERROR, e);

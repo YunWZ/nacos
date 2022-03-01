@@ -27,14 +27,14 @@ import com.alibaba.nacos.config.server.service.notify.NotifyService;
 import com.alibaba.nacos.config.server.utils.GroupKey2;
 import com.alibaba.nacos.core.remote.Connection;
 import com.alibaba.nacos.core.remote.ConnectionManager;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,8 +127,8 @@ public class CommunicationController {
         SampleResult result = longPollingService.getCollectSubscribleInfoByIp(ip);
         List<Connection> connectionsByIp = connectionManager.getConnectionByIp(ip);
         for (Connection connectionByIp : connectionsByIp) {
-            Map<String, String> listenKeys = configChangeListenContext
-                    .getListenKeys(connectionByIp.getMetaInfo().getConnectionId());
+            Map<String, String> listenKeys = configChangeListenContext.getListenKeys(
+                    connectionByIp.getMetaInfo().getConnectionId());
             if (listenKeys != null) {
                 result.getLisentersGroupkeyStatus().putAll(listenKeys);
             }

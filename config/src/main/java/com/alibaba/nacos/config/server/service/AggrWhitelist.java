@@ -38,8 +38,7 @@ public class AggrWhitelist {
     
     public static final String AGGRIDS_METADATA = "com.alibaba.nacos.metadata.aggrIDs";
     
-    static final AtomicReference<List<Pattern>> AGGR_DATAID_WHITELIST = new AtomicReference<>(
-            new ArrayList<>());
+    static final AtomicReference<List<Pattern>> AGGR_DATAID_WHITELIST = new AtomicReference<>(new ArrayList<>());
     
     /**
      * Judge whether specified dataId includes aggregation white list.

@@ -29,6 +29,9 @@ import com.alibaba.nacos.core.remote.Connection;
 import com.alibaba.nacos.core.remote.ConnectionMeta;
 import com.alibaba.nacos.core.remote.RpcAckCallbackSynchronizer;
 import com.alibaba.nacos.core.utils.Loggers;
+import io.grpc.Metadata;
+import io.grpc.ServerCall;
+import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.netty.shaded.io.netty.channel.Channel;
 import io.grpc.stub.ServerCallStreamObserver;
@@ -44,12 +47,22 @@ public class GrpcConnection extends Connection {
     
     private StreamObserver streamObserver;
     
+    @Deprecated
     private Channel channel;
     
+    private ServerCall serverCall;
+    
+    @Deprecated
     public GrpcConnection(ConnectionMeta metaInfo, StreamObserver streamObserver, Channel channel) {
         super(metaInfo);
         this.streamObserver = streamObserver;
         this.channel = channel;
+    }
+    
+    public GrpcConnection(ConnectionMeta metaInfo, StreamObserver streamObserver, ServerCall serverCall) {
+        super(metaInfo);
+        this.streamObserver = streamObserver;
+        this.serverCall = serverCall;
     }
     
     private void sendRequestNoAck(Request request) throws NacosException {
@@ -77,8 +90,8 @@ public class GrpcConnection extends Connection {
                 Loggers.REMOTE_DIGEST.info("[{}]Send request to client ,payload={}", connectionId,
                         payload.toByteString().toStringUtf8());
             } catch (Throwable throwable) {
-                Loggers.REMOTE_DIGEST
-                        .warn("[{}]Send request to client trace error, ,error={}", connectionId, throwable);
+                Loggers.REMOTE_DIGEST.warn("[{}]Send request to client trace error, ,error={}", connectionId,
+                        throwable);
             }
         }
     }
@@ -129,7 +142,12 @@ public class GrpcConnection extends Connection {
             }
             
             closeBiStream();
-            channel.close();
+            if (channel != null) {
+                channel.close();
+            }
+            if (serverCall != null) {
+                serverCall.close(Status.OK, new Metadata());
+            }
             
         } catch (Exception e) {
             Loggers.REMOTE_DIGEST.warn("[{}] connection  close exception  : {}", connectionId, e);
@@ -147,6 +165,13 @@ public class GrpcConnection extends Connection {
     
     @Override
     public boolean isConnected() {
-        return channel != null && channel.isOpen() && channel.isActive();
+        if (channel != null) {
+            return channel.isOpen() && channel.isActive();
+        }
+        if (serverCall != null) {
+            return serverCall.isReady();
+        }
+        
+        return false;
     }
 }

@@ -61,7 +61,7 @@ public class AppNameUtilsTest {
         System.setProperty(PARAM_MARKING_TOMCAT, LINUX_ADMIN_HOME + SERVER_TOMCAT + File.separator);
         Assert.assertEquals(SERVER_TOMCAT, AppNameUtils.getAppName());
         System.clearProperty(PARAM_MARKING_TOMCAT);
-    
+        
         Assert.assertEquals(DEFAULT_APP_NAME, AppNameUtils.getAppName());
         
     }

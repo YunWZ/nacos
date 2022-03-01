@@ -88,7 +88,7 @@ public class ExternalDataSourceServiceImplTest {
     
     @Test
     public void testGetHealth() {
-    
+        
         List<Boolean> isHealthList = new ArrayList<>();
         ReflectionTestUtils.setField(service, "isHealthList", isHealthList);
         Assert.assertEquals("UP", service.getHealth());
@@ -100,7 +100,7 @@ public class ExternalDataSourceServiceImplTest {
         List<JdbcTemplate> testJtList = new ArrayList<>();
         testJtList.add(jt);
         ReflectionTestUtils.setField(service, "testJtList", testJtList);
-    
+        
         List<Boolean> isHealthList = new ArrayList<>();
         isHealthList.add(Boolean.FALSE);
         ReflectionTestUtils.setField(service, "isHealthList", isHealthList);

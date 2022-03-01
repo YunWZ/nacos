@@ -52,7 +52,7 @@ public class PropertyUtilTest {
         EnvUtil.setEnvironment(configurableEnvironment);
         envUtilMockedStatic.when(() -> EnvUtil.getProperty(eq("test"), eq("default"))).thenReturn("default");
         Assert.assertEquals("default", new PropertyUtil().getProperty("test", "default"));
-    
+        
         envUtilMockedStatic.close();
     }
     

@@ -24,8 +24,8 @@ import com.alibaba.nacos.naming.misc.SwitchDomain;
 import com.alibaba.nacos.naming.pojo.Subscriber;
 import com.alibaba.nacos.naming.remote.udp.AckEntry;
 import com.alibaba.nacos.naming.remote.udp.UdpConnector;
+import com.fasterxml.jackson.core.util.VersionUtil;
 import org.apache.commons.collections.MapUtils;
-import org.codehaus.jackson.util.VersionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -114,16 +114,16 @@ public class UdpPushService {
             dataBytes = compressIfNecessary(dataBytes);
             return prepareAckEntry(socketAddress, dataBytes, data, lastRefTime);
         } catch (Exception e) {
-            Loggers.PUSH
-                    .error("[NACOS-PUSH] failed to compress data: {} to client: {}, error: {}", data, socketAddress, e);
+            Loggers.PUSH.error("[NACOS-PUSH] failed to compress data: {} to client: {}, error: {}", data, socketAddress,
+                    e);
             return null;
         }
     }
     
     private static AckEntry prepareAckEntry(InetSocketAddress socketAddress, byte[] dataBytes, Map<String, Object> data,
             long lastRefTime) {
-        String key = AckEntry
-                .getAckKey(socketAddress.getAddress().getHostAddress(), socketAddress.getPort(), lastRefTime);
+        String key = AckEntry.getAckKey(socketAddress.getAddress().getHostAddress(), socketAddress.getPort(),
+                lastRefTime);
         try {
             DatagramPacket packet = new DatagramPacket(dataBytes, dataBytes.length, socketAddress);
             AckEntry ackEntry = new AckEntry(key, packet);
@@ -132,8 +132,8 @@ public class UdpPushService {
             ackEntry.setData(data);
             return ackEntry;
         } catch (Exception e) {
-            Loggers.PUSH
-                    .error("[NACOS-PUSH] failed to prepare data: {} to client: {}, error: {}", data, socketAddress, e);
+            Loggers.PUSH.error("[NACOS-PUSH] failed to prepare data: {} to client: {}, error: {}", data, socketAddress,
+                    e);
         }
         return null;
     }
@@ -152,20 +152,23 @@ public class UdpPushService {
         
         ClientInfo clientInfo = new ClientInfo(agent);
         
-        if (ClientInfo.ClientType.JAVA == clientInfo.type
-                && clientInfo.version.compareTo(VersionUtil.parseVersion(switchDomain.getPushJavaVersion())) >= 0) {
+        if (ClientInfo.ClientType.JAVA == clientInfo.type && clientInfo.version.compareTo(
+                VersionUtil.parseVersion(switchDomain.getPushJavaVersion(), "com.alibaba.nacos", "nacos-client"))
+                >= 0) {
             return true;
-        } else if (ClientInfo.ClientType.DNS == clientInfo.type
-                && clientInfo.version.compareTo(VersionUtil.parseVersion(switchDomain.getPushPythonVersion())) >= 0) {
+        } else if (ClientInfo.ClientType.DNS == clientInfo.type && clientInfo.version.compareTo(
+                VersionUtil.parseVersion(switchDomain.getPushPythonVersion(), "com.alibaba.nacos", "nacos-client"))
+                >= 0) {
             return true;
-        } else if (ClientInfo.ClientType.C == clientInfo.type
-                && clientInfo.version.compareTo(VersionUtil.parseVersion(switchDomain.getPushCVersion())) >= 0) {
+        } else if (ClientInfo.ClientType.C == clientInfo.type && clientInfo.version.compareTo(
+                VersionUtil.parseVersion(switchDomain.getPushCVersion(), "com.alibaba.nacos", "nacos-client")) >= 0) {
             return true;
-        } else if (ClientInfo.ClientType.GO == clientInfo.type
-                && clientInfo.version.compareTo(VersionUtil.parseVersion(switchDomain.getPushGoVersion())) >= 0) {
+        } else if (ClientInfo.ClientType.GO == clientInfo.type && clientInfo.version.compareTo(
+                VersionUtil.parseVersion(switchDomain.getPushGoVersion(), "com.alibaba.nacos", "nacos-client")) >= 0) {
             return true;
-        } else if (ClientInfo.ClientType.CSHARP == clientInfo.type
-                && clientInfo.version.compareTo(VersionUtil.parseVersion(switchDomain.getPushCSharpVersion())) >= 0) {
+        } else if (ClientInfo.ClientType.CSHARP == clientInfo.type && clientInfo.version.compareTo(
+                VersionUtil.parseVersion(switchDomain.getPushCSharpVersion(), "com.alibaba.nacos", "nacos-client"))
+                >= 0) {
             return true;
         }
         

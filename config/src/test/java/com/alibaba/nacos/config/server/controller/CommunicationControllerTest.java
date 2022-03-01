@@ -28,6 +28,9 @@ import com.alibaba.nacos.core.remote.ConnectionManager;
 import com.alibaba.nacos.core.remote.ConnectionMeta;
 import com.alibaba.nacos.core.remote.grpc.GrpcConnection;
 import com.alibaba.nacos.sys.env.EnvUtil;
+import io.grpc.netty.shaded.io.netty.channel.Channel;
+import io.grpc.stub.StreamObserver;
+import jakarta.servlet.ServletContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,8 +47,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import javax.servlet.ServletContext;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,9 +68,6 @@ public class CommunicationControllerTest {
     private MockMvc mockMvc;
     
     @Mock
-    private ServletContext servletContext;
-    
-    @Mock
     DumpService dumpService;
     
     @Mock
@@ -80,6 +78,9 @@ public class CommunicationControllerTest {
     
     @Mock
     ConnectionManager connectionManager;
+    
+    @Mock
+    private ServletContext servletContext;
     
     @Before
     public void setUp() {
@@ -128,7 +129,7 @@ public class CommunicationControllerTest {
         listenersClients.add(connectionId);
         when(configChangeListenContext.getListeners(groupKey)).thenReturn(listenersClients);
         ConnectionMeta connectionMeta = new ConnectionMeta(connectionId, connectionId, connectionId, 8888, 9848, "GRPC", "", "", new HashMap<>());
-        Connection client = new GrpcConnection(connectionMeta, null, null);
+        Connection client = new GrpcConnection(connectionMeta, null, (Channel) null);
         when(connectionManager.getConnection(connectionId)).thenReturn(client);
         when(configChangeListenContext.getListenKeyMd5(connectionId, groupKey)).thenReturn("md5");
         
@@ -146,7 +147,7 @@ public class CommunicationControllerTest {
         result.setLisentersGroupkeyStatus(new HashMap<>());
         when(longPollingService.getCollectSubscribleInfoByIp(ip)).thenReturn(result);
         ConnectionMeta connectionMeta = new ConnectionMeta(ip, ip, ip, 8888, 9848, "GRPC", "", "", new HashMap<>());
-        Connection connection = new GrpcConnection(connectionMeta, null, null);
+        Connection connection = new GrpcConnection(connectionMeta, (StreamObserver) null, (Channel) null);
         List<Connection> connectionList = new ArrayList<>();
         connectionList.add(connection);
         when(connectionManager.getConnectionByIp(ip)).thenReturn(connectionList);

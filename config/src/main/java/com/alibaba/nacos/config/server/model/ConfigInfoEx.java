@@ -26,8 +26,8 @@ public class ConfigInfoEx extends ConfigInfo {
     private static final long serialVersionUID = 8905036592920606608L;
     
     /**
-     * Single message status code, when querying for batch.
-     * And details of message status code, you can see Constants.java.
+     * Single message status code, when querying for batch. And details of message status code, you can see
+     * Constants.java.
      */
     private int status;
     

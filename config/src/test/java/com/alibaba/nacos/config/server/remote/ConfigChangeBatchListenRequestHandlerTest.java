@@ -37,15 +37,15 @@ import static org.mockito.ArgumentMatchers.eq;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigChangeBatchListenRequestHandlerTest extends TestCase {
-
+    
     @InjectMocks
     private ConfigChangeBatchListenRequestHandler configQueryRequestHandler;
-
+    
     @InjectMocks
     private ConfigChangeListenContext configChangeListenContext;
-
+    
     private RequestMeta requestMeta;
-
+    
     @Before
     public void setUp() {
         configQueryRequestHandler = new ConfigChangeBatchListenRequestHandler();
@@ -53,7 +53,7 @@ public class ConfigChangeBatchListenRequestHandlerTest extends TestCase {
         requestMeta = new RequestMeta();
         requestMeta.setClientIp("1.1.1.1");
     }
-
+    
     @Test
     public void testHandle() {
         MockedStatic<ConfigCacheService> configCacheServiceMockedStatic = Mockito.mockStatic(ConfigCacheService.class);
@@ -63,7 +63,7 @@ public class ConfigChangeBatchListenRequestHandlerTest extends TestCase {
         String tenant = "tenant";
         String groupKey = GroupKey2.getKey(dataId, group, tenant);
         groupKey = StringPool.get(groupKey);
-    
+        
         final String groupKeyCopy = groupKey;
         configCacheServiceMockedStatic.when(
                 () -> ConfigCacheService.isUptodate(eq(groupKeyCopy), Mockito.any(), Mockito.any(), Mockito.any()))
@@ -71,8 +71,8 @@ public class ConfigChangeBatchListenRequestHandlerTest extends TestCase {
         ConfigBatchListenRequest configChangeListenRequest = new ConfigBatchListenRequest();
         configChangeListenRequest.addConfigListenContext(group, dataId, tenant, " ");
         try {
-            ConfigChangeBatchListenResponse configChangeBatchListenResponse = configQueryRequestHandler
-                    .handle(configChangeListenRequest, requestMeta);
+            ConfigChangeBatchListenResponse configChangeBatchListenResponse = configQueryRequestHandler.handle(
+                    configChangeListenRequest, requestMeta);
             boolean hasChange = false;
             for (ConfigChangeBatchListenResponse.ConfigContext changedConfig : configChangeBatchListenResponse.getChangedConfigs()) {
                 if (changedConfig.getDataId().equals(dataId)) {
@@ -87,5 +87,5 @@ public class ConfigChangeBatchListenRequestHandlerTest extends TestCase {
             configCacheServiceMockedStatic.close();
         }
     }
-
+    
 }

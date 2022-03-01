@@ -40,9 +40,8 @@ public class SimpleFlowData {
     
     private int slotCount;
     
-    private ScheduledExecutorService timer = ExecutorFactory.Managed
-            .newSingleScheduledExecutorService(ClassUtils.getCanonicalName(Config.class),
-                    new NameThreadFactory("com.alibaba.nacos.config.flow.control"));
+    private ScheduledExecutorService timer = ExecutorFactory.Managed.newSingleScheduledExecutorService(
+            ClassUtils.getCanonicalName(Config.class), new NameThreadFactory("com.alibaba.nacos.config.flow.control"));
     
     public SimpleFlowData(int slotCount, int interval) {
         this.slotCount = slotCount;

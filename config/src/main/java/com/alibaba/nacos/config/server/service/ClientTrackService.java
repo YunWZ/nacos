@@ -31,6 +31,11 @@ import java.util.concurrent.ConcurrentMap;
 public class ClientTrackService {
     
     /**
+     * All of client records, adding or deleting.
+     */
+    static volatile ConcurrentMap<String, ClientRecord> clientRecords = new ConcurrentHashMap<>();
+    
+    /**
      * Track client's md5 value.
      */
     public static void trackClientMd5(String ip, Map<String, String> clientMd5Map) {
@@ -95,7 +100,7 @@ public class ClientTrackService {
      */
     public static Map<String, SubscriberStatus> listSubStatus(String ip) {
         Map<String, SubscriberStatus> status = new HashMap<>(100);
-
+        
         // record here is non-null
         ClientRecord record = getClientRecord(ip);
         for (Map.Entry<String, String> entry : record.getGroupKey2md5Map().entrySet()) {
@@ -130,8 +135,7 @@ public class ClientTrackService {
     }
     
     /**
-     * Specify subscriber's ip and look up whether data is latest.
-     * groupKey -> isUptodate.
+     * Specify subscriber's ip and look up whether data is latest. groupKey -> isUptodate.
      */
     public static Map<String, Boolean> isClientUptodate(String ip) {
         Map<String, Boolean> result = new HashMap<>(100);
@@ -145,8 +149,7 @@ public class ClientTrackService {
     }
     
     /**
-     * Specify groupKey and look up whether subscriber and data is latest.
-     * IP -> isUptodate.
+     * Specify groupKey and look up whether subscriber and data is latest. IP -> isUptodate.
      */
     public static Map<String, Boolean> listSubscriberByGroup(String groupKey) {
         Map<String, Boolean> subs = new HashMap<>(100);
@@ -180,11 +183,6 @@ public class ClientTrackService {
     public static void refreshClientRecord() {
         clientRecords = new ConcurrentHashMap<>(50);
     }
-    
-    /**
-     * All of client records, adding or deleting.
-     */
-    static volatile ConcurrentMap<String, ClientRecord> clientRecords = new ConcurrentHashMap<>();
 }
 
 

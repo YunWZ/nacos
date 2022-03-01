@@ -73,7 +73,7 @@ public class LookupFactoryTest extends TestCase {
     
     @Test
     public void createLookUpFileConfigMemberLookup() throws Exception {
-        EnvUtil.setIsStandalone(false);
+        //
         mockEnvironment.setProperty(LOOKUP_MODE_TYPE, "file");
         memberLookup = LookupFactory.createLookUp(memberManager);
         assertEquals(FileConfigMemberLookup.class, memberLookup.getClass());

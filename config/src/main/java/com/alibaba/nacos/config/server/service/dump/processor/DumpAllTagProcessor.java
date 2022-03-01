@@ -36,6 +36,12 @@ import static com.alibaba.nacos.config.server.utils.LogUtil.DEFAULT_LOG;
  */
 public class DumpAllTagProcessor implements NacosTaskProcessor {
     
+    static final int PAGE_SIZE = 1000;
+    
+    final DumpService dumpService;
+    
+    final ConfigInfoTagPersistService configInfoTagPersistService;
+    
     public DumpAllTagProcessor(DumpService dumpService) {
         this.dumpService = dumpService;
         this.configInfoTagPersistService = dumpService.getConfigInfoTagPersistService();
@@ -48,12 +54,12 @@ public class DumpAllTagProcessor implements NacosTaskProcessor {
         
         int actualRowCount = 0;
         for (int pageNo = 1; pageNo <= pageCount; pageNo++) {
-            Page<ConfigInfoTagWrapper> page = configInfoTagPersistService.findAllConfigInfoTagForDumpAll(pageNo, PAGE_SIZE);
+            Page<ConfigInfoTagWrapper> page = configInfoTagPersistService.findAllConfigInfoTagForDumpAll(pageNo,
+                    PAGE_SIZE);
             if (page != null) {
                 for (ConfigInfoTagWrapper cf : page.getPageItems()) {
-                    boolean result = ConfigCacheService
-                            .dumpTag(cf.getDataId(), cf.getGroup(), cf.getTenant(), cf.getTag(), cf.getContent(),
-                                    cf.getLastModified(), cf.getEncryptedDataKey());
+                    boolean result = ConfigCacheService.dumpTag(cf.getDataId(), cf.getGroup(), cf.getTenant(),
+                            cf.getTag(), cf.getContent(), cf.getLastModified(), cf.getEncryptedDataKey());
                     LogUtil.DUMP_LOG.info("[dump-all-Tag-ok] result={}, {}, {}, length={}, md5={}", result,
                             GroupKey2.getKey(cf.getDataId(), cf.getGroup()), cf.getLastModified(),
                             cf.getContent().length(), cf.getMd5());
@@ -65,10 +71,4 @@ public class DumpAllTagProcessor implements NacosTaskProcessor {
         }
         return true;
     }
-    
-    static final int PAGE_SIZE = 1000;
-    
-    final DumpService dumpService;
-    
-    final ConfigInfoTagPersistService configInfoTagPersistService;
 }

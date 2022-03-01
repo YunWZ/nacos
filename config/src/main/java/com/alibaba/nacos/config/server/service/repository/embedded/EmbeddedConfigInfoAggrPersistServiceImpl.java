@@ -54,14 +54,15 @@ import static com.alibaba.nacos.config.server.service.repository.RowMapperManage
  *
  * @author lixiaoshuang
  */
-@SuppressWarnings({"PMD.MethodReturnWrapperTypeRule", "checkstyle:linelength"})
+@SuppressWarnings({"PMD.MethodReturnWrapperTypeRule", "checkstyle:linelength", "PMD.MethodTooLongRule",
+        "PMD.LowerCamelCaseVariableNamingRule"})
 @Conditional(value = ConditionOnEmbeddedStorage.class)
 @Service("embeddedConfigInfoAggrPersistServiceImpl")
 public class EmbeddedConfigInfoAggrPersistServiceImpl implements ConfigInfoAggrPersistService {
     
-    private DataSourceService dataSourceService;
-    
     private final DatabaseOperate databaseOperate;
+    
+    private DataSourceService dataSourceService;
     
     private MapperManager mapperManager;
     

@@ -17,19 +17,19 @@
 package com.alibaba.nacos.config.server.controller;
 
 import com.alibaba.nacos.common.model.RestResult;
+import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.config.server.constant.Constants;
 import com.alibaba.nacos.config.server.model.capacity.Capacity;
 import com.alibaba.nacos.config.server.service.capacity.CapacityService;
-import com.alibaba.nacos.common.utils.StringUtils;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Capacity Management.
@@ -42,13 +42,13 @@ public class CapacityController {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(CapacityController.class);
     
-    private final CapacityService capacityService;
-    
     private static final int STATUS200 = 200;
     
     private static final int STATUS400 = 400;
     
     private static final int STATUS500 = 500;
+    
+    private final CapacityService capacityService;
     
     public CapacityController(CapacityService capacityService) {
         this.capacityService = capacityService;
@@ -131,8 +131,8 @@ public class CapacityController {
             return restResult;
         }
         try {
-            boolean insertOrUpdateResult = capacityService
-                    .insertOrUpdateCapacity(group, tenant, quota, maxSize, maxAggrCount, maxAggrSize);
+            boolean insertOrUpdateResult = capacityService.insertOrUpdateCapacity(group, tenant, quota, maxSize,
+                    maxAggrCount, maxAggrSize);
             if (insertOrUpdateResult) {
                 setSuccessResult(response, restResult);
                 restResult.setMessage(

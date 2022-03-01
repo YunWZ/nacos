@@ -44,6 +44,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class StandaloneExternalStorageTest {
     
+    PropertyUtil propertyUtil = new PropertyUtil();
+    
     @InjectMocks
     private DynamicDataSource dataSource;
     
@@ -54,8 +56,6 @@ public class StandaloneExternalStorageTest {
     
     @Mock
     private ExternalDataSourceServiceImpl basicDataSourceService;
-    
-    PropertyUtil propertyUtil = new PropertyUtil();
     
     @Before
     public void setUp() throws Exception {

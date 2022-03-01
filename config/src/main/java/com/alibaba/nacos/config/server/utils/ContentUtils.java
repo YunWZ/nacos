@@ -27,6 +27,8 @@ import static com.alibaba.nacos.config.server.constant.Constants.WORD_SEPARATOR;
  */
 public class ContentUtils {
     
+    private static final int LIMIT_CONTENT_SIZE = 100;
+    
     /**
      * verify the pub config content.
      *
@@ -39,7 +41,8 @@ public class ContentUtils {
         for (int i = 0; i < content.length(); i++) {
             char c = content.charAt(i);
             if (c == '\r' || c == '\n') {
-                throw new IllegalArgumentException("The content for publishing or deleting cannot contain enter and next line symbol!");
+                throw new IllegalArgumentException(
+                        "The content for publishing or deleting cannot contain enter and next line symbol!");
             }
             if (c == Constants.WORD_SEPARATOR.charAt(0)) {
                 throw new IllegalArgumentException("The content for publishing or deleting cannot contain (char)2!");
@@ -78,6 +81,4 @@ public class ContentUtils {
             return content.substring(0, 100) + "...";
         }
     }
-    
-    private static final int LIMIT_CONTENT_SIZE = 100;
 }

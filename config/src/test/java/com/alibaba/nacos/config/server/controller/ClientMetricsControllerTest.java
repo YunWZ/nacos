@@ -22,6 +22,7 @@ import com.alibaba.nacos.core.cluster.ServerMemberManager;
 import com.alibaba.nacos.core.remote.Connection;
 import com.alibaba.nacos.core.remote.ConnectionManager;
 import com.alibaba.nacos.sys.env.EnvUtil;
+import jakarta.servlet.ServletContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,8 +41,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import javax.servlet.ServletContext;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +53,7 @@ import static org.mockito.Mockito.when;
 @ContextConfiguration(classes = MockServletContext.class)
 @WebAppConfiguration
 public class ClientMetricsControllerTest {
-
+    
     @InjectMocks
     ClientMetricsController clientMetricsController;
     
@@ -80,11 +79,11 @@ public class ClientMetricsControllerTest {
     
     @Test
     public void testGetClusterMetric() throws Exception {
-    
+        
         when(memberManager.allMembers()).thenReturn(new ArrayList<>());
-    
-        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(Constants.METRICS_CONTROLLER_PATH + "/cluster")
-                .param("ip", "127.0.0.1").param("tenant", "test")
+        
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(
+                        Constants.METRICS_CONTROLLER_PATH + "/cluster").param("ip", "127.0.0.1").param("tenant", "test")
                 .param("dataId", "test").param("group", "test");
         int actualValue = mockMvc.perform(builder).andReturn().getResponse().getStatus();
         Assert.assertEquals(200, actualValue);
@@ -92,7 +91,7 @@ public class ClientMetricsControllerTest {
     
     @Test
     public void testGetCurrentMetric() throws Exception {
-    
+        
         ClientConfigMetricResponse response = new ClientConfigMetricResponse();
         response.putMetric("test", "test");
         Connection connection = Mockito.mock(Connection.class);
@@ -100,13 +99,13 @@ public class ClientMetricsControllerTest {
         List<Connection> connections = new ArrayList<>();
         connections.add(connection);
         when(connectionManager.getConnectionByIp(eq("127.0.0.1"))).thenReturn(connections);
-    
-        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(Constants.METRICS_CONTROLLER_PATH + "/current")
-                .param("ip", "127.0.0.1").param("tenant", "test")
+        
+        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get(
+                        Constants.METRICS_CONTROLLER_PATH + "/current").param("ip", "127.0.0.1").param("tenant", "test")
                 .param("dataId", "test").param("group", "test");
         String actualValue = mockMvc.perform(builder).andReturn().getResponse().getContentAsString();
         Assert.assertEquals("{\"test\":\"test\"}", actualValue);
-    
+        
     }
     
 }

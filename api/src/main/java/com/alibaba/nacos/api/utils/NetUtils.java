@@ -46,7 +46,7 @@ public class NetUtils {
      *
      * @return local ip
      */
-    public static String localIP() {
+    public static String localIp() {
         if (!StringUtils.isEmpty(localIp)) {
             return localIp;
         }

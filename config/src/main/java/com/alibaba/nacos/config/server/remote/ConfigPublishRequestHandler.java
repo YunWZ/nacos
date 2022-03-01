@@ -34,8 +34,8 @@ import com.alibaba.nacos.config.server.service.repository.ConfigInfoTagPersistSe
 import com.alibaba.nacos.config.server.service.trace.ConfigTraceService;
 import com.alibaba.nacos.config.server.utils.ParamUtils;
 import com.alibaba.nacos.config.server.utils.TimeUtils;
-import com.alibaba.nacos.core.remote.RequestHandler;
 import com.alibaba.nacos.core.control.TpsControl;
+import com.alibaba.nacos.core.remote.RequestHandler;
 import com.alibaba.nacos.core.utils.Loggers;
 import com.alibaba.nacos.plugin.auth.constant.ActionTypes;
 import com.alibaba.nacos.plugin.auth.constant.SignType;
@@ -53,6 +53,7 @@ import java.util.Map;
  * @version $Id: ConfigPublishRequestHandler.java, v 0.1 2020年07月16日 4:41 PM liuzunfei Exp $
  */
 @Component
+@SuppressWarnings("PMD.MethodTooLongRule")
 public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishRequest, ConfigPublishResponse> {
     
     private final ConfigInfoPersistService configInfoPersistService;
@@ -101,8 +102,8 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
             ParamUtils.checkParam(configAdvanceInfo);
             
             if (AggrWhitelist.isAggrDataId(dataId)) {
-                Loggers.REMOTE_DIGEST
-                        .warn("[aggr-conflict] {} attempt to publish single data, {}, {}", srcIp, dataId, group);
+                Loggers.REMOTE_DIGEST.warn("[aggr-conflict] {} attempt to publish single data, {}, {}", srcIp, dataId,
+                        group);
                 throw new NacosException(NacosException.NO_RIGHT, "dataId:" + dataId + " is aggr");
             }
             
@@ -115,21 +116,22 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
             if (StringUtils.isBlank(betaIps)) {
                 if (StringUtils.isBlank(tag)) {
                     if (StringUtils.isNotBlank(request.getCasMd5())) {
-                        boolean casSuccess = configInfoPersistService
-                                .insertOrUpdateCas(srcIp, srcUser, configInfo, time, configAdvanceInfo, false);
+                        boolean casSuccess = configInfoPersistService.insertOrUpdateCas(srcIp, srcUser, configInfo,
+                                time, configAdvanceInfo, false);
                         if (!casSuccess) {
                             return ConfigPublishResponse.buildFailResponse(ResponseCode.FAIL.getCode(),
                                     "Cas publish fail,server md5 may have changed.");
                         }
                     } else {
-                        configInfoPersistService.insertOrUpdate(srcIp, srcUser, configInfo, time, configAdvanceInfo, false);
+                        configInfoPersistService.insertOrUpdate(srcIp, srcUser, configInfo, time, configAdvanceInfo,
+                                false);
                     }
                     ConfigChangePublisher.notifyConfigChange(
                             new ConfigDataChangeEvent(false, dataId, group, tenant, time.getTime()));
                 } else {
                     if (StringUtils.isNotBlank(request.getCasMd5())) {
-                        boolean casSuccess = configInfoTagPersistService
-                                .insertOrUpdateTagCas(configInfo, tag, srcIp, srcUser, time, false);
+                        boolean casSuccess = configInfoTagPersistService.insertOrUpdateTagCas(configInfo, tag, srcIp,
+                                srcUser, time, false);
                         if (!casSuccess) {
                             return ConfigPublishResponse.buildFailResponse(ResponseCode.FAIL.getCode(),
                                     "Cas publish tag config fail,server md5 may have changed.");
@@ -144,8 +146,8 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
             } else {
                 // beta publish
                 if (StringUtils.isNotBlank(request.getCasMd5())) {
-                    boolean casSuccess = configInfoBetaPersistService
-                            .insertOrUpdateBetaCas(configInfo, betaIps, srcIp, srcUser, time, false);
+                    boolean casSuccess = configInfoBetaPersistService.insertOrUpdateBetaCas(configInfo, betaIps, srcIp,
+                            srcUser, time, false);
                     if (!casSuccess) {
                         return ConfigPublishResponse.buildFailResponse(ResponseCode.FAIL.getCode(),
                                 "Cas publish beta config fail,server md5 may have changed.");
@@ -154,12 +156,11 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
                     configInfoBetaPersistService.insertOrUpdateBeta(configInfo, betaIps, srcIp, srcUser, time, false);
                     
                 }
-                ConfigChangePublisher
-                        .notifyConfigChange(new ConfigDataChangeEvent(true, dataId, group, tenant, time.getTime()));
+                ConfigChangePublisher.notifyConfigChange(
+                        new ConfigDataChangeEvent(true, dataId, group, tenant, time.getTime()));
             }
-            ConfigTraceService
-                    .logPersistenceEvent(dataId, group, tenant, requestIpApp, time.getTime(), InetUtils.getSelfIP(),
-                            ConfigTraceService.PERSISTENCE_EVENT_PUB, content);
+            ConfigTraceService.logPersistenceEvent(dataId, group, tenant, requestIpApp, time.getTime(),
+                    InetUtils.getSelfIP(), ConfigTraceService.PERSISTENCE_EVENT_PUB, content);
             return ConfigPublishResponse.buildSuccessResponse();
         } catch (Exception e) {
             Loggers.REMOTE_DIGEST.error("[ConfigPublishRequestHandler] publish config error ,request ={}", request, e);

@@ -121,10 +121,10 @@ public class FailoverReactor implements Closeable {
      * @return new date
      */
     public Date addDay(Date date, int num) {
-        Calendar startDT = Calendar.getInstance();
-        startDT.setTime(date);
-        startDT.add(Calendar.DAY_OF_MONTH, num);
-        return startDT.getTime();
+        Calendar startDt = Calendar.getInstance();
+        startDt.setTime(date);
+        startDt.add(Calendar.DAY_OF_MONTH, num);
+        return startDt.getTime();
     }
     
     @Override

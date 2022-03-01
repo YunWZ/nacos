@@ -27,21 +27,21 @@ import java.util.Set;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigChangeListenContextTest {
-
+    
     private ConfigChangeListenContext configChangeListenContext;
-
+    
     @Before
     public void setUp() throws Exception {
         configChangeListenContext = new ConfigChangeListenContext();
     }
-
+    
     @Test
     public void testAddListen() {
         configChangeListenContext.addListen("groupKey", "md5", "connectionId");
         Set<String> groupKey = configChangeListenContext.getListeners("groupKey");
         Assert.assertEquals(1, groupKey.size());
     }
-
+    
     @Test
     public void testRemoveListen() {
         configChangeListenContext.addListen("groupKey", "md5", "connectionId");
@@ -49,14 +49,14 @@ public class ConfigChangeListenContextTest {
         Set<String> groupKey = configChangeListenContext.getListeners("groupKey");
         Assert.assertNull(groupKey);
     }
-
+    
     @Test
     public void testGetListeners() {
         configChangeListenContext.addListen("groupKey", "md5", "connectionId");
         Set<String> groupKey = configChangeListenContext.getListeners("groupKey");
         Assert.assertEquals(1, groupKey.size());
     }
-
+    
     @Test
     public void testClearContextForConnectionId() {
         configChangeListenContext.addListen("groupKey", "md5", "connectionId");
@@ -66,19 +66,19 @@ public class ConfigChangeListenContextTest {
         Map<String, String> connectionIdAfter = configChangeListenContext.getListenKeys("connectionId");
         Assert.assertNull(connectionIdAfter);
     }
-
+    
     @Test
     public void testGetListenKeys() {
         configChangeListenContext.addListen("groupKey", "md5", "connectionId");
         Set<String> groupKey = configChangeListenContext.getListeners("groupKey");
         Assert.assertEquals(1, groupKey.size());
     }
-
+    
     @Test
     public void testGetListenKeyMd5() {
         configChangeListenContext.addListen("groupKey", "md5", "connectionId");
         String listenKeyMd5 = configChangeListenContext.getListenKeyMd5("connectionId", "groupKey");
         Assert.assertEquals("md5", listenKeyMd5);
     }
-
+    
 }

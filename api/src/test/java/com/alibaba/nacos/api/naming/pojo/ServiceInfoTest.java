@@ -72,7 +72,7 @@ public class ServiceInfoTest {
         assertEquals(0, actual.getLastRefTime());
         assertTrue(actual.getHosts().isEmpty());
         assertTrue(actual.isValid());
-        assertFalse(actual.isAllIPs());
+        assertFalse(actual.isAllIps());
     }
     
     @Test

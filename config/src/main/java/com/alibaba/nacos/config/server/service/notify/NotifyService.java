@@ -32,16 +32,8 @@ import java.util.List;
  *
  * @author jiuRen
  */
+@SuppressWarnings("PMD.LowerCamelCaseVariableNamingRule")
 public class NotifyService {
-    
-    @Autowired
-    public NotifyService(ServerMemberManager memberManager) {
-        notifyTaskManager = new TaskManager("com.alibaba.nacos.NotifyTaskManager");
-        notifyTaskManager.setDefaultTaskProcessor(new NotifyTaskProcessor(memberManager));
-    }
-    
-    protected NotifyService() {
-    }
     
     /**
      * In order to facilitate the system beta, without changing the notify.do interface, the new lastModifed parameter
@@ -53,6 +45,15 @@ public class NotifyService {
     
     private TaskManager notifyTaskManager;
     
+    @Autowired
+    public NotifyService(ServerMemberManager memberManager) {
+        notifyTaskManager = new TaskManager("com.alibaba.nacos.NotifyTaskManager");
+        notifyTaskManager.setDefaultTaskProcessor(new NotifyTaskProcessor(memberManager));
+    }
+    
+    protected NotifyService() {
+    }
+    
     /**
      * Invoke http get request.
      *
@@ -62,7 +63,7 @@ public class NotifyService {
      * @return {@link com.alibaba.nacos.common.model.RestResult}
      * @throws Exception throw Exception
      */
-    @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
+    @SuppressWarnings({"checkstyle:AbbreviationAsWordInName", "PMD.:LowerCamelCaseVariableNamingRule"})
     public static RestResult<String> invokeURL(String url, List<String> headers, String encoding) throws Exception {
         Header header = Header.newInstance();
         header.addParam(HttpHeaderConsts.ACCEPT_CHARSET, encoding);

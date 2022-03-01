@@ -73,6 +73,6 @@ public final class PreconditionsTest {
     
     @Test(expected = IllegalArgumentException.class)
     public void testCheckArgument3Args1false3null() {
-        Preconditions.checkArgument(false, ERRORMSG, null);
+        Preconditions.checkArgument(false, ERRORMSG, (Object) null);
     }
 }

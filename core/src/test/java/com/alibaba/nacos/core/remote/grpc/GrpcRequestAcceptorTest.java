@@ -44,6 +44,7 @@ import io.grpc.ServerCallHandler;
 import io.grpc.ServerInterceptor;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
+import io.grpc.netty.shaded.io.netty.channel.Channel;
 import io.grpc.stub.StreamObserver;
 import io.grpc.testing.GrpcCleanupRule;
 import org.junit.Assert;
@@ -292,7 +293,7 @@ public class GrpcRequestAcceptorTest {
         String ip = "1.1.1.1";
         ConnectionMeta connectionMeta = new ConnectionMeta(connectId, ip, ip, 8888, 9848, "GRPC", "", "",
                 new HashMap<>());
-        Connection connection = new GrpcConnection(connectionMeta, null, null);
+        Connection connection = new GrpcConnection(connectionMeta, null, (Channel) null);
         Mockito.when(connectionManager.getConnection(Mockito.any())).thenReturn(connection);
         
         RequestMeta metadata = new RequestMeta();

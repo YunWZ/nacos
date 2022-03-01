@@ -58,16 +58,17 @@ import static com.alibaba.nacos.config.server.service.repository.RowMapperManage
  *
  * @author lixiaoshuang
  */
-@SuppressWarnings(value = {"PMD.MethodReturnWrapperTypeRule", "checkstyle:linelength"})
+@SuppressWarnings(value = {"PMD.MethodReturnWrapperTypeRule", "checkstyle:linelength", "PMD.MethodTooLongRule",
+        "PMD.LowerCamelCaseVariableNamingRule"})
 @Conditional(value = ConditionOnExternalStorage.class)
 @Service("externalConfigInfoAggrPersistServiceImpl")
 public class ExternalConfigInfoAggrPersistServiceImpl implements ConfigInfoAggrPersistService {
     
-    private DataSourceService dataSourceService;
-    
     protected JdbcTemplate jt;
     
     protected TransactionTemplate tjt;
+    
+    private DataSourceService dataSourceService;
     
     private MapperManager mapperManager;
     

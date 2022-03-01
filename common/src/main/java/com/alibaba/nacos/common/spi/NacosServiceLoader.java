@@ -16,6 +16,7 @@
 
 package com.alibaba.nacos.common.spi;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -38,7 +39,7 @@ public class NacosServiceLoader {
      * <p>Load service by SPI and cache the classes for reducing cost when load second time.
      *
      * @param service service class
-     * @param <T> type of service
+     * @param <T>     type of service
      * @return service instances
      */
     public static <T> Collection<T> load(final Class<T> service) {
@@ -64,7 +65,7 @@ public class NacosServiceLoader {
      * New service instances.
      *
      * @param service service class
-     * @param <T> type of service
+     * @param <T>     type of service
      * @return service instances
      */
     public static <T> Collection<T> newServiceInstances(final Class<T> service) {
@@ -82,9 +83,10 @@ public class NacosServiceLoader {
     
     private static Object newServiceInstance(final Class<?> clazz) {
         try {
-            return clazz.newInstance();
-        } catch (IllegalAccessException | InstantiationException e) {
-            throw new ServiceLoaderException(clazz, e);
+            return clazz.getDeclaredConstructor().newInstance();
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException
+              |   NoSuchMethodException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -215,7 +215,7 @@ public final class RowMapperManager {
             try {
                 info.setEncryptedDataKey(rs.getString("encrypted_data_key"));
             } catch (SQLException ignore) {
-        
+            
             }
             return info;
         }
@@ -389,7 +389,7 @@ public final class RowMapperManager {
             try {
                 info.setEncryptedDataKey(rs.getString("encrypted_data_key"));
             } catch (SQLException ignore) {
-        
+            
             }
             return info;
         }
@@ -538,7 +538,7 @@ public final class RowMapperManager {
             try {
                 configHistoryInfo.setEncryptedDataKey(rs.getString("encrypted_data_key"));
             } catch (SQLException ignore) {
-        
+            
             }
             return configHistoryInfo;
         }

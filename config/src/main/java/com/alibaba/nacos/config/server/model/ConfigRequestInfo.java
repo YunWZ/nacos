@@ -21,6 +21,7 @@ import java.util.Objects;
 
 /**
  * ConfigRequestInfo.
+ *
  * @author dongyafei
  * @date 2022/8/11
  */
@@ -76,8 +77,8 @@ public class ConfigRequestInfo implements Serializable {
             return false;
         }
         ConfigRequestInfo that = (ConfigRequestInfo) o;
-        return Objects.equals(srcIp, that.srcIp) && Objects.equals(requestIpApp, that.requestIpApp) && Objects
-                .equals(betaIps, that.betaIps);
+        return Objects.equals(srcIp, that.srcIp) && Objects.equals(requestIpApp, that.requestIpApp) && Objects.equals(
+                betaIps, that.betaIps);
     }
     
     @Override

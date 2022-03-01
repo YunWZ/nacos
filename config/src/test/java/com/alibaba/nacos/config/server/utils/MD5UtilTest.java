@@ -43,12 +43,13 @@ public class MD5UtilTest {
     
     @Test
     public void testCompareMd5() {
-        final MockedStatic<ConfigCacheService> configCacheServiceMockedStatic = Mockito.mockStatic(ConfigCacheService.class);
-    
+        final MockedStatic<ConfigCacheService> configCacheServiceMockedStatic = Mockito.mockStatic(
+                ConfigCacheService.class);
+        
         configCacheServiceMockedStatic.when(
-                () -> ConfigCacheService.isUptodate(anyString(), anyString(), anyString(), anyString()))
+            () -> ConfigCacheService.isUptodate(anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(false);
-    
+        
         Map<String, String> clientMd5Map = new HashMap<>();
         clientMd5Map.put("test", "test");
         
@@ -60,7 +61,7 @@ public class MD5UtilTest {
         
         Assert.assertEquals(1, changedGroupKeys.size());
         Assert.assertEquals("test", changedGroupKeys.get(0));
-    
+        
         configCacheServiceMockedStatic.close();
         
     }
@@ -81,7 +82,7 @@ public class MD5UtilTest {
         String actualValue = MD5Util.compareMd5OldResult(changedGroupKeys);
         
         Assert.assertEquals("test0:test1;", actualValue);
-    
+        
         groupKey2MockedStatic.close();
         
     }
@@ -105,7 +106,7 @@ public class MD5UtilTest {
         } catch (IOException e) {
             System.out.println(e);
         }
-    
+        
         groupKey2MockedStatic.close();
     }
     
@@ -125,11 +126,11 @@ public class MD5UtilTest {
     @Test
     public void testGetClientMd5MapForNewProtocol() {
         String configKeysString =
-                "test0" + MD5Util.WORD_SEPARATOR_CHAR + "test1" + MD5Util.WORD_SEPARATOR_CHAR + "test2" + MD5Util.WORD_SEPARATOR_CHAR + "test3"
-                        + MD5Util.LINE_SEPARATOR_CHAR;
-    
+                "test0" + MD5Util.WORD_SEPARATOR_CHAR + "test1" + MD5Util.WORD_SEPARATOR_CHAR + "test2"
+                        + MD5Util.WORD_SEPARATOR_CHAR + "test3" + MD5Util.LINE_SEPARATOR_CHAR;
+        
         Map<String, String> actualValueMap = MD5Util.getClientMd5Map(configKeysString);
-    
+        
         Assert.assertEquals("test2", actualValueMap.get("test0+test1+test3"));
     }
     

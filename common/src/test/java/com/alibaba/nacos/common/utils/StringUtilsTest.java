@@ -168,7 +168,7 @@ public class StringUtilsTest {
     
     @Test
     public void isAnyBlank() {
-        Assert.assertTrue(StringUtils.isAnyBlank(null));
+        Assert.assertTrue(StringUtils.isAnyBlank());
         Assert.assertTrue(StringUtils.isAnyBlank(null, "foo"));
         Assert.assertTrue(StringUtils.isAnyBlank(null, null));
         Assert.assertTrue(StringUtils.isAnyBlank("", "bar"));

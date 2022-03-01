@@ -36,6 +36,7 @@ import com.alibaba.nacos.core.remote.core.ServerReloaderRequestHandler;
 import com.alibaba.nacos.core.utils.Commons;
 import com.alibaba.nacos.core.utils.RemoteUtils;
 import com.alibaba.nacos.plugin.auth.constant.ActionTypes;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -64,6 +64,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @RestController
 @RequestMapping(Commons.NACOS_CORE_CONTEXT_V2 + "/loader")
+@SuppressWarnings("PMD.MethodTooLongRule")
 public class ServerLoaderController {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerLoaderController.class);
@@ -312,8 +313,8 @@ public class ServerLoaderController {
         }
         
         try {
-            ServerLoaderInfoResponse handle = serverLoaderInfoRequestHandler
-                    .handle(new ServerLoaderInfoRequest(), new RequestMeta());
+            ServerLoaderInfoResponse handle = serverLoaderInfoRequestHandler.handle(new ServerLoaderInfoRequest(),
+                    new RequestMeta());
             ServerLoaderMetrics metrics = new ServerLoaderMetrics();
             metrics.setAddress(serverMemberManager.getSelf().getAddress());
             metrics.setMetric(handle.getLoaderMetrics());

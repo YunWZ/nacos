@@ -193,24 +193,24 @@ public class ConfigForm implements Serializable {
             return false;
         }
         ConfigForm configForm = (ConfigForm) o;
-        return dataId.equals(configForm.dataId) && group.equals(configForm.group) && Objects.equals(namespaceId, configForm.namespaceId)
-                && content.equals(configForm.content) && Objects.equals(tag, configForm.tag) && Objects
-                .equals(appName, configForm.appName) && Objects.equals(srcUser, configForm.srcUser) && Objects
-                .equals(configTags, configForm.configTags) && Objects.equals(desc, configForm.desc) && Objects
-                .equals(use, configForm.use) && Objects.equals(effect, configForm.effect) && Objects
-                .equals(type, configForm.type) && Objects.equals(schema, configForm.schema);
+        return dataId.equals(configForm.dataId) && group.equals(configForm.group) && Objects.equals(namespaceId,
+                configForm.namespaceId) && content.equals(configForm.content) && Objects.equals(tag, configForm.tag)
+                && Objects.equals(appName, configForm.appName) && Objects.equals(srcUser, configForm.srcUser)
+                && Objects.equals(configTags, configForm.configTags) && Objects.equals(desc, configForm.desc)
+                && Objects.equals(use, configForm.use) && Objects.equals(effect, configForm.effect) && Objects.equals(
+                type, configForm.type) && Objects.equals(schema, configForm.schema);
     }
     
     @Override
     public int hashCode() {
-        return Objects.hash(dataId, group, namespaceId, content, tag, appName, srcUser, configTags, desc, use, effect, type,
-                schema);
+        return Objects.hash(dataId, group, namespaceId, content, tag, appName, srcUser, configTags, desc, use, effect,
+                type, schema);
     }
     
     @Override
     public String toString() {
-        return "ConfigVo{" + "dataId='" + dataId + '\'' + ", group='" + group + '\'' + ", namespaceId='" + namespaceId + '\''
-                + ", content='" + content + '\'' + ", tag='" + tag + '\'' + ", appName='" + appName + '\''
+        return "ConfigVo{" + "dataId='" + dataId + '\'' + ", group='" + group + '\'' + ", namespaceId='" + namespaceId
+                + '\'' + ", content='" + content + '\'' + ", tag='" + tag + '\'' + ", appName='" + appName + '\''
                 + ", srcUser='" + srcUser + '\'' + ", configTags='" + configTags + '\'' + ", desc='" + desc + '\''
                 + ", use='" + use + '\'' + ", effect='" + effect + '\'' + ", type='" + type + '\'' + ", schema='"
                 + schema + '\'' + '}';

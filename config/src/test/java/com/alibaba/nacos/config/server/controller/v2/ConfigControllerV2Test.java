@@ -24,6 +24,8 @@ import com.alibaba.nacos.config.server.model.ConfigRequestInfo;
 import com.alibaba.nacos.config.server.model.form.ConfigForm;
 import com.alibaba.nacos.config.server.service.ConfigOperationService;
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,9 +34,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,14 +46,6 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigControllerV2Test {
     
-    private ConfigControllerV2 configControllerV2;
-    
-    @Mock
-    private ConfigServletInner inner;
-    
-    @Mock
-    private ConfigOperationService configOperationService;
-    
     private static final String TEST_DATA_ID = "test";
     
     private static final String TEST_GROUP = "test";
@@ -66,6 +57,14 @@ public class ConfigControllerV2Test {
     private static final String TEST_TAG = "";
     
     private static final String TEST_CONTENT = "test config";
+    
+    private ConfigControllerV2 configControllerV2;
+    
+    @Mock
+    private ConfigServletInner inner;
+    
+    @Mock
+    private ConfigOperationService configOperationService;
     
     @Before
     public void setUp() {

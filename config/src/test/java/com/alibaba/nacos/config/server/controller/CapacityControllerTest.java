@@ -21,6 +21,7 @@ import com.alibaba.nacos.config.server.constant.Constants;
 import com.alibaba.nacos.config.server.model.capacity.Capacity;
 import com.alibaba.nacos.config.server.service.capacity.CapacityService;
 import com.alibaba.nacos.sys.env.EnvUtil;
+import jakarta.servlet.ServletContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,8 +39,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import javax.servlet.ServletContext;
-
 import java.sql.Timestamp;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -49,7 +48,7 @@ import static org.mockito.Mockito.when;
 @ContextConfiguration(classes = MockServletContext.class)
 @WebAppConfiguration
 public class CapacityControllerTest {
-
+    
     @InjectMocks
     CapacityController capacityController;
     
@@ -71,7 +70,7 @@ public class CapacityControllerTest {
     
     @Test
     public void testGetCapacity() throws Exception {
-    
+        
         Capacity capacity = new Capacity();
         capacity.setId(1L);
         capacity.setMaxAggrCount(1);
@@ -97,12 +96,11 @@ public class CapacityControllerTest {
     
     @Test
     public void testUpdateCapacity1x() throws Exception {
-    
+        
         when(capacityService.insertOrUpdateCapacity("test", "test", 1, 1, 1, 1)).thenReturn(true);
         
         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(Constants.CAPACITY_CONTROLLER_PATH)
-                .param("group", "test").param("tenant", "test")
-                .param("quota", "1").param("maxSize", "1")
+                .param("group", "test").param("tenant", "test").param("quota", "1").param("maxSize", "1")
                 .param("maxAggrCount", "1").param("maxAggrSize", "1");
         String actualValue = mockMvc.perform(builder).andReturn().getResponse().getContentAsString();
         String code = JacksonUtils.toObj(actualValue).get("code").toString();
@@ -140,8 +138,7 @@ public class CapacityControllerTest {
         when(capacityService.insertOrUpdateCapacity("test", "test", 1, 1, 1, 1)).thenReturn(false);
         
         MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.post(Constants.CAPACITY_CONTROLLER_PATH)
-                .param("group", "test").param("tenant", "test")
-                .param("quota", "1").param("maxSize", "1")
+                .param("group", "test").param("tenant", "test").param("quota", "1").param("maxSize", "1")
                 .param("maxAggrCount", "1").param("maxAggrSize", "1");
         String actualValue = mockMvc.perform(builder).andReturn().getResponse().getContentAsString();
         String code = JacksonUtils.toObj(actualValue).get("code").toString();

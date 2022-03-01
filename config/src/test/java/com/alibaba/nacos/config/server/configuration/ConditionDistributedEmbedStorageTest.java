@@ -29,18 +29,18 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 
 public class ConditionDistributedEmbedStorageTest {
     
-    private ConditionDistributedEmbedStorage conditionDistributedEmbedStorage;
-    
     @Mock
     ConditionContext context;
     
     @Mock
     AnnotatedTypeMetadata metadata;
     
+    private ConditionDistributedEmbedStorage conditionDistributedEmbedStorage;
+    
     @Before
     public void init() {
         conditionDistributedEmbedStorage = new ConditionDistributedEmbedStorage();
-       
+        
     }
     
     @Test
@@ -51,7 +51,7 @@ public class ConditionDistributedEmbedStorageTest {
         propertyUtilMockedStatic.when(PropertyUtil::isEmbeddedStorage).thenReturn(true);
         envUtilMockedStatic.when(EnvUtil::getStandaloneMode).thenReturn(true);
         Assert.assertFalse(conditionDistributedEmbedStorage.matches(context, metadata));
-    
+        
         Mockito.when(PropertyUtil.isEmbeddedStorage()).thenReturn(true);
         Mockito.when(EnvUtil.getStandaloneMode()).thenReturn(false);
         propertyUtilMockedStatic.when(PropertyUtil::isEmbeddedStorage).thenReturn(true);

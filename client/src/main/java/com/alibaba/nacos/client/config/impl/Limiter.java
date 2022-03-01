@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Nacos
  */
+@SuppressWarnings("PMD.LowerCamelCaseVariableNamingRule")
 public class Limiter {
     
     private static final Logger LOGGER = LogUtils.logger(Limiter.class);
@@ -41,11 +42,8 @@ public class Limiter {
     private static final Cache<String, RateLimiter> CACHE;
     
     static {
-        CACHE = CacheBuilder.<String, RateLimiter>builder()
-                .expireNanos(1, TimeUnit.MINUTES)
-                .initializeCapacity(CAPACITY_SIZE)
-                .sync(true)
-                .build();
+        CACHE = CacheBuilder.<String, RateLimiter>builder().expireNanos(1, TimeUnit.MINUTES)
+                .initializeCapacity(CAPACITY_SIZE).sync(true).build();
     }
     
     private static final String LIMIT_TIME_PROPERTY = "limitTime";
@@ -57,7 +55,8 @@ public class Limiter {
     
     static {
         try {
-            String limitTimeStr = NacosClientProperties.PROTOTYPE.getProperty(LIMIT_TIME_PROPERTY, String.valueOf(limit));
+            String limitTimeStr = NacosClientProperties.PROTOTYPE.getProperty(LIMIT_TIME_PROPERTY,
+                    String.valueOf(limit));
             limit = Double.parseDouble(limitTimeStr);
             LOGGER.info("limitTime:{}", limit);
         } catch (Exception e) {

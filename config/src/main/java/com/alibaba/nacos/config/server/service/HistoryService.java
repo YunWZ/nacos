@@ -69,8 +69,8 @@ public class HistoryService {
         checkHistoryInfoPermission(configHistoryInfo, dataId, group, namespaceId);
         
         String encryptedDataKey = configHistoryInfo.getEncryptedDataKey();
-        Pair<String, String> pair = EncryptionHandler
-                .decryptHandler(dataId, encryptedDataKey, configHistoryInfo.getContent());
+        Pair<String, String> pair = EncryptionHandler.decryptHandler(dataId, encryptedDataKey,
+                configHistoryInfo.getContent());
         configHistoryInfo.setContent(pair.getSecond());
         
         return configHistoryInfo;
@@ -102,9 +102,8 @@ public class HistoryService {
      */
     private void checkHistoryInfoPermission(ConfigHistoryInfo configHistoryInfo, String dataId, String group,
             String namespaceId) throws AccessException {
-        if (!Objects.equals(configHistoryInfo.getDataId(), dataId) || !Objects
-                .equals(configHistoryInfo.getGroup(), group) || !Objects
-                .equals(configHistoryInfo.getTenant(), namespaceId)) {
+        if (!Objects.equals(configHistoryInfo.getDataId(), dataId) || !Objects.equals(configHistoryInfo.getGroup(),
+                group) || !Objects.equals(configHistoryInfo.getTenant(), namespaceId)) {
             throw new AccessException("Please check dataId, group or namespaceId.");
         }
     }

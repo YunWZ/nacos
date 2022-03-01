@@ -60,8 +60,8 @@ public class ConfigChangePublisherTest {
         EnvUtil.setIsStandalone(true);
         PropertyUtil.setEmbeddedStorage(true);
         
-        ConfigChangePublisher
-                .notifyConfigChange(new ConfigDataChangeEvent("chuntaojun", "chuntaojun", System.currentTimeMillis()));
+        ConfigChangePublisher.notifyConfigChange(
+                new ConfigDataChangeEvent("chuntaojun", "chuntaojun", System.currentTimeMillis()));
         Thread.sleep(2000);
         Assert.assertNotNull(reference.get());
         reference.set(null);
@@ -69,8 +69,8 @@ public class ConfigChangePublisherTest {
         // nacos is standalone mode and use external storage
         EnvUtil.setIsStandalone(true);
         PropertyUtil.setEmbeddedStorage(false);
-        ConfigChangePublisher
-                .notifyConfigChange(new ConfigDataChangeEvent("chuntaojun", "chuntaojun", System.currentTimeMillis()));
+        ConfigChangePublisher.notifyConfigChange(
+                new ConfigDataChangeEvent("chuntaojun", "chuntaojun", System.currentTimeMillis()));
         Thread.sleep(2000);
         Assert.assertNotNull(reference.get());
         reference.set(null);
@@ -78,8 +78,8 @@ public class ConfigChangePublisherTest {
         // nacos is cluster mode and use embedded storage
         EnvUtil.setIsStandalone(false);
         PropertyUtil.setEmbeddedStorage(true);
-        ConfigChangePublisher
-                .notifyConfigChange(new ConfigDataChangeEvent("chuntaojun", "chuntaojun", System.currentTimeMillis()));
+        ConfigChangePublisher.notifyConfigChange(
+                new ConfigDataChangeEvent("chuntaojun", "chuntaojun", System.currentTimeMillis()));
         Thread.sleep(2000);
         Assert.assertNull(reference.get());
         reference.set(null);
@@ -87,12 +87,12 @@ public class ConfigChangePublisherTest {
         // nacos is cluster mode and use external storage
         EnvUtil.setIsStandalone(false);
         PropertyUtil.setEmbeddedStorage(false);
-        ConfigChangePublisher
-                .notifyConfigChange(new ConfigDataChangeEvent("chuntaojun", "chuntaojun", System.currentTimeMillis()));
+        ConfigChangePublisher.notifyConfigChange(
+                new ConfigDataChangeEvent("chuntaojun", "chuntaojun", System.currentTimeMillis()));
         Thread.sleep(2000);
         Assert.assertNotNull(reference.get());
         reference.set(null);
-    
+        
     }
     
     @After

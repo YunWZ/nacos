@@ -25,14 +25,15 @@ import com.alibaba.nacos.config.server.utils.PropertyUtil;
  */
 public class DynamicDataSource {
     
+    private static final DynamicDataSource INSTANCE = new DynamicDataSource();
+    
     private DataSourceService localDataSourceService = null;
     
     private DataSourceService basicDataSourceService = null;
     
-    private static final DynamicDataSource INSTANCE = new DynamicDataSource();
-
-    private DynamicDataSource() {}
-
+    private DynamicDataSource() {
+    }
+    
     public static DynamicDataSource getInstance() {
         return INSTANCE;
     }

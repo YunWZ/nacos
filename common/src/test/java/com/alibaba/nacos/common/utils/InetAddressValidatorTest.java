@@ -29,10 +29,10 @@ public class InetAddressValidatorTest {
     
     @Test
     public void isIPv6Address() {
-        Assert.assertTrue(InetAddressValidator.isIPv6Address("2000:0000:0000:0000:0001:2345:6789:abcd"));
-        Assert.assertTrue(InetAddressValidator.isIPv6Address("2001:DB8:0:0:8:800:200C:417A"));
-        Assert.assertTrue(InetAddressValidator.isIPv6Address("2001:DB8::8:800:200C:417A"));
-        Assert.assertFalse(InetAddressValidator.isIPv6Address("2001:DB8::8:800:200C141aA"));
+        Assert.assertTrue(InetAddressValidator.isIpv6Address("2000:0000:0000:0000:0001:2345:6789:abcd"));
+        Assert.assertTrue(InetAddressValidator.isIpv6Address("2001:DB8:0:0:8:800:200C:417A"));
+        Assert.assertTrue(InetAddressValidator.isIpv6Address("2001:DB8::8:800:200C:417A"));
+        Assert.assertFalse(InetAddressValidator.isIpv6Address("2001:DB8::8:800:200C141aA"));
     }
     
     @Test
@@ -43,12 +43,12 @@ public class InetAddressValidatorTest {
     
     @Test
     public void isIPv6IPv4MappedAddress() {
-        Assert.assertFalse(InetAddressValidator.isIPv6IPv4MappedAddress(":ffff:1.1.1.1"));
-        Assert.assertTrue(InetAddressValidator.isIPv6IPv4MappedAddress("::FFFF:192.168.1.2"));
+        Assert.assertFalse(InetAddressValidator.isIpv6Ipv4MappedAddress(":ffff:1.1.1.1"));
+        Assert.assertTrue(InetAddressValidator.isIpv6Ipv4MappedAddress("::FFFF:192.168.1.2"));
     }
     
     @Test
     public void isIPv4Address() {
-        Assert.assertTrue(InetAddressValidator.isIPv4Address("192.168.1.2"));
+        Assert.assertTrue(InetAddressValidator.isIpv4Address("192.168.1.2"));
     }
 }

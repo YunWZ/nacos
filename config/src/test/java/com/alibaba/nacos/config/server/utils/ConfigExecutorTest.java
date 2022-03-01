@@ -47,7 +47,7 @@ public class ConfigExecutorTest {
         Runnable runnable = atomicInteger::incrementAndGet;
         
         ConfigExecutor.executeEmbeddedDump(runnable);
-    
+        
         TimeUnit.MILLISECONDS.sleep(20);
         
         Assert.assertEquals(1, atomicInteger.get());
@@ -92,11 +92,11 @@ public class ConfigExecutorTest {
         Runnable runnable = atomicInteger::incrementAndGet;
         
         ConfigExecutor.scheduleAsyncNotify(runnable, 20, TimeUnit.MILLISECONDS);
-    
+        
         Assert.assertEquals(0, atomicInteger.get());
         
         TimeUnit.MILLISECONDS.sleep(40);
-    
+        
         Assert.assertEquals(1, atomicInteger.get());
     }
     

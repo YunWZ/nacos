@@ -16,9 +16,9 @@
 
 package com.alibaba.nacos.config.server.service.dump;
 
-import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.common.notify.Event;
 import com.alibaba.nacos.common.notify.listener.Subscriber;
+import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.config.server.model.event.ConfigDumpEvent;
 import com.alibaba.nacos.config.server.service.AggrWhitelist;
 import com.alibaba.nacos.config.server.service.ClientIpWhiteList;
@@ -31,6 +31,7 @@ import com.alibaba.nacos.config.server.service.trace.ConfigTraceService;
  *
  * @author <a href="mailto:liaochuntao@live.com">liaochuntao</a>
  */
+@SuppressWarnings("PMD.MethodTooLongRule")
 public class DumpConfigHandler extends Subscriber<ConfigDumpEvent> {
     
     /**
@@ -57,9 +58,8 @@ public class DumpConfigHandler extends Subscriber<ConfigDumpEvent> {
                 }
                 return result;
             } else {
-                result = ConfigCacheService
-                        .dumpBeta(dataId, group, namespaceId, content, lastModified, event.getBetaIps(),
-                                encryptedDataKey);
+                result = ConfigCacheService.dumpBeta(dataId, group, namespaceId, content, lastModified,
+                        event.getBetaIps(), encryptedDataKey);
                 if (result) {
                     ConfigTraceService.logDumpEvent(dataId, group, namespaceId, null, lastModified, event.getHandleIp(),
                             ConfigTraceService.DUMP_EVENT_OK, System.currentTimeMillis() - lastModified,
@@ -84,8 +84,8 @@ public class DumpConfigHandler extends Subscriber<ConfigDumpEvent> {
             
             boolean result;
             if (!event.isRemove()) {
-                result = ConfigCacheService
-                        .dump(dataId, group, namespaceId, content, lastModified, type, encryptedDataKey);
+                result = ConfigCacheService.dump(dataId, group, namespaceId, content, lastModified, type,
+                        encryptedDataKey);
                 
                 if (result) {
                     ConfigTraceService.logDumpEvent(dataId, group, namespaceId, null, lastModified, event.getHandleIp(),
@@ -105,8 +105,8 @@ public class DumpConfigHandler extends Subscriber<ConfigDumpEvent> {
             //
             boolean result;
             if (!event.isRemove()) {
-                result = ConfigCacheService
-                        .dumpTag(dataId, group, namespaceId, event.getTag(), content, lastModified, encryptedDataKey);
+                result = ConfigCacheService.dumpTag(dataId, group, namespaceId, event.getTag(), content, lastModified,
+                        encryptedDataKey);
                 if (result) {
                     ConfigTraceService.logDumpEvent(dataId, group, namespaceId, null, lastModified, event.getHandleIp(),
                             ConfigTraceService.DUMP_EVENT_OK, System.currentTimeMillis() - lastModified,

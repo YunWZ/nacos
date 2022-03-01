@@ -63,7 +63,7 @@ public class HealthCheckCommonV2Test {
     
     @Test
     public void testReEvaluateCheckRT() {
-        healthCheckCommonV2.reEvaluateCheckRT(1, healthCheckTaskV2, healthParams);
+        healthCheckCommonV2.reEvaluateCheckRt(1, healthCheckTaskV2, healthParams);
         
         verify(healthParams, times(2)).getMax();
         verify(healthParams, times(1)).getMin();

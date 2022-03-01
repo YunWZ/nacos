@@ -25,6 +25,7 @@ import com.alibaba.nacos.config.server.service.repository.embedded.DatabaseOpera
 import com.alibaba.nacos.config.server.utils.PropertyUtil;
 import com.alibaba.nacos.sys.env.EnvUtil;
 import com.alibaba.nacos.sys.utils.ApplicationUtils;
+import jakarta.servlet.ServletContext;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +47,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import javax.servlet.ServletContext;
 import java.util.ArrayList;
 
 import static org.mockito.Mockito.when;
@@ -129,8 +129,9 @@ public class ConfigOpsControllerTest {
                 .multipart(Constants.OPS_CONTROLLER_PATH + "/data/removal").file(file);
         int actualValue = mockMvc.perform(builder).andReturn().getResponse().getStatus();
         Assert.assertEquals(200, actualValue);
-        
+       
         propertyUtilMockedStatic.close();
         applicationUtilsMockedStatic.close();
     }
+    
 }

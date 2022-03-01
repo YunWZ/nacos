@@ -17,12 +17,11 @@
 package com.alibaba.nacos.config.server.utils;
 
 import com.alibaba.nacos.api.common.Constants;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import static org.mockito.ArgumentMatchers.eq;
 

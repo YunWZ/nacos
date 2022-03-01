@@ -16,44 +16,75 @@
 
 package com.alibaba.nacos.client.logging.logback;
 
-import ch.qos.logback.core.joran.action.Action;
-import ch.qos.logback.core.joran.action.ActionUtil;
-import ch.qos.logback.core.joran.spi.ActionException;
-import ch.qos.logback.core.joran.spi.InterpretationContext;
-import ch.qos.logback.core.util.OptionHelper;
+import ch.qos.logback.core.joran.action.BaseModelAction;
+import ch.qos.logback.core.joran.spi.SaxEventInterpretationContext;
+import ch.qos.logback.core.model.Model;
+import ch.qos.logback.core.model.NamedModel;
 import com.alibaba.nacos.client.env.NacosClientProperties;
 import org.xml.sax.Attributes;
 
 /**
- * support logback read properties from NacosClientProperties. just like springProperty.
- * for example:
+ * support logback read properties from NacosClientProperties. just like springProperty. for example:
  * <nacosClientProperty scope="context" name="logPath" source="system.log.path" defaultValue="/root" />
+ *
  * @author onewe
  */
-class NacosClientPropertyAction extends Action {
+class NacosClientPropertyAction extends BaseModelAction {
     
     private static final String DEFAULT_VALUE_ATTRIBUTE = "defaultValue";
     
     private static final String SOURCE_ATTRIBUTE = "source";
     
-    @Override
-    public void begin(InterpretationContext ic, String elementName, Attributes attributes) throws ActionException {
-        String name = attributes.getValue(NAME_ATTRIBUTE);
-        String source = attributes.getValue(SOURCE_ATTRIBUTE);
-        ActionUtil.Scope scope = ActionUtil.stringToScope(attributes.getValue(SCOPE_ATTRIBUTE));
-        String defaultValue = attributes.getValue(DEFAULT_VALUE_ATTRIBUTE);
-        if (OptionHelper.isEmpty(name)) {
-            addError("The \"name\" and \"source\"  attributes of <nacosClientProperty> must be set");
-        }
-        ActionUtil.setProperty(ic, name, getValue(source, defaultValue), scope);
-    }
-    
-    @Override
-    public void end(InterpretationContext ic, String name) throws ActionException {
-    
-    }
-    
     private String getValue(String source, String defaultValue) {
         return NacosClientProperties.PROTOTYPE.getProperty(source, defaultValue);
+    }
+    
+    private String getValue(String source) {
+        return NacosClientProperties.PROTOTYPE.getProperty(source);
+    }
+    
+    @Override
+    protected Model buildCurrentModel(SaxEventInterpretationContext interpretationContext, String name,
+            Attributes attributes) {
+        NacosClientPropertyModel model = new NacosClientPropertyModel();
+        model.setName(attributes.getValue(NAME_ATTRIBUTE));
+        model.setScope(attributes.getValue(SCOPE_ATTRIBUTE));
+        model.setSource(getValue(attributes.getValue(SOURCE_ATTRIBUTE)));
+        model.setDefaultValue(attributes.getValue(DEFAULT_VALUE_ATTRIBUTE));
+        return model;
+    }
+    
+    public class NacosClientPropertyModel extends NamedModel {
+        
+        private String scope;
+        
+        private String defaultValue;
+        
+        private String source;
+        
+        String getScope() {
+            return this.scope;
+        }
+        
+        void setScope(String scope) {
+            this.scope = scope;
+        }
+        
+        String getDefaultValue() {
+            return this.defaultValue;
+        }
+        
+        void setDefaultValue(String defaultValue) {
+            this.defaultValue = defaultValue;
+        }
+        
+        String getSource() {
+            return this.source;
+        }
+        
+        void setSource(String source) {
+            this.source = source;
+        }
+        
     }
 }

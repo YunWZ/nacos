@@ -213,7 +213,7 @@ public class NamingHttpClientProxy extends AbstractNamingClientProxy {
         params.put(CommonParams.SERVICE_NAME, NamingUtils.getGroupedName(serviceName, groupName));
         params.put(CLUSTERS_PARAM, clusters);
         params.put(UDP_PORT_PARAM, String.valueOf(udpPort));
-        params.put(CLIENT_IP_PARAM, NetUtils.localIP());
+        params.put(CLIENT_IP_PARAM, NetUtils.localIp());
         params.put(HEALTHY_ONLY_PARAM, String.valueOf(healthyOnly));
         String result = reqApi(UtilAndComs.nacosUrlBase + "/instance/list", params, HttpMethod.GET);
         if (StringUtils.isNotEmpty(result)) {

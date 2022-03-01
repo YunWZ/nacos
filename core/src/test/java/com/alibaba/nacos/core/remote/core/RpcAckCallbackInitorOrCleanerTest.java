@@ -20,6 +20,7 @@ package com.alibaba.nacos.core.remote.core;
 import com.alibaba.nacos.core.remote.Connection;
 import com.alibaba.nacos.core.remote.ConnectionMeta;
 import com.alibaba.nacos.core.remote.grpc.GrpcConnection;
+import io.grpc.netty.shaded.io.netty.channel.Channel;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -36,7 +37,7 @@ public class RpcAckCallbackInitorOrCleanerTest {
     public void testInitAndCleaner() {
         String connectId = "11";
         ConnectionMeta meta = new ConnectionMeta(connectId, "", "", 80, 80, "GRPC", "", "", new HashMap<>());
-        Connection connection = new GrpcConnection(meta, null, null);
+        Connection connection = new GrpcConnection(meta, null, (Channel) null);
         
         RpcAckCallbackInitorOrCleaner initorOrCleaner = new RpcAckCallbackInitorOrCleaner();
         initorOrCleaner.clientConnected(connection);

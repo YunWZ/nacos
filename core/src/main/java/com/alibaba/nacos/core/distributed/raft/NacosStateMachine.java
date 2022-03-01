@@ -20,8 +20,8 @@ import com.alibaba.nacos.common.notify.NotifyCenter;
 import com.alibaba.nacos.common.utils.ExceptionUtil;
 import com.alibaba.nacos.common.utils.JacksonUtils;
 import com.alibaba.nacos.common.utils.LoggerUtils;
-import com.alibaba.nacos.consistency.RequestProcessor;
 import com.alibaba.nacos.consistency.ProtoMessageUtil;
+import com.alibaba.nacos.consistency.RequestProcessor;
 import com.alibaba.nacos.consistency.cp.RequestProcessor4CP;
 import com.alibaba.nacos.consistency.entity.ReadRequest;
 import com.alibaba.nacos.consistency.entity.Response;
@@ -66,6 +66,7 @@ import java.util.function.BiConsumer;
  *
  * @author <a href="mailto:liaochuntao@live.com">liaochuntao</a>
  */
+@SuppressWarnings("PMD.LowerCamelCaseVariableNamingRule")
 class NacosStateMachine extends StateMachineAdapter {
     
     protected final JRaftServer server;
@@ -218,8 +219,7 @@ class NacosStateMachine extends StateMachineAdapter {
         processor.onError(e);
         NotifyCenter.publishEvent(
                 RaftEvent.builder().groupId(groupId).leader(leaderIp).term(term).raftClusterInfo(allPeers())
-                        .errMsg(e.toString())
-                        .build());
+                        .errMsg(e.toString()).build());
     }
     
     public boolean isLeader() {
@@ -277,10 +277,10 @@ class NacosStateMachine extends StateMachineAdapter {
                                 throw new ConsistencyException(e);
                             }
                         });
-                        final Status status = result
-                                && !Arrays.asList(results).stream().anyMatch(Boolean.FALSE::equals) ? Status.OK()
-                                : new Status(RaftError.EIO, "Fail to compress snapshot at %s, error is %s",
-                                        writer.getPath(), t == null ? "" : t.getMessage());
+                        final Status status =
+                                result && !Arrays.asList(results).stream().anyMatch(Boolean.FALSE::equals) ? Status.OK()
+                                        : new Status(RaftError.EIO, "Fail to compress snapshot at %s, error is %s",
+                                                writer.getPath(), t == null ? "" : t.getMessage());
                         done.run(status);
                     };
                     item.onSnapshotSave(wCtx, callFinally);
@@ -290,8 +290,8 @@ class NacosStateMachine extends StateMachineAdapter {
                 public boolean onSnapshotLoad(SnapshotReader reader) {
                     final Map<String, LocalFileMeta> metaMap = new HashMap<>(reader.listFiles().size());
                     for (String fileName : reader.listFiles()) {
-                        final LocalFileMetaOutter.LocalFileMeta meta = (LocalFileMetaOutter.LocalFileMeta) reader
-                                .getFileMeta(fileName);
+                        final LocalFileMetaOutter.LocalFileMeta meta = (LocalFileMetaOutter.LocalFileMeta) reader.getFileMeta(
+                                fileName);
                         
                         byte[] bytes = meta.getUserMeta().toByteArray();
                         

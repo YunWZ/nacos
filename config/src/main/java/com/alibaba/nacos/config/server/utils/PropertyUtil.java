@@ -27,6 +27,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  *
  * @author Nacos
  */
+@SuppressWarnings("PMD.LowerCamelCaseVariableNamingRule")
 public class PropertyUtil implements ApplicationContextInitializer<ConfigurableApplicationContext> {
     
     private static final Logger LOGGER = LogUtil.DEFAULT_LOG;
@@ -242,12 +243,12 @@ public class PropertyUtil implements ApplicationContextInitializer<ConfigurableA
     // if use mysql, Reduce database read pressure
     // if use raft+derby, Reduce leader read pressure
     
-    public static boolean isDirectRead() {
-        return EnvUtil.getStandaloneMode() && isEmbeddedStorage();
-    }
-    
     public static void setEmbeddedStorage(boolean embeddedStorage) {
         PropertyUtil.embeddedStorage = embeddedStorage;
+    }
+    
+    public static boolean isDirectRead() {
+        return EnvUtil.getStandaloneMode() && isEmbeddedStorage();
     }
     
     private void loadSetting() {
@@ -279,7 +280,7 @@ public class PropertyUtil implements ApplicationContextInitializer<ConfigurableA
             setDefaultMaxAggrSize(getInt(PropertiesConstant.DEFAULT_MAX_AGGR_SIZE, defaultMaxAggrSize));
             setCorrectUsageDelay(getInt(PropertiesConstant.CORRECT_USAGE_DELAY, correctUsageDelay));
             setInitialExpansionPercent(getInt(PropertiesConstant.INITIAL_EXPANSION_PERCENT, initialExpansionPercent));
-    
+            
             // External data sources are used by default in cluster mode
             String platform = DatasourcePlatformUtil.getDatasourcePlatform("");
             boolean useExternalStorage = !PropertiesConstant.EMPTY_DATASOURCE_PLATFORM.equalsIgnoreCase(platform)

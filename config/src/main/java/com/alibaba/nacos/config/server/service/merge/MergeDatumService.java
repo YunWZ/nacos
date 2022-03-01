@@ -52,15 +52,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Service
 public class MergeDatumService {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(MergeDatumService.class);
-    
-    final TaskManager mergeTasks;
-    
     static final int INIT_THREAD_COUNT = 40;
     
     static final AtomicInteger FINISHED = new AtomicInteger();
     
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergeDatumService.class);
+    
     static int total = 0;
+    
+    final TaskManager mergeTasks;
     
     private ConfigInfoPersistService configInfoPersistService;
     
@@ -157,8 +157,8 @@ public class MergeDatumService {
                     int rowCount = configInfoAggrPersistService.aggrConfigInfoCount(dataId, group, tenant);
                     int pageCount = (int) Math.ceil(rowCount * 1.0 / PAGE_SIZE);
                     for (int pageNo = 1; pageNo <= pageCount; pageNo++) {
-                        Page<ConfigInfoAggr> page = configInfoAggrPersistService
-                                .findConfigInfoAggrByPage(dataId, group, tenant, pageNo, PAGE_SIZE);
+                        Page<ConfigInfoAggr> page = configInfoAggrPersistService.findConfigInfoAggrByPage(dataId, group,
+                                tenant, pageNo, PAGE_SIZE);
                         if (page != null) {
                             datumList.addAll(page.getPageItems());
                             LOGGER.info("[merge-query] {}, {}, size/total={}/{}", dataId, group, datumList.size(),
@@ -178,8 +178,9 @@ public class MergeDatumService {
                     } else {
                         // remove
                         configInfoPersistService.removeConfigInfo(dataId, group, tenant, InetUtils.getSelfIP(), null);
-                        LOGGER.warn("[merge-delete] delete config info because no datum. dataId=" + dataId + ", groupId="
-                                + group);
+                        LOGGER.warn(
+                                "[merge-delete] delete config info because no datum. dataId=" + dataId + ", groupId="
+                                        + group);
                     }
                     
                 } catch (Exception e) {

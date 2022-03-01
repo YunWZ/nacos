@@ -36,8 +36,8 @@ import com.alibaba.nacos.config.server.utils.GroupKey2;
 import com.alibaba.nacos.config.server.utils.LogUtil;
 import com.alibaba.nacos.config.server.utils.PropertyUtil;
 import com.alibaba.nacos.config.server.utils.TimeUtils;
-import com.alibaba.nacos.core.remote.RequestHandler;
 import com.alibaba.nacos.core.control.TpsControl;
+import com.alibaba.nacos.core.remote.RequestHandler;
 import com.alibaba.nacos.plugin.auth.constant.ActionTypes;
 import com.alibaba.nacos.plugin.auth.constant.SignType;
 import org.apache.commons.io.FileUtils;
@@ -60,6 +60,7 @@ import static com.alibaba.nacos.config.server.utils.RequestUtil.CLIENT_APPNAME_H
  * @version $Id: ConfigQueryRequestHandler.java, v 0.1 2020年07月14日 9:54 AM liuzunfei Exp $
  */
 @Component
+@SuppressWarnings("PMD.MethodTooLongRule")
 public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest, ConfigQueryResponse> {
     
     private static final int TRY_GET_LOCK_TIMES = 9;
@@ -76,6 +77,64 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
         this.configInfoPersistService = configInfoPersistService;
         this.configInfoTagPersistService = configInfoTagPersistService;
         this.configInfoBetaPersistService = configInfoBetaPersistService;
+    }
+    
+    /**
+     * read content.
+     *
+     * @param file file to read.
+     * @return content.
+     */
+    public static String readFileContent(File file) throws IOException {
+        return FileUtils.readFileToString(file, ENCODE);
+        
+    }
+    
+    private static void releaseConfigReadLock(String groupKey) {
+        ConfigCacheService.releaseReadLock(groupKey);
+    }
+    
+    private static boolean fileNotExist(File file) {
+        return file == null || !file.exists();
+    }
+    
+    private static int tryConfigReadLock(String groupKey) {
+        
+        // Lock failed by default.
+        int lockResult = -1;
+        
+        // Try to get lock times, max value: 10;
+        for (int i = TRY_GET_LOCK_TIMES; i >= 0; --i) {
+            lockResult = ConfigCacheService.tryReadLock(groupKey);
+            
+            // The data is non-existent.
+            if (0 == lockResult) {
+                break;
+            }
+            
+            // Success
+            if (lockResult > 0) {
+                break;
+            }
+            
+            // Retry.
+            if (i > 0) {
+                try {
+                    Thread.sleep(1);
+                } catch (Exception e) {
+                    LogUtil.PULL_CHECK_LOG.error("An Exception occurred while thread sleep", e);
+                }
+            }
+        }
+        
+        return lockResult;
+    }
+    
+    private static boolean isUseTag(CacheItem cacheItem, String tag) {
+        if (cacheItem != null && cacheItem.tagMd5 != null && cacheItem.tagMd5.size() > 0) {
+            return StringUtils.isNotBlank(tag) && cacheItem.tagMd5.containsKey(tag);
+        }
+        return false;
     }
     
     @Override
@@ -100,8 +159,8 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
         String tag = configQueryRequest.getTag();
         ConfigQueryResponse response = new ConfigQueryResponse();
         
-        final String groupKey = GroupKey2
-                .getKey(configQueryRequest.getDataId(), configQueryRequest.getGroup(), configQueryRequest.getTenant());
+        final String groupKey = GroupKey2.getKey(configQueryRequest.getDataId(), configQueryRequest.getGroup(),
+                configQueryRequest.getTenant());
         
         String autoTag = configQueryRequest.getHeader(com.alibaba.nacos.api.common.Constants.VIPSERVER_TAG);
         
@@ -150,7 +209,8 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
                                 }
                             }
                             if (PropertyUtil.isDirectRead()) {
-                                configInfoBase = configInfoTagPersistService.findConfigInfo4Tag(dataId, group, tenant, autoTag);
+                                configInfoBase = configInfoTagPersistService.findConfigInfo4Tag(dataId, group, tenant,
+                                        autoTag);
                             } else {
                                 file = DiskUtil.targetTagFile(dataId, group, tenant, autoTag);
                             }
@@ -258,9 +318,8 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
         } else if (lockResult == 0) {
             
             // FIXME CacheItem No longer exists. It is impossible to simply calculate the push delayed. Here, simply record it as - 1.
-            ConfigTraceService
-                    .logPullEvent(dataId, group, tenant, requestIpApp, -1, ConfigTraceService.PULL_EVENT_NOTFOUND, -1,
-                            clientIp, notify);
+            ConfigTraceService.logPullEvent(dataId, group, tenant, requestIpApp, -1,
+                    ConfigTraceService.PULL_EVENT_NOTFOUND, -1, clientIp, notify);
             response.setErrorInfo(ConfigQueryResponse.CONFIG_NOT_FOUND, "config data not exist");
             
         } else {
@@ -269,64 +328,6 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
                     "requested file is being modified, please try later.");
         }
         return response;
-    }
-    
-    /**
-     * read content.
-     *
-     * @param file file to read.
-     * @return content.
-     */
-    public static String readFileContent(File file) throws IOException {
-        return FileUtils.readFileToString(file, ENCODE);
-        
-    }
-    
-    private static void releaseConfigReadLock(String groupKey) {
-        ConfigCacheService.releaseReadLock(groupKey);
-    }
-    
-    private static boolean fileNotExist(File file) {
-        return file == null || !file.exists();
-    }
-    
-    private static int tryConfigReadLock(String groupKey) {
-        
-        // Lock failed by default.
-        int lockResult = -1;
-        
-        // Try to get lock times, max value: 10;
-        for (int i = TRY_GET_LOCK_TIMES; i >= 0; --i) {
-            lockResult = ConfigCacheService.tryReadLock(groupKey);
-            
-            // The data is non-existent.
-            if (0 == lockResult) {
-                break;
-            }
-            
-            // Success
-            if (lockResult > 0) {
-                break;
-            }
-            
-            // Retry.
-            if (i > 0) {
-                try {
-                    Thread.sleep(1);
-                } catch (Exception e) {
-                    LogUtil.PULL_CHECK_LOG.error("An Exception occurred while thread sleep", e);
-                }
-            }
-        }
-        
-        return lockResult;
-    }
-    
-    private static boolean isUseTag(CacheItem cacheItem, String tag) {
-        if (cacheItem != null && cacheItem.tagMd5 != null && cacheItem.tagMd5.size() > 0) {
-            return StringUtils.isNotBlank(tag) && cacheItem.tagMd5.containsKey(tag);
-        }
-        return false;
     }
     
 }

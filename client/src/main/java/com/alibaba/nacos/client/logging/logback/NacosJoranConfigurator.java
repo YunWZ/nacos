@@ -17,7 +17,6 @@
 package com.alibaba.nacos.client.logging.logback;
 
 import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.joran.event.SaxEvent;
 import ch.qos.logback.core.joran.spi.ElementSelector;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.joran.spi.RuleStore;
@@ -26,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.List;
 
 /**
  * ensure that Nacos configuration does not affect user configuration savepoints and  scanning url.
@@ -36,19 +34,10 @@ import java.util.List;
  */
 public class NacosJoranConfigurator extends JoranConfigurator {
     
-    /**
-     * ensure that Nacos configuration does not affect user configuration savepoints.
-     *
-     * @param eventList safe data
-     */
     @Override
-    public void registerSafeConfiguration(List<SaxEvent> eventList) {
-    }
-    
-    @Override
-    public void addInstanceRules(RuleStore rs) {
-        super.addInstanceRules(rs);
-        rs.addRule(new ElementSelector("configuration/nacosClientProperty"), new NacosClientPropertyAction());
+    public void addElementSelectorAndActionAssociations(RuleStore rs) {
+        super.addElementSelectorAndActionAssociations(rs);
+        rs.addRule(new ElementSelector("configuration/nacosClientProperty"), NacosClientPropertyAction::new);
     }
     
     /**

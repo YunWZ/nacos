@@ -29,13 +29,13 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 
 public class ConditionStandaloneEmbedStorageTest {
     
-    private ConditionStandaloneEmbedStorage conditionStandaloneEmbedStorage;
-    
     @Mock
     ConditionContext context;
     
     @Mock
     AnnotatedTypeMetadata metadata;
+    
+    private ConditionStandaloneEmbedStorage conditionStandaloneEmbedStorage;
     
     @Before
     public void init() {
@@ -50,19 +50,19 @@ public class ConditionStandaloneEmbedStorageTest {
         propertyUtilMockedStatic.when(PropertyUtil::isEmbeddedStorage).thenReturn(true);
         envUtilMockedStatic.when(EnvUtil::getStandaloneMode).thenReturn(true);
         Assert.assertTrue(conditionStandaloneEmbedStorage.matches(context, metadata));
-    
+        
         propertyUtilMockedStatic.when(PropertyUtil::isEmbeddedStorage).thenReturn(true);
         envUtilMockedStatic.when(EnvUtil::getStandaloneMode).thenReturn(false);
         Assert.assertFalse(conditionStandaloneEmbedStorage.matches(context, metadata));
-    
+        
         propertyUtilMockedStatic.when(PropertyUtil::isEmbeddedStorage).thenReturn(false);
         envUtilMockedStatic.when(EnvUtil::getStandaloneMode).thenReturn(true);
         Assert.assertFalse(conditionStandaloneEmbedStorage.matches(context, metadata));
-    
+        
         propertyUtilMockedStatic.when(PropertyUtil::isEmbeddedStorage).thenReturn(false);
         envUtilMockedStatic.when(EnvUtil::getStandaloneMode).thenReturn(false);
         Assert.assertFalse(conditionStandaloneEmbedStorage.matches(context, metadata));
-    
+        
         propertyUtilMockedStatic.close();
         envUtilMockedStatic.close();
     }

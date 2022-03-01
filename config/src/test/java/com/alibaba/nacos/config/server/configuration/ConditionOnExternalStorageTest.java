@@ -28,13 +28,13 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 
 public class ConditionOnExternalStorageTest {
     
-    private ConditionOnExternalStorage conditionOnExternalStorage;
-    
     @Mock
     ConditionContext context;
     
     @Mock
     AnnotatedTypeMetadata metadata;
+    
+    private ConditionOnExternalStorage conditionOnExternalStorage;
     
     @Before
     public void init() {
@@ -47,10 +47,10 @@ public class ConditionOnExternalStorageTest {
         
         mockedStatic.when(PropertyUtil::isEmbeddedStorage).thenReturn(true);
         Assert.assertFalse(conditionOnExternalStorage.matches(context, metadata));
-    
+        
         mockedStatic.when(PropertyUtil::isEmbeddedStorage).thenReturn(false);
         Assert.assertTrue(conditionOnExternalStorage.matches(context, metadata));
-    
+        
         mockedStatic.close();
     }
     

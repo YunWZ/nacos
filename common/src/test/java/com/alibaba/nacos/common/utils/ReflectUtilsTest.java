@@ -41,9 +41,9 @@ public class ReflectUtilsTest {
 
     @Test
     public void getFieldValue() {
-        Object elementData = ReflectUtils.getFieldValue(listStr, "elementData");
+        Object elementData = ReflectUtils.getFieldValue(listStr, "EMPTY_ELEMENTDATA");
         Assert.assertTrue(elementData instanceof Object[]);
-        Assert.assertEquals(((Object[]) elementData).length, 2);
+        Assert.assertEquals(((Object[]) elementData).length, 0);
     }
 
     @Test

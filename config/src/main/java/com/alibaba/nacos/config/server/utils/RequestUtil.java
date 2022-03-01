@@ -18,8 +18,7 @@ package com.alibaba.nacos.config.server.utils;
 
 import com.alibaba.nacos.api.common.Constants;
 import com.alibaba.nacos.common.utils.StringUtils;
-
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Request util.
@@ -28,13 +27,13 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class RequestUtil {
     
+    public static final String CLIENT_APPNAME_HEADER = "Client-AppName";
+    
     private static final String X_REAL_IP = "X-Real-IP";
     
     private static final String X_FORWARDED_FOR = "X-Forwarded-For";
     
     private static final String X_FORWARDED_FOR_SPLIT_SYMBOL = ",";
-    
-    public static final String CLIENT_APPNAME_HEADER = "Client-AppName";
     
     /**
      * get real client ip

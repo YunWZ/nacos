@@ -29,7 +29,7 @@ public class UrlAnalysisUtilsTest {
         
         String url2 = "127.0.0.1:8080/test?paramA=A&paramB=B";
         Assert.assertEquals("127.0.0.1:8080", UrlAnalysisUtils.getContentIdentity(url2));
-    
+        
         String url3 = "";
         Assert.assertNull(UrlAnalysisUtils.getContentIdentity(url3));
     }

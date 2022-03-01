@@ -56,8 +56,8 @@ public class RpcConfigChangeNotifierTest {
     @Test
     public void testOnEvent() {
         final String groupKey = GroupKey2.getKey("nacos.internal.tps.control_rule_1", "nacos", "tenant");
-        final String limitGroupKey = GroupKey2
-                .getKey("nacos.internal.tps.nacos.internal.connection.limit.rule", "nacos", "tenant");
+        final String limitGroupKey = GroupKey2.getKey("nacos.internal.tps.nacos.internal.connection.limit.rule",
+                "nacos", "tenant");
         List<String> betaIps = new ArrayList<>();
         
         betaIps.add("1.1.1.1");

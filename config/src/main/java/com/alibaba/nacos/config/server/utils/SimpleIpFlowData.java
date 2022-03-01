@@ -38,9 +38,9 @@ public class SimpleIpFlowData {
     
     private int averageCount;
     
-    private ScheduledExecutorService timer = ExecutorFactory.Managed
-            .newSingleScheduledExecutorService(ClassUtils.getCanonicalName(Config.class),
-                    new NameThreadFactory("com.alibaba.nacos.config.flow.control.ip"));
+    private ScheduledExecutorService timer = ExecutorFactory.Managed.newSingleScheduledExecutorService(
+            ClassUtils.getCanonicalName(Config.class),
+            new NameThreadFactory("com.alibaba.nacos.config.flow.control.ip"));
     
     public SimpleIpFlowData(int slotCount, int interval) {
         if (slotCount <= 0) {

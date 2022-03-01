@@ -16,13 +16,13 @@
 
 package com.alibaba.nacos.config.server.utils;
 
-import java.util.Map;
-
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.exception.api.NacosApiException;
 import com.alibaba.nacos.api.model.v2.ErrorCode;
 import com.alibaba.nacos.common.utils.StringUtils;
 import org.springframework.http.HttpStatus;
+
+import java.util.Map;
 
 /**
  * Parameter validity check util.
@@ -30,8 +30,6 @@ import org.springframework.http.HttpStatus;
  * @author Nacos
  */
 public class ParamUtils {
-    
-    private static char[] validChars = new char[] {'_', '-', '.', ':'};
     
     private static final int TAG_MAX_LEN = 16;
     
@@ -50,6 +48,8 @@ public class ParamUtils {
     private static final String SCHEMA = "schema";
     
     private static final String ENCRYPTED_DATA_KEY = "encryptedDataKey";
+    
+    private static char[] validChars = new char[] {'_', '-', '.', ':'};
     
     /**
      * Whitelist checks that valid parameters can only contain letters, Numbers, and characters in validChars, and

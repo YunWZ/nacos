@@ -26,6 +26,7 @@ import com.alibaba.nacos.plugin.datasource.MapperManager;
 import com.alibaba.nacos.plugin.datasource.constants.TableConstant;
 import com.alibaba.nacos.plugin.datasource.mapper.TenantCapacityMapper;
 import com.alibaba.nacos.sys.env.EnvUtil;
+import jakarta.annotation.PostConstruct;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -33,7 +34,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -69,24 +69,9 @@ public class TenantCapacityPersistService {
     public void init() {
         this.dataSourceService = DynamicDataSource.getInstance().getDataSource();
         this.jdbcTemplate = dataSourceService.getJdbcTemplate();
-        Boolean isDataSourceLogEnable = EnvUtil.getProperty(Constants.NACOS_PLUGIN_DATASOURCE_LOG, Boolean.class, false);
+        Boolean isDataSourceLogEnable = EnvUtil.getProperty(Constants.NACOS_PLUGIN_DATASOURCE_LOG, Boolean.class,
+                false);
         this.mapperManager = MapperManager.instance(isDataSourceLogEnable);
-    }
-    
-    private static final class TenantCapacityRowMapper implements RowMapper<TenantCapacity> {
-        
-        @Override
-        public TenantCapacity mapRow(ResultSet rs, int rowNum) throws SQLException {
-            TenantCapacity tenantCapacity = new TenantCapacity();
-            tenantCapacity.setId(rs.getLong("id"));
-            tenantCapacity.setQuota(rs.getInt("quota"));
-            tenantCapacity.setUsage(rs.getInt("usage"));
-            tenantCapacity.setMaxSize(rs.getInt("max_size"));
-            tenantCapacity.setMaxAggrCount(rs.getInt("max_aggr_count"));
-            tenantCapacity.setMaxAggrSize(rs.getInt("max_aggr_size"));
-            tenantCapacity.setTenant(rs.getString("tenant_id"));
-            return tenantCapacity;
-        }
     }
     
     public TenantCapacity getTenantCapacity(String tenantId) {
@@ -335,6 +320,22 @@ public class TenantCapacityPersistService {
         } catch (CannotGetJdbcConnectionException e) {
             FATAL_LOG.error("[db-error]", e);
             throw e;
+        }
+    }
+    
+    private static final class TenantCapacityRowMapper implements RowMapper<TenantCapacity> {
+        
+        @Override
+        public TenantCapacity mapRow(ResultSet rs, int rowNum) throws SQLException {
+            TenantCapacity tenantCapacity = new TenantCapacity();
+            tenantCapacity.setId(rs.getLong("id"));
+            tenantCapacity.setQuota(rs.getInt("quota"));
+            tenantCapacity.setUsage(rs.getInt("usage"));
+            tenantCapacity.setMaxSize(rs.getInt("max_size"));
+            tenantCapacity.setMaxAggrCount(rs.getInt("max_aggr_count"));
+            tenantCapacity.setMaxAggrSize(rs.getInt("max_aggr_size"));
+            tenantCapacity.setTenant(rs.getString("tenant_id"));
+            return tenantCapacity;
         }
     }
 }

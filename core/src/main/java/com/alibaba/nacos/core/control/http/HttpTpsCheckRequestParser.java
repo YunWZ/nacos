@@ -19,8 +19,8 @@
 package com.alibaba.nacos.core.control.http;
 
 import com.alibaba.nacos.plugin.control.tps.request.TpsCheckRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * http tps check request parser.

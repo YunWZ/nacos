@@ -27,6 +27,7 @@ public interface IdentityContextBuilder<T> {
     
     /**
      * build identity context from request.
+     *
      * @param request user request
      * @return IdentityContext from request context
      */
