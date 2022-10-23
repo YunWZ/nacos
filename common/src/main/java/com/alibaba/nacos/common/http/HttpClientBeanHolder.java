@@ -38,8 +38,7 @@ public final class HttpClientBeanHolder {
     
     private static final Map<String, NacosRestTemplate> SINGLETON_REST = new HashMap<>(10);
     
-    private static final Map<String, NacosAsyncRestTemplate> SINGLETON_ASYNC_REST = new HashMap<>(
-            10);
+    private static final Map<String, NacosAsyncRestTemplate> SINGLETON_ASYNC_REST = new HashMap<>(10);
     
     private static final AtomicBoolean ALREADY_SHUTDOWN = new AtomicBoolean(false);
     
@@ -101,11 +100,28 @@ public final class HttpClientBeanHolder {
             return;
         }
         LOGGER.warn("[HttpClientBeanHolder] Start destroying common HttpClient");
-        try {
-            shutdown(DefaultHttpClientFactory.class.getName());
-        } catch (Exception ex) {
-            LOGGER.error("An exception occurred when the common HTTP client was closed : {}", ExceptionUtil.getStackTrace(ex));
-        }
+        SINGLETON_REST.values().forEach(nacosRestTemplate -> {
+            try {
+                if (nacosRestTemplate != null) {
+                    nacosRestTemplate.close();
+                }
+            } catch (Exception ex) {
+                LOGGER.error("An exception occurred when the common HTTP client was closed : {}",
+                        ExceptionUtil.getStackTrace(ex));
+            }
+        });
+        
+        SINGLETON_ASYNC_REST.values().forEach(nacosRestTemplate -> {
+            try {
+                if (nacosRestTemplate != null) {
+                    nacosRestTemplate.close();
+                }
+            } catch (Exception ex) {
+                LOGGER.error("An exception occurred when the common HTTP client was closed : {}",
+                        ExceptionUtil.getStackTrace(ex));
+            }
+        });
+        
         LOGGER.warn("[HttpClientBeanHolder] Destruction of the end");
     }
     

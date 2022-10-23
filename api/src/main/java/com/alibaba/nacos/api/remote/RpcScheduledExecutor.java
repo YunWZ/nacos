@@ -33,7 +33,11 @@ public class RpcScheduledExecutor extends ScheduledThreadPoolExecutor {
             "com.alibaba.nacos.remote.ServerCommonScheduler");
     
     public RpcScheduledExecutor(int corePoolSize, final String threadName) {
-        super(corePoolSize, r -> new Thread(r, threadName));
+        super(corePoolSize, r -> {
+            Thread t = new Thread(r, threadName);
+            t.setDaemon(true);
+            return t;
+        });
     }
     
 }

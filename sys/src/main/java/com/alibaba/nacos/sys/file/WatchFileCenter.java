@@ -58,7 +58,7 @@ public class WatchFileCenter {
      */
     private static final int MAX_WATCH_FILE_JOB = Integer.getInteger("nacos.watch-file.max-dirs", 16);
     
-    private static final Map<String, WatchDirJob> MANAGER = new HashMap<String, WatchDirJob>(MAX_WATCH_FILE_JOB);
+    private static final Map<String, WatchDirJob> MANAGER = new HashMap<>(MAX_WATCH_FILE_JOB);
     
     private static final FileSystem FILE_SYSTEM = FileSystems.getDefault();
     
@@ -154,26 +154,27 @@ public class WatchFileCenter {
     
     private static class WatchDirJob extends Thread {
         
-        private ExecutorService callBackExecutor;
+        private final ExecutorService callBackExecutor;
         
         private final String paths;
         
-        private WatchService watchService;
+        private final WatchService watchService;
         
         private volatile boolean watch = true;
         
-        private Set<FileWatcher> watchers = new ConcurrentHashSet<>();
+        private final Set<FileWatcher> watchers = new ConcurrentHashSet<>();
         
         public WatchDirJob(String paths) throws NacosException {
             setName(paths);
+            setDaemon(true);
             this.paths = paths;
             final Path p = Paths.get(paths);
             if (!p.toFile().isDirectory()) {
                 throw new IllegalArgumentException("Must be a file directory : " + paths);
             }
             
-            this.callBackExecutor = ExecutorFactory
-                    .newSingleExecutorService(new NameThreadFactory("com.alibaba.nacos.sys.file.watch-" + paths));
+            this.callBackExecutor = ExecutorFactory.newSingleExecutorService(
+                    new NameThreadFactory("com.alibaba.nacos.sys.file.watch-" + paths));
             
             try {
                 WatchService service = FILE_SYSTEM.newWatchService();
@@ -210,7 +211,7 @@ public class WatchFileCenter {
                     callBackExecutor.execute(() -> {
                         for (WatchEvent<?> event : events) {
                             WatchEvent.Kind<?> kind = event.kind();
-
+                            
                             // Since the OS's event cache may be overflow, a backstop is needed
                             if (StandardWatchEventKinds.OVERFLOW.equals(kind)) {
                                 eventOverflow();

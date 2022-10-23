@@ -103,7 +103,7 @@ public final class TaskExecuteWorker implements NacosTaskProcessor, Closeable {
     private class InnerWorker extends Thread {
         
         InnerWorker(String name) {
-            setDaemon(false);
+            setDaemon(true);
             setName(name);
         }
         
@@ -119,7 +119,7 @@ public final class TaskExecuteWorker implements NacosTaskProcessor, Closeable {
                         log.warn("task {} takes {}ms", task, duration);
                     }
                 } catch (Throwable e) {
-                    log.error("[TASK-FAILED] " + e.toString(), e);
+                    log.error("[TASK-FAILED] " + e, e);
                 }
             }
         }
