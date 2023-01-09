@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 1999-2018 Alibaba Group Holding Ltd.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.alibaba.nacos</groupId>
+        <artifactId>nacos-all</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    
+    
+    <artifactId>nacos-microbench</artifactId>
+    <packaging>jar</packaging>
+    
+    <name>nacos-microbench ${project.version}</name>
+    
+    <properties>
+        <!-- Skip tests by default; run only if -DskipTests=false is specified -->
+        <skipTests>true</skipTests>
+        <jmh.version>1.35</jmh.version>
+        <checkstyle.skip>true</checkstyle.skip>
+        <uberjar.name>nacos-microbenchmarks</uberjar.name>
+        <logging.logLevel>debug</logging.logLevel>
+        <logging.config>${project.basedir}/src/main/resources/logback-test.xml</logging.config>
+        <argLine.common>
+            -server
+            -XX:+HeapDumpOnOutOfMemoryError
+        </argLine.common>
+        <argLine.printGC>-XX:+PrintGCDetails</argLine.printGC>
+        <testJavaHome>${java.home}</testJavaHome>
+        <testJvm>${testJavaHome}/bin/java</testJvm>
+    </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nacos-config</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nacos-naming</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nacos-core</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nacos-sys</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nacos-plugin-default-impl</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        
+        <!--base-->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>${jmh.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>${jmh.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <testSourceDirectory>${project.build.sourceDirectory}</testSourceDirectory>
+                    <testClassesDirectory>${project.build.outputDirectory}</testClassesDirectory>
+                    <excludes>
+                        <exclude>**/Abstract*</exclude>
+                        <exclude>**/*TestUtil*</exclude>
+                        <exclude>**/*$*.class</exclude>
+                        <exclude>**/generated/*.class</exclude>
+                        <exclude>**/jmh_generated/*.class</exclude>
+                    </excludes>
+                    <includes>
+                        <include>**/*Test*.java</include>
+                        <include>**/*Benchmark*.java</include>
+                    </includes>
+                    <runOrder>random</runOrder>
+                    <systemPropertyVariables>
+                        <logback.configurationFile>${logging.config}</logback.configurationFile>
+                        <logLevel>${logging.logLevel}</logLevel>
+                        <perfReportDir>${project.build.directory}/reports/performance/</perfReportDir>
+                    </systemPropertyVariables>
+                    <argLine>${argLine.common} ${argLine.printGC}</argLine>
+                    <properties>
+                    </properties>
+                    <skipTests>${skipTests}</skipTests>
+                    <!--                    <jvm>${testJvm}</jvm>-->
+                    <!-- Ensure the whole stacktrace is preserved when an exception is thrown. See https://issues.apache.org/jira/browse/SUREFIRE-1457 -->
+                    <trimStackTrace>false</trimStackTrace>
+                    <parallel>false</parallel>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <profiles>
+        <profile>
+            <id>benchmark-jar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>3.2.1</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                                <configuration>
+                                    <finalName>${uberjar.name}</finalName>
+                                    <transformers>
+                                        <transformer
+                                            implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                            <mainClass>org.openjdk.jmh.Main</mainClass>
+                                        </transformer>
+                                        <transformer
+                                            implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                    </transformers>
+                                    <filters>
+                                        <filter>
+                                            <!--
+                                                Shading signed JARs will fail without this.
+                                                http://stackoverflow.com/questions/999489/invalid-signature-file-when-attempting-to-run-a-jar
+                                            -->
+                                            <artifact>*:*</artifact>
+                                            <excludes>
+                                                <exclude>META-INF/*.SF</exclude>
+                                                <exclude>META-INF/*.DSA</exclude>
+                                                <exclude>META-INF/*.RSA</exclude>
+                                            </excludes>
+                                        </filter>
+                                    </filters>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
+
