@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
  */
 @State(Scope.Benchmark)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-public class JwtTokenManager32Benchmark extends AbstractMicrobenchmark {
+public class JwtTokenManagerBenchmark extends AbstractMicrobenchmark {
     
     JwtTokenManager jwtTokenManager;
     
@@ -57,11 +57,11 @@ public class JwtTokenManager32Benchmark extends AbstractMicrobenchmark {
     
     public static final String BASE64EDKEY64 = "U2VjcmV0S2V5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTJTZWNyZXRLZXkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMmE=";
     
-    private static final String ACCESS_TOKEN_HS256 = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJuYWNvcyIsImV4cCI6MTY3NDcyNzkwNX0.xYp-6tPpTZC-baP3SJeduaCIyqYJ4PLNFGVPfoqRijs";
+    private static final String ACCESS_TOKEN_HS256 = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VybmFtZSIsImV4cCI6MTY3NTE5ODMzOH0.kS9fYO-vGozRmKruY38kYDcB4DvllPJHBfakHuGUyAU";
     
-    private static final String ACCESS_TOKEN_HS384 = "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJuYWNvcyIsImV4cCI6MTY3NDcyODAyMX0.vtMcU996i8O5FDQ3vaufggenU0_xpk19pKTuPiaqjh3RRRo-Yd9tPZKsEoizRal7";
+    private static final String ACCESS_TOKEN_HS384 = "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ1c2VybmFtZSIsImV4cCI6MTY3NTE5ODU1OH0.JMZ6Hgw2B2V_HlehYdaTH-8goolWd5XJFPHOWIyNi8c0A4X8XrNLdcsdR7jv09GW";
     
-    private static final String ACCESS_TOKEN_HS512 = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuYWNvcyIsImV4cCI6MTY3NDcyODA0N30.J_A5KNcOeaVZSaoNRB5MOET9AwconyZ52Mj5DQ0sYQiiWPpQobxzMoQCEWu8W3RbFaZmIZTTVinq0xBsOFLtog";
+    private static final String ACCESS_TOKEN_HS512 = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VybmFtZSIsImV4cCI6MTY3NTE5ODU5MX0.ua4rzH89A-Q0BOsotJwL596hXKTdMF-iavuydNvYIJxakaLN6Jl9NKgjgLp3JXcILdn3z-Whn1toWXchFfVusQ";
     
     @Setup
     public void setUp() {
@@ -84,18 +84,18 @@ public class JwtTokenManager32Benchmark extends AbstractMicrobenchmark {
         environment.setProperty(Constants.Auth.NACOS_CORE_AUTH_SYSTEM_TYPE, "nacos");
         
         environment.setProperty("nacos.core.auth.plugin.nacos.token.secret.key", BASE64EDKEY32);
-        environment.setProperty("nacos.core.auth.plugin.nacos.token.expire.seconds", "300000");
+        environment.setProperty("nacos.core.auth.plugin.nacos.token.expire.seconds", "3600000");
     }
     
     @Benchmark
     @BenchmarkMode({Mode.AverageTime, Mode.Throughput})
-    public void measureCreateToken() {
+    public void measureCreateTokenForManager() {
         jwtTokenManager.createToken("username");
     }
     
     @Benchmark
     @BenchmarkMode({Mode.AverageTime, Mode.Throughput})
-    public void measureValidOldToken() {
+    public void measureValidForManager() throws AccessException {
         jwtTokenManager.validateToken(ACCESS_TOKEN_HS256);
     }
     

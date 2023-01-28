@@ -1,0 +1,891 @@
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser32
+
+# Run progress: 0.00% complete, ETA 01:20:00
+# Fork: 1 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+# Run progress: 3.13% complete, ETA 01:18:24
+# Fork: 2 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser32":
+  ≈ 10⁻⁴ ops/ns
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser48
+
+# Run progress: 6.25% complete, ETA 01:15:48
+# Fork: 1 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+# Run progress: 9.38% complete, ETA 01:13:17
+# Fork: 2 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser48":
+  ≈ 10⁻⁴ ops/ns
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser64
+
+# Run progress: 12.50% complete, ETA 01:10:45
+# Fork: 1 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+# Run progress: 15.63% complete, ETA 01:08:14
+# Fork: 2 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser64":
+  ≈ 10⁻⁴ ops/ns
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateTokenForManager
+
+# Run progress: 18.75% complete, ETA 01:05:42
+# Fork: 1 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+# Run progress: 21.88% complete, ETA 01:03:10
+# Fork: 2 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateTokenForManager":
+  ≈ 10⁻⁴ ops/ns
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidForManager
+
+# Run progress: 25.00% complete, ETA 01:00:39
+# Fork: 1 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+# Run progress: 28.13% complete, ETA 00:58:07
+# Fork: 2 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidForManager":
+  ≈ 10⁻⁴ ops/ns
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser32
+
+# Run progress: 31.25% complete, ETA 00:55:35
+# Fork: 1 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+# Run progress: 34.38% complete, ETA 00:53:03
+# Fork: 2 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser32":
+  ≈ 10⁻⁴ ops/ns
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser48
+
+# Run progress: 37.50% complete, ETA 00:50:31
+# Fork: 1 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+# Run progress: 40.63% complete, ETA 00:48:00
+# Fork: 2 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser48":
+  ≈ 10⁻⁴ ops/ns
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser64
+
+# Run progress: 43.75% complete, ETA 00:45:28
+# Fork: 1 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+# Run progress: 46.88% complete, ETA 00:42:57
+# Fork: 2 of 2
+# Warmup Iteration   1: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   2: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   3: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   4: ≈ 10⁻⁴ ops/ns
+# Warmup Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   1: ≈ 10⁻⁴ ops/ns
+Iteration   2: ≈ 10⁻⁴ ops/ns
+Iteration   3: ≈ 10⁻⁴ ops/ns
+Iteration   4: ≈ 10⁻⁴ ops/ns
+Iteration   5: ≈ 10⁻⁴ ops/ns
+Iteration   6: ≈ 10⁻⁴ ops/ns
+Iteration   7: ≈ 10⁻⁴ ops/ns
+Iteration   8: ≈ 10⁻⁴ ops/ns
+Iteration   9: ≈ 10⁻⁴ ops/ns
+Iteration  10: ≈ 10⁻⁴ ops/ns
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser64":
+  ≈ 10⁻⁴ ops/ns
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser32
+
+# Run progress: 50.00% complete, ETA 00:40:25
+# Fork: 1 of 2
+# Warmup Iteration   1: 3690.171 ns/op
+# Warmup Iteration   2: 3315.903 ns/op
+# Warmup Iteration   3: 3337.334 ns/op
+# Warmup Iteration   4: 3331.890 ns/op
+# Warmup Iteration   5: 3339.027 ns/op
+Iteration   1: 3330.584 ns/op
+Iteration   2: 3384.844 ns/op
+Iteration   3: 3343.448 ns/op
+Iteration   4: 3320.270 ns/op
+Iteration   5: 3353.603 ns/op
+Iteration   6: 3343.372 ns/op
+Iteration   7: 3334.549 ns/op
+Iteration   8: 3354.453 ns/op
+Iteration   9: 3360.663 ns/op
+Iteration  10: 3318.214 ns/op
+
+# Run progress: 53.13% complete, ETA 00:37:53
+# Fork: 2 of 2
+# Warmup Iteration   1: 3728.837 ns/op
+# Warmup Iteration   2: 3329.675 ns/op
+# Warmup Iteration   3: 3334.724 ns/op
+# Warmup Iteration   4: 3371.877 ns/op
+# Warmup Iteration   5: 3324.865 ns/op
+Iteration   1: 3302.795 ns/op
+Iteration   2: 3338.378 ns/op
+Iteration   3: 3357.725 ns/op
+Iteration   4: 3301.156 ns/op
+Iteration   5: 3337.229 ns/op
+Iteration   6: 3406.297 ns/op
+Iteration   7: 3293.801 ns/op
+Iteration   8: 3322.626 ns/op
+Iteration   9: 3332.947 ns/op
+Iteration  10: 3301.769 ns/op
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser32":
+  3336.936 ±(99.9%) 24.569 ns/op [Average]
+  (min, avg, max) = (3293.801, 3336.936, 3406.297), stdev = 28.294
+  CI (99.9%): [3312.367, 3361.505] (assumes normal distribution)
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser48
+
+# Run progress: 56.25% complete, ETA 00:35:22
+# Fork: 1 of 2
+# Warmup Iteration   1: 4012.318 ns/op
+# Warmup Iteration   2: 3438.277 ns/op
+# Warmup Iteration   3: 3468.295 ns/op
+# Warmup Iteration   4: 3451.836 ns/op
+# Warmup Iteration   5: 3490.221 ns/op
+Iteration   1: 3476.686 ns/op
+Iteration   2: 3456.477 ns/op
+Iteration   3: 3482.186 ns/op
+Iteration   4: 3482.624 ns/op
+Iteration   5: 3476.523 ns/op
+Iteration   6: 3482.523 ns/op
+Iteration   7: 3486.473 ns/op
+Iteration   8: 3459.249 ns/op
+Iteration   9: 3515.041 ns/op
+Iteration  10: 3454.977 ns/op
+
+# Run progress: 59.38% complete, ETA 00:32:50
+# Fork: 2 of 2
+# Warmup Iteration   1: 3896.405 ns/op
+# Warmup Iteration   2: 3419.839 ns/op
+# Warmup Iteration   3: 3441.222 ns/op
+# Warmup Iteration   4: 3416.848 ns/op
+# Warmup Iteration   5: 3477.728 ns/op
+Iteration   1: 3469.385 ns/op
+Iteration   2: 3438.868 ns/op
+Iteration   3: 3450.334 ns/op
+Iteration   4: 3472.100 ns/op
+Iteration   5: 3470.844 ns/op
+Iteration   6: 3466.939 ns/op
+Iteration   7: 3426.836 ns/op
+Iteration   8: 3430.654 ns/op
+Iteration   9: 3454.258 ns/op
+Iteration  10: 3458.292 ns/op
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser48":
+  3465.563 ±(99.9%) 17.984 ns/op [Average]
+  (min, avg, max) = (3426.836, 3465.563, 3515.041), stdev = 20.710
+  CI (99.9%): [3447.580, 3483.547] (assumes normal distribution)
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser64
+
+# Run progress: 62.50% complete, ETA 00:30:19
+# Fork: 1 of 2
+# Warmup Iteration   1: 3908.406 ns/op
+# Warmup Iteration   2: 3493.818 ns/op
+# Warmup Iteration   3: 3523.109 ns/op
+# Warmup Iteration   4: 3482.399 ns/op
+# Warmup Iteration   5: 3523.955 ns/op
+Iteration   1: 3544.110 ns/op
+Iteration   2: 3502.555 ns/op
+Iteration   3: 3536.215 ns/op
+Iteration   4: 3528.978 ns/op
+Iteration   5: 3496.943 ns/op
+Iteration   6: 3517.341 ns/op
+Iteration   7: 3527.895 ns/op
+Iteration   8: 3495.041 ns/op
+Iteration   9: 3534.951 ns/op
+Iteration  10: 3527.034 ns/op
+
+# Run progress: 65.63% complete, ETA 00:27:47
+# Fork: 2 of 2
+# Warmup Iteration   1: 3857.262 ns/op
+# Warmup Iteration   2: 3442.314 ns/op
+# Warmup Iteration   3: 3446.089 ns/op
+# Warmup Iteration   4: 3456.750 ns/op
+# Warmup Iteration   5: 3436.756 ns/op
+Iteration   1: 3442.983 ns/op
+Iteration   2: 3440.817 ns/op
+Iteration   3: 3423.520 ns/op
+Iteration   4: 3461.848 ns/op
+Iteration   5: 3421.565 ns/op
+Iteration   6: 3432.205 ns/op
+Iteration   7: 3457.777 ns/op
+Iteration   8: 3436.134 ns/op
+Iteration   9: 3416.024 ns/op
+Iteration  10: 3480.999 ns/op
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser64":
+  3481.247 ±(99.9%) 38.944 ns/op [Average]
+  (min, avg, max) = (3416.024, 3481.247, 3544.110), stdev = 44.848
+  CI (99.9%): [3442.302, 3520.191] (assumes normal distribution)
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateTokenForManager
+
+# Run progress: 68.75% complete, ETA 00:25:15
+# Fork: 1 of 2
+# Warmup Iteration   1: 3733.675 ns/op
+# Warmup Iteration   2: 3263.337 ns/op
+# Warmup Iteration   3: 3316.655 ns/op
+# Warmup Iteration   4: 3341.368 ns/op
+# Warmup Iteration   5: 3324.959 ns/op
+Iteration   1: 3338.484 ns/op
+Iteration   2: 3339.476 ns/op
+Iteration   3: 3318.388 ns/op
+Iteration   4: 3338.753 ns/op
+Iteration   5: 3338.101 ns/op
+Iteration   6: 3326.334 ns/op
+Iteration   7: 3342.160 ns/op
+Iteration   8: 3354.245 ns/op
+Iteration   9: 3336.521 ns/op
+Iteration  10: 3352.004 ns/op
+
+# Run progress: 71.88% complete, ETA 00:22:44
+# Fork: 2 of 2
+# Warmup Iteration   1: 3720.824 ns/op
+# Warmup Iteration   2: 3301.536 ns/op
+# Warmup Iteration   3: 3359.362 ns/op
+# Warmup Iteration   4: 3349.785 ns/op
+# Warmup Iteration   5: 3326.652 ns/op
+Iteration   1: 3370.844 ns/op
+Iteration   2: 3351.335 ns/op
+Iteration   3: 3313.768 ns/op
+Iteration   4: 3345.298 ns/op
+Iteration   5: 3406.798 ns/op
+Iteration   6: 3295.371 ns/op
+Iteration   7: 3315.779 ns/op
+Iteration   8: 3366.470 ns/op
+Iteration   9: 3351.258 ns/op
+Iteration  10: 3364.320 ns/op
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureCreateTokenForManager":
+  3343.285 ±(99.9%) 20.955 ns/op [Average]
+  (min, avg, max) = (3295.371, 3343.285, 3406.798), stdev = 24.132
+  CI (99.9%): [3322.330, 3364.241] (assumes normal distribution)
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidForManager
+
+# Run progress: 75.00% complete, ETA 00:20:12
+# Fork: 1 of 2
+# Warmup Iteration   1: 3813.180 ns/op
+# Warmup Iteration   2: 3357.451 ns/op
+# Warmup Iteration   3: 3379.457 ns/op
+# Warmup Iteration   4: 3418.446 ns/op
+# Warmup Iteration   5: 3404.842 ns/op
+Iteration   1: 3403.582 ns/op
+Iteration   2: 3410.484 ns/op
+Iteration   3: 3413.458 ns/op
+Iteration   4: 3412.076 ns/op
+Iteration   5: 3436.371 ns/op
+Iteration   6: 3385.338 ns/op
+Iteration   7: 3415.367 ns/op
+Iteration   8: 3430.179 ns/op
+Iteration   9: 3391.517 ns/op
+Iteration  10: 3397.785 ns/op
+
+# Run progress: 78.13% complete, ETA 00:17:41
+# Fork: 2 of 2
+# Warmup Iteration   1: 3830.689 ns/op
+# Warmup Iteration   2: 3363.609 ns/op
+# Warmup Iteration   3: 3365.333 ns/op
+# Warmup Iteration   4: 3416.478 ns/op
+# Warmup Iteration   5: 3397.128 ns/op
+Iteration   1: 3386.635 ns/op
+Iteration   2: 3407.536 ns/op
+Iteration   3: 3399.439 ns/op
+Iteration   4: 3422.989 ns/op
+Iteration   5: 3412.248 ns/op
+Iteration   6: 3418.215 ns/op
+Iteration   7: 3382.422 ns/op
+Iteration   8: 3421.383 ns/op
+Iteration   9: 3428.178 ns/op
+Iteration  10: 3388.199 ns/op
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidForManager":
+  3408.170 ±(99.9%) 13.833 ns/op [Average]
+  (min, avg, max) = (3382.422, 3408.170, 3436.371), stdev = 15.930
+  CI (99.9%): [3394.337, 3422.003] (assumes normal distribution)
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser32
+
+# Run progress: 81.25% complete, ETA 00:15:09
+# Fork: 1 of 2
+# Warmup Iteration   1: 3876.652 ns/op
+# Warmup Iteration   2: 3454.831 ns/op
+# Warmup Iteration   3: 3456.514 ns/op
+# Warmup Iteration   4: 3489.563 ns/op
+# Warmup Iteration   5: 3470.684 ns/op
+Iteration   1: 3437.414 ns/op
+Iteration   2: 3470.183 ns/op
+Iteration   3: 3475.422 ns/op
+Iteration   4: 3438.192 ns/op
+Iteration   5: 3463.096 ns/op
+Iteration   6: 3464.132 ns/op
+Iteration   7: 3432.231 ns/op
+Iteration   8: 3474.127 ns/op
+Iteration   9: 3491.045 ns/op
+Iteration  10: 3443.860 ns/op
+
+# Run progress: 84.38% complete, ETA 00:12:38
+# Fork: 2 of 2
+# Warmup Iteration   1: 3876.623 ns/op
+# Warmup Iteration   2: 3370.309 ns/op
+# Warmup Iteration   3: 3370.801 ns/op
+# Warmup Iteration   4: 3384.962 ns/op
+# Warmup Iteration   5: 3410.711 ns/op
+Iteration   1: 3377.262 ns/op
+Iteration   2: 3387.601 ns/op
+Iteration   3: 3382.274 ns/op
+Iteration   4: 3392.725 ns/op
+Iteration   5: 3348.965 ns/op
+Iteration   6: 3359.809 ns/op
+Iteration   7: 3410.907 ns/op
+Iteration   8: 3387.781 ns/op
+Iteration   9: 3419.631 ns/op
+Iteration  10: 3382.588 ns/op
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser32":
+  3421.962 ±(99.9%) 37.206 ns/op [Average]
+  (min, avg, max) = (3348.965, 3421.962, 3491.045), stdev = 42.847
+  CI (99.9%): [3384.756, 3459.168] (assumes normal distribution)
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser48
+
+# Run progress: 87.50% complete, ETA 00:10:06
+# Fork: 1 of 2
+# Warmup Iteration   1: 4021.969 ns/op
+# Warmup Iteration   2: 3556.927 ns/op
+# Warmup Iteration   3: 3605.686 ns/op
+# Warmup Iteration   4: 3569.997 ns/op
+# Warmup Iteration   5: 3602.724 ns/op
+Iteration   1: 3603.647 ns/op
+Iteration   2: 3588.051 ns/op
+Iteration   3: 3653.228 ns/op
+Iteration   4: 3703.655 ns/op
+Iteration   5: 3585.440 ns/op
+Iteration   6: 3625.799 ns/op
+Iteration   7: 3608.455 ns/op
+Iteration   8: 3587.235 ns/op
+Iteration   9: 3641.580 ns/op
+Iteration  10: 3638.047 ns/op
+
+# Run progress: 90.63% complete, ETA 00:07:34
+# Fork: 2 of 2
+# Warmup Iteration   1: 4022.678 ns/op
+# Warmup Iteration   2: 3520.729 ns/op
+# Warmup Iteration   3: 3574.416 ns/op
+# Warmup Iteration   4: 3535.422 ns/op
+# Warmup Iteration   5: 3568.206 ns/op
+Iteration   1: 3550.513 ns/op
+Iteration   2: 3524.027 ns/op
+Iteration   3: 3573.148 ns/op
+Iteration   4: 3575.484 ns/op
+Iteration   5: 3549.088 ns/op
+Iteration   6: 3485.326 ns/op
+Iteration   7: 3526.976 ns/op
+Iteration   8: 3523.391 ns/op
+Iteration   9: 3530.666 ns/op
+Iteration  10: 3579.361 ns/op
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser48":
+  3582.656 ±(99.9%) 46.176 ns/op [Average]
+  (min, avg, max) = (3485.326, 3582.656, 3703.655), stdev = 53.176
+  CI (99.9%): [3536.480, 3628.831] (assumes normal distribution)
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=130719322290833 -javaagent:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=57734:/Users/yunye/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser64
+
+# Run progress: 93.75% complete, ETA 00:05:03
+# Fork: 1 of 2
+# Warmup Iteration   1: 3965.204 ns/op
+# Warmup Iteration   2: 3502.576 ns/op
+# Warmup Iteration   3: 3578.131 ns/op
+# Warmup Iteration   4: 3647.741 ns/op
+# Warmup Iteration   5: 3642.035 ns/op
+Iteration   1: 3524.622 ns/op
+Iteration   2: 3557.302 ns/op
+Iteration   3: 3550.624 ns/op
+Iteration   4: 3550.001 ns/op
+Iteration   5: 3550.980 ns/op
+Iteration   6: 3540.621 ns/op
+Iteration   7: 3525.276 ns/op
+Iteration   8: 3548.817 ns/op
+Iteration   9: 3550.440 ns/op
+Iteration  10: 3531.297 ns/op
+
+# Run progress: 96.88% complete, ETA 00:02:31
+# Fork: 2 of 2
+# Warmup Iteration   1: 4003.182 ns/op
+# Warmup Iteration   2: 3534.924 ns/op
+# Warmup Iteration   3: 3598.679 ns/op
+# Warmup Iteration   4: 3610.805 ns/op
+# Warmup Iteration   5: 3593.381 ns/op
+Iteration   1: 3581.572 ns/op
+Iteration   2: 3574.914 ns/op
+Iteration   3: 3600.438 ns/op
+Iteration   4: 3574.008 ns/op
+Iteration   5: 3654.272 ns/op
+Iteration   6: 3613.759 ns/op
+Iteration   7: 3547.891 ns/op
+Iteration   8: 3573.089 ns/op
+Iteration   9: 3578.175 ns/op
+Iteration  10: 3546.718 ns/op
+
+
+Result "com.alibaba.nacos.microbench.plugin.auth.JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser64":
+  3563.741 ±(99.9%) 27.454 ns/op [Average]
+  (min, avg, max) = (3524.622, 3563.741, 3654.272), stdev = 31.616
+  CI (99.9%): [3536.287, 3591.194] (assumes normal distribution)
+
+
+# Run complete. Total time: 01:20:50
+
+REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
+why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
+experiments, perform baseline and negative tests that provide experimental control, make sure
+the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from the domain experts.
+Do not assume the numbers tell you what you want them to tell.
+
+Benchmark                                                           Mode  Cnt     Score    Error   Units
+JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser32  thrpt   20    ≈ 10⁻⁴           ops/ns
+JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser48  thrpt   20    ≈ 10⁻⁴           ops/ns
+JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser64  thrpt   20    ≈ 10⁻⁴           ops/ns
+JwtTokenManagerBenchmark.measureCreateTokenForManager              thrpt   20    ≈ 10⁻⁴           ops/ns
+JwtTokenManagerBenchmark.measureValidForManager                    thrpt   20    ≈ 10⁻⁴           ops/ns
+JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser32   thrpt   20    ≈ 10⁻⁴           ops/ns
+JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser48   thrpt   20    ≈ 10⁻⁴           ops/ns
+JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser64   thrpt   20    ≈ 10⁻⁴           ops/ns
+JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser32   avgt   20  3336.936 ± 24.569   ns/op
+JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser48   avgt   20  3465.563 ± 17.984   ns/op
+JwtTokenManagerBenchmark.measureCreateNewTokenForNacosJwtParser64   avgt   20  3481.247 ± 38.944   ns/op
+JwtTokenManagerBenchmark.measureCreateTokenForManager               avgt   20  3343.285 ± 20.955   ns/op
+JwtTokenManagerBenchmark.measureValidForManager                     avgt   20  3408.170 ± 13.833   ns/op
+JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser32    avgt   20  3421.962 ± 37.206   ns/op
+JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser48    avgt   20  3582.656 ± 46.176   ns/op
+JwtTokenManagerBenchmark.measureValidNewTokenForNacosJwtParser64    avgt   20  3563.741 ± 27.454   ns/op
+
+Process finished with exit code 0
