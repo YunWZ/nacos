@@ -17,17 +17,14 @@
 package com.alibaba.nacos.plugin.auth.impl.persistence;
 
 import com.alibaba.nacos.common.utils.StringUtils;
-import com.alibaba.nacos.config.server.configuration.ConditionOnExternalStorage;
-import com.alibaba.nacos.config.server.model.Page;
-import com.alibaba.nacos.config.server.service.repository.PaginationHelper;
-import com.alibaba.nacos.config.server.service.repository.extrnal.ExternalStoragePersistServiceImpl;
-import com.alibaba.nacos.config.server.utils.LogUtil;
+import com.alibaba.nacos.plugin.auth.impl.persistence.model.Page;
+import com.alibaba.nacos.plugin.auth.impl.persistence.repository.PaginationHelper;
+import com.alibaba.nacos.plugin.auth.impl.persistence.repository.extrnal.ExternalStoragePersistServiceImpl;
+import com.alibaba.nacos.plugin.auth.impl.utils.LogUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -40,8 +37,8 @@ import static com.alibaba.nacos.plugin.auth.impl.persistence.AuthRowMapperManage
  *
  * @author <a href="mailto:liaochuntao@live.com">liaochuntao</a>
  */
-@Conditional(value = ConditionOnExternalStorage.class)
-@Component
+//@Conditional(value = ConditionOnExternalStorage.class)
+//@Component
 public class ExternalUserPersistServiceImpl implements UserPersistService {
     
     @Autowired
@@ -69,7 +66,7 @@ public class ExternalUserPersistServiceImpl implements UserPersistService {
         try {
             jt.update(sql, username, password, true);
         } catch (CannotGetJdbcConnectionException e) {
-            LogUtil.FATAL_LOG.error("[db-error] " + e.toString(), e);
+            LogUtil.AUTH.error("[db-error] " + e.toString(), e);
             throw e;
         }
     }
@@ -85,7 +82,7 @@ public class ExternalUserPersistServiceImpl implements UserPersistService {
         try {
             jt.update(sql, username);
         } catch (CannotGetJdbcConnectionException e) {
-            LogUtil.FATAL_LOG.error("[db-error] " + e.toString(), e);
+            LogUtil.AUTH.error("[db-error] " + e.toString(), e);
             throw e;
         }
     }
@@ -101,7 +98,7 @@ public class ExternalUserPersistServiceImpl implements UserPersistService {
         try {
             jt.update("UPDATE users SET password = ? WHERE username=?", password, username);
         } catch (CannotGetJdbcConnectionException e) {
-            LogUtil.FATAL_LOG.error("[db-error] " + e.toString(), e);
+            LogUtil.AUTH.error("[db-error] " + e.toString(), e);
             throw e;
         }
     }
@@ -118,12 +115,12 @@ public class ExternalUserPersistServiceImpl implements UserPersistService {
         try {
             return this.jt.queryForObject(sql, new Object[] {username}, USER_ROW_MAPPER);
         } catch (CannotGetJdbcConnectionException e) {
-            LogUtil.FATAL_LOG.error("[db-error] " + e.toString(), e);
+            LogUtil.AUTH.error("[db-error] " + e.toString(), e);
             throw e;
         } catch (EmptyResultDataAccessException e) {
             return null;
         } catch (Exception e) {
-            LogUtil.FATAL_LOG.error("[db-other-error]" + e.getMessage(), e);
+            LogUtil.AUTH.error("[db-other-error]" + e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -155,7 +152,7 @@ public class ExternalUserPersistServiceImpl implements UserPersistService {
             }
             return pageInfo;
         } catch (CannotGetJdbcConnectionException e) {
-            LogUtil.FATAL_LOG.error("[db-error] " + e.toString(), e);
+            LogUtil.AUTH.error("[db-error] " + e.toString(), e);
             throw e;
         }
     }
@@ -184,7 +181,7 @@ public class ExternalUserPersistServiceImpl implements UserPersistService {
             return helper.fetchPage(sqlCountRows + where, sqlFetchRows + where,
                     params.toArray(), pageNo, pageSize, USER_ROW_MAPPER);
         } catch (CannotGetJdbcConnectionException e) {
-            LogUtil.FATAL_LOG.error("[db-error] " + e.toString(), e);
+            LogUtil.AUTH.error("[db-error] " + e.toString(), e);
             throw e;
         }
     }

@@ -22,7 +22,6 @@ import com.alibaba.nacos.auth.config.AuthConfigs;
 import com.alibaba.nacos.common.model.RestResult;
 import com.alibaba.nacos.common.model.RestResultUtils;
 import com.alibaba.nacos.common.utils.JacksonUtils;
-import com.alibaba.nacos.config.server.model.Page;
 import com.alibaba.nacos.plugin.auth.api.IdentityContext;
 import com.alibaba.nacos.plugin.auth.constant.ActionTypes;
 import com.alibaba.nacos.plugin.auth.exception.AccessException;
@@ -32,6 +31,7 @@ import com.alibaba.nacos.plugin.auth.impl.constant.AuthConstants;
 import com.alibaba.nacos.plugin.auth.impl.constant.AuthSystemTypes;
 import com.alibaba.nacos.plugin.auth.impl.persistence.RoleInfo;
 import com.alibaba.nacos.plugin.auth.impl.persistence.User;
+import com.alibaba.nacos.plugin.auth.impl.persistence.model.Page;
 import com.alibaba.nacos.plugin.auth.impl.roles.NacosRoleServiceImpl;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUser;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetailsServiceImpl;
@@ -39,12 +39,6 @@ import com.alibaba.nacos.plugin.auth.impl.utils.PasswordEncoderUtil;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.HttpSessionRequiredException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -71,10 +65,6 @@ public class UserController {
     
     @Autowired
     private JwtTokenManager jwtTokenManager;
-    
-    @Autowired
-    @Deprecated
-    private AuthenticationManager authenticationManager;
     
     @Autowired
     private NacosUserDetailsServiceImpl userDetailsService;
@@ -239,7 +229,7 @@ public class UserController {
         }
         
         // create Authentication class through username and password, the implement class is UsernamePasswordAuthenticationToken
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,
+        /*UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,
                 password);
         
         try {
@@ -254,7 +244,9 @@ public class UserController {
             return RestResultUtils.success("Bearer " + token);
         } catch (BadCredentialsException authentication) {
             return RestResultUtils.failed(HttpStatus.UNAUTHORIZED.value(), null, "Login failed");
-        }
+        }*/
+        //        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        return RestResultUtils.failed(HttpStatus.UNAUTHORIZED.value(), "unauthorized");
     }
     
     /**
@@ -268,7 +260,7 @@ public class UserController {
     @Deprecated
     public RestResult<String> updatePassword(@RequestParam(value = "oldPassword") String oldPassword,
             @RequestParam(value = "newPassword") String newPassword) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        /*Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = ((UserDetails) principal).getUsername();
         User user = userDetailsService.getUserFromDatabase(username);
         String password = user.getPassword();
@@ -282,7 +274,8 @@ public class UserController {
             return RestResultUtils.failed(HttpStatus.UNAUTHORIZED.value(), "Old password is invalid");
         } catch (Exception e) {
             return RestResultUtils.failed(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Update userpassword failed");
-        }
+        }*/
+        return null;
     }
     
     

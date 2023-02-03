@@ -28,8 +28,6 @@ import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetails;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetailsServiceImpl;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.filter.EqualsFilter;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * LdapAuthenticatoinManager.
@@ -76,12 +74,12 @@ public class LdapAuthenticationManager extends AbstractAuthenticationManager {
             username = username.toLowerCase();
         }
         
-        UserDetails userDetails = null;
+        NacosUserDetails userDetails = null;
         try {
             if (ldapLogin(username, rawPassword)) {
                 userDetails = userDetailsService.loadUserByUsername(AuthConstants.LDAP_PREFIX + username);
             }
-        } catch (UsernameNotFoundException exception) {
+        } catch (AccessException exception) {
             userDetailsService.createUser(AuthConstants.LDAP_PREFIX + username,
                     AuthConstants.LDAP_DEFAULT_ENCODED_PASSWORD);
             User user = new User();

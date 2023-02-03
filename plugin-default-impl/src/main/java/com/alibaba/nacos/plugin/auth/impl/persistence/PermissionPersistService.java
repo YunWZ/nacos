@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.plugin.auth.impl.persistence;
 
-import com.alibaba.nacos.config.server.model.Page;
+import com.alibaba.nacos.plugin.auth.impl.persistence.model.Page;
 
 /**
  * Permission CRUD service.
@@ -26,36 +26,36 @@ import com.alibaba.nacos.config.server.model.Page;
  */
 @SuppressWarnings("PMD.AbstractMethodOrInterfaceMethodMustUseJavadocRule")
 public interface PermissionPersistService {
-
+    
     /**
      * get the permissions of role by page.
      *
-     * @param role role
-     * @param pageNo pageNo
+     * @param role     role
+     * @param pageNo   pageNo
      * @param pageSize pageSize
      * @return permissions page info
      */
     Page<PermissionInfo> getPermissions(String role, int pageNo, int pageSize);
-
+    
     /**
      * assign permission to role.
      *
-     * @param role role
+     * @param role     role
      * @param resource resource
-     * @param action action
+     * @param action   action
      */
     void addPermission(String role, String resource, String action);
-
+    
     /**
      * delete the role's permission.
      *
-     * @param role role
+     * @param role     role
      * @param resource resource
-     * @param action action
+     * @param action   action
      */
     void deletePermission(String role, String resource, String action);
-
+    
     Page<PermissionInfo> findPermissionsLike4Page(String role, int pageNo, int pageSize);
-
+    
     String generateLikeArgument(String s);
 }

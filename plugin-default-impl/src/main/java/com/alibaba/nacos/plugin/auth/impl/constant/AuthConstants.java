@@ -39,7 +39,9 @@ public class AuthConstants {
     
     public static final String PARAM_PASSWORD = "password";
     
-    public static final String CONSOLE_RESOURCE_NAME_PREFIX = "console/";
+    public static final String RESOURCE_NORMAL_PREFIX = "normal/";
+    
+    public static final String CONSOLE_RESOURCE_NAME_PREFIX = RESOURCE_NORMAL_PREFIX + "console/";
     
     public static final String UPDATE_PASSWORD_ENTRY_POINT = CONSOLE_RESOURCE_NAME_PREFIX + "user/password";
     
@@ -73,4 +75,18 @@ public class AuthConstants {
     public static final String LDAP_DEFAULT_ENCODED_PASSWORD = PasswordEncoderUtil.encode(LDAP_DEFAULT_PASSWORD);
     
     public static final String LDAP_PREFIX = "LDAP_";
+    
+    public static final String EMPTY_DATASOURCE_PLATFORM = "";
+    
+    public static final String EMBEDDED_STORAGE = "embeddedStorage";
+    
+    public static final String DATASOURCE_PLATFORM_PROPERTY_OLD = "spring.datasource.platform";
+    
+    public static final String DATASOURCE_PLATFORM_PROPERTY = "spring.sql.init.platform";
+    
+    public static final String MYSQL = "mysql";
+    
+    public static final String DERBY = "derby";
+    
+    public static final String DERBY_BASE_DIR = "derby-data";
 }

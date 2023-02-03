@@ -25,6 +25,7 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.alibaba.nacos.api.naming.pojo.healthcheck.AbstractHealthChecker;
 import com.alibaba.nacos.api.naming.utils.NamingUtils;
+import com.alibaba.nacos.auth.annotation.Secured;
 import com.alibaba.nacos.common.utils.InternetAddressUtil;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.naming.core.ClusterOperator;
@@ -84,6 +85,7 @@ public class AddressServerClusterController {
      * @return result of create new cluster
      */
     @RequestMapping(value = "", method = RequestMethod.POST)
+    @Secured(resource = AddressServerConstants.ADDRESS_SERVER_RESOURCE)
     public ResponseEntity<String> postCluster(@RequestParam(required = false) String product,
             @RequestParam(required = false) String cluster, @RequestParam(name = "ips") String ips) {
         
@@ -153,6 +155,7 @@ public class AddressServerClusterController {
      * @return delete result (the cluster information is return if success, exception information is return if  fail)
      */
     @RequestMapping(value = "", method = RequestMethod.DELETE)
+    @Secured(resource = AddressServerConstants.ADDRESS_SERVER_RESOURCE)
     public ResponseEntity<String> deleteCluster(@RequestParam(required = false) String product,
             @RequestParam(required = false) String cluster, @RequestParam String ips) {
         //1. prepare the storage name for product and cluster

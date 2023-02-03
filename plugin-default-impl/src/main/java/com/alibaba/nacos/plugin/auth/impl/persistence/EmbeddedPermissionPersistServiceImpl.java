@@ -17,12 +17,12 @@
 package com.alibaba.nacos.plugin.auth.impl.persistence;
 
 import com.alibaba.nacos.common.utils.StringUtils;
-import com.alibaba.nacos.config.server.configuration.ConditionOnEmbeddedStorage;
-import com.alibaba.nacos.config.server.model.Page;
-import com.alibaba.nacos.config.server.service.repository.PaginationHelper;
-import com.alibaba.nacos.config.server.service.repository.embedded.DatabaseOperate;
-import com.alibaba.nacos.config.server.service.repository.embedded.EmbeddedStoragePersistServiceImpl;
-import com.alibaba.nacos.config.server.service.sql.EmbeddedStorageContextUtils;
+import com.alibaba.nacos.plugin.auth.impl.configuration.condition.ConditionOnEmbeddedStorage;
+import com.alibaba.nacos.plugin.auth.impl.persistence.model.Page;
+import com.alibaba.nacos.plugin.auth.impl.persistence.repository.PaginationHelper;
+import com.alibaba.nacos.plugin.auth.impl.persistence.repository.embedded.DatabaseOperate;
+import com.alibaba.nacos.plugin.auth.impl.persistence.repository.embedded.EmbeddedStoragePersistServiceImpl;
+import com.alibaba.nacos.plugin.auth.impl.persistence.sql.EmbeddedStorageContextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;

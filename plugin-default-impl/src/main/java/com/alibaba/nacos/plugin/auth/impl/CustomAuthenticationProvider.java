@@ -18,26 +18,20 @@ package com.alibaba.nacos.plugin.auth.impl;
 
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 
 /**
  * auth provider.
  *
  * @author wfnuser
  */
-@Component
+//@Component
 @Deprecated
-public class CustomAuthenticationProvider implements AuthenticationProvider {
+public class CustomAuthenticationProvider {
     
     @Autowired
     private NacosUserDetailsServiceImpl userDetailsService;
     
-    @Override
+    /*@Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         
         String username = (String) authentication.getPrincipal();
@@ -54,5 +48,5 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     public boolean supports(Class<?> aClass) {
         return aClass.equals(UsernamePasswordAuthenticationToken.class);
     }
-    
+    */
 }

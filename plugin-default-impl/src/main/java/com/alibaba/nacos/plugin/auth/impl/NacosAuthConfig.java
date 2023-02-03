@@ -17,32 +17,17 @@
 package com.alibaba.nacos.plugin.auth.impl;
 
 import com.alibaba.nacos.auth.config.AuthConfigs;
-import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.core.code.ControllerMethodsCache;
 import com.alibaba.nacos.plugin.auth.impl.authenticate.AuthenticationNamagerDelegator;
 import com.alibaba.nacos.plugin.auth.impl.authenticate.DefaultAuthenticationManager;
 import com.alibaba.nacos.plugin.auth.impl.authenticate.IAuthenticationManager;
 import com.alibaba.nacos.plugin.auth.impl.authenticate.LdapAuthenticationManager;
-import com.alibaba.nacos.plugin.auth.impl.constant.AuthSystemTypes;
-import com.alibaba.nacos.plugin.auth.impl.filter.JwtAuthenticationTokenFilter;
 import com.alibaba.nacos.plugin.auth.impl.roles.NacosRoleServiceImpl;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetailsServiceImpl;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.BeanIds;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsUtils;
 
 import javax.annotation.PostConstruct;
 
@@ -51,8 +36,9 @@ import javax.annotation.PostConstruct;
  *
  * @author Nacos
  */
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class NacosAuthConfig extends WebSecurityConfigurerAdapter {
+@Deprecated
+//@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class NacosAuthConfig  {
     
     private static final String SECURITY_IGNORE_URLS_SPILT_CHAR = ",";
     
@@ -98,7 +84,7 @@ public class NacosAuthConfig extends WebSecurityConfigurerAdapter {
         methodsCache.initClassMethod("com.alibaba.nacos.plugin.auth.impl.controller");
     }
     
-    @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
+    /*@Bean(name = BeanIds.AUTHENTICATION_MANAGER)
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
@@ -154,7 +140,7 @@ public class NacosAuthConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
+    */
     @Bean
     @Primary
     public IAuthenticationManager authenticationManager(

@@ -17,7 +17,7 @@
 package com.alibaba.nacos.plugin.auth.impl;
 
 import com.alibaba.nacos.common.tls.TlsHelper;
-import com.alibaba.nacos.core.utils.Loggers;
+import com.alibaba.nacos.plugin.auth.impl.utils.LogUtil;
 import org.springframework.ldap.core.support.LdapContextSource;
 
 import java.io.IOException;
@@ -84,7 +84,7 @@ public class NacosLdapContextSource extends LdapContextSource {
             try {
                 this.socketFactory = TlsHelper.buildSslContext(true).getSocketFactory();
             } catch (NoSuchAlgorithmException | KeyManagementException e) {
-                Loggers.AUTH.error("Failed to create SSLContext", e);
+                LogUtil.AUTH.error("Failed to create SSLContext", e);
             }
         }
         

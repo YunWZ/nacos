@@ -17,6 +17,7 @@
 package com.alibaba.nacos.address.constant;
 
 import com.alibaba.nacos.naming.misc.UtilsAndCommons;
+import com.alibaba.nacos.plugin.auth.impl.constant.AuthConstants;
 
 /**
  * Uniform constant parameter naming for address servers and default values ​​for related parameters.
@@ -68,5 +69,7 @@ public interface AddressServerConstants {
      */
     String ADDRESS_SERVER_REQUEST_URL =
             UtilsAndCommons.NACOS_SERVER_CONTEXT + UtilsAndCommons.NACOS_SERVER_VERSION + "/as";
+    
+    String ADDRESS_SERVER_RESOURCE = AuthConstants.RESOURCE_NORMAL_PREFIX + "as";
     
 }

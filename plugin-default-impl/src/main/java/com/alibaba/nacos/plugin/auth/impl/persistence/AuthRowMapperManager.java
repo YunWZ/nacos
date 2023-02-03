@@ -16,11 +16,12 @@
 
 package com.alibaba.nacos.plugin.auth.impl.persistence;
 
-import com.alibaba.nacos.config.server.service.repository.RowMapperManager;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Auth plugin row mapper manager.
@@ -35,15 +36,17 @@ public class AuthRowMapperManager {
     
     public static final PermissionRowMapper PERMISSION_ROW_MAPPER = new PermissionRowMapper();
     
+    public static final Map<String, RowMapper> MAPPER_REGISTRY = new HashMap<>(4);
+    
     static {
         // USER_ROW_MAPPER
-        RowMapperManager.registerRowMapper(USER_ROW_MAPPER.getClass().getCanonicalName(), USER_ROW_MAPPER);
-    
+        MAPPER_REGISTRY.put(USER_ROW_MAPPER.getClass().getCanonicalName(), USER_ROW_MAPPER);
+        
         // ROLE_INFO_ROW_MAPPER
-        RowMapperManager.registerRowMapper(ROLE_INFO_ROW_MAPPER.getClass().getCanonicalName(), ROLE_INFO_ROW_MAPPER);
+        MAPPER_REGISTRY.put(ROLE_INFO_ROW_MAPPER.getClass().getCanonicalName(), ROLE_INFO_ROW_MAPPER);
         
         // PERMISSION_ROW_MAPPER
-        RowMapperManager.registerRowMapper(PERMISSION_ROW_MAPPER.getClass().getCanonicalName(), PERMISSION_ROW_MAPPER);
+        MAPPER_REGISTRY.put(PERMISSION_ROW_MAPPER.getClass().getCanonicalName(), PERMISSION_ROW_MAPPER);
     }
     
     public static final class UserRowMapper implements RowMapper<User> {

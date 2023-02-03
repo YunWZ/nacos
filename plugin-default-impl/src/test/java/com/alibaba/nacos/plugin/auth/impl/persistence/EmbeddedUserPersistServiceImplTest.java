@@ -16,10 +16,10 @@
 
 package com.alibaba.nacos.plugin.auth.impl.persistence;
 
-import com.alibaba.nacos.config.server.model.Page;
-import com.alibaba.nacos.config.server.service.repository.PaginationHelper;
-import com.alibaba.nacos.config.server.service.repository.embedded.DatabaseOperate;
-import com.alibaba.nacos.config.server.service.repository.embedded.EmbeddedStoragePersistServiceImpl;
+import com.alibaba.nacos.plugin.auth.impl.persistence.model.Page;
+import com.alibaba.nacos.plugin.auth.impl.persistence.repository.PaginationHelper;
+import com.alibaba.nacos.plugin.auth.impl.persistence.repository.embedded.DatabaseOperate;
+import com.alibaba.nacos.plugin.auth.impl.persistence.repository.embedded.EmbeddedStoragePersistServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

@@ -16,9 +16,9 @@
 
 package com.alibaba.nacos.plugin.auth.impl.persistence;
 
-import com.alibaba.nacos.config.server.model.Page;
-import com.alibaba.nacos.config.server.service.repository.PaginationHelper;
-import com.alibaba.nacos.config.server.service.repository.extrnal.ExternalStoragePersistServiceImpl;
+import com.alibaba.nacos.plugin.auth.impl.persistence.model.Page;
+import com.alibaba.nacos.plugin.auth.impl.persistence.repository.PaginationHelper;
+import com.alibaba.nacos.plugin.auth.impl.persistence.repository.extrnal.ExternalStoragePersistServiceImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

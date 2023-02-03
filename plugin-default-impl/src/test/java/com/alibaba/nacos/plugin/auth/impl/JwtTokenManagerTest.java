@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.env.MockEnvironment;
-import org.springframework.security.core.Authentication;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -74,13 +73,6 @@ public class JwtTokenManagerTest {
         String nacosToken = jwtTokenManager.createToken("nacos");
         Assert.assertNotNull(nacosToken);
         jwtTokenManager.validateToken(nacosToken);
-    }
-    
-    @Test
-    public void getAuthentication() throws AccessException {
-        String nacosToken = jwtTokenManager.createToken("nacos");
-        Authentication authentication = jwtTokenManager.getAuthentication(nacosToken);
-        Assert.assertNotNull(authentication);
     }
     
     @Test

@@ -20,8 +20,6 @@ import com.alibaba.nacos.auth.config.AuthConfigs;
 import com.alibaba.nacos.common.utils.CollectionUtils;
 import com.alibaba.nacos.common.utils.ConcurrentHashSet;
 import com.alibaba.nacos.common.utils.StringUtils;
-import com.alibaba.nacos.config.server.model.Page;
-import com.alibaba.nacos.core.utils.Loggers;
 import com.alibaba.nacos.plugin.auth.api.Permission;
 import com.alibaba.nacos.plugin.auth.api.Resource;
 import com.alibaba.nacos.plugin.auth.constant.Constants;
@@ -31,8 +29,10 @@ import com.alibaba.nacos.plugin.auth.impl.persistence.PermissionInfo;
 import com.alibaba.nacos.plugin.auth.impl.persistence.PermissionPersistService;
 import com.alibaba.nacos.plugin.auth.impl.persistence.RoleInfo;
 import com.alibaba.nacos.plugin.auth.impl.persistence.RolePersistService;
+import com.alibaba.nacos.plugin.auth.impl.persistence.model.Page;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUser;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetailsServiceImpl;
+import com.alibaba.nacos.plugin.auth.impl.utils.LogUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -103,7 +103,7 @@ public class NacosRoleServiceImpl {
             roleInfoMap = tmpRoleInfoMap;
             permissionInfoMap = tmpPermissionInfoMap;
         } catch (Exception e) {
-            Loggers.AUTH.warn("[LOAD-ROLES] load failed", e);
+            LogUtil.AUTH.warn("[LOAD-ROLES] load failed", e);
         }
     }
     
@@ -118,8 +118,8 @@ public class NacosRoleServiceImpl {
      * @return true if granted, false otherwise
      */
     public boolean hasPermission(NacosUser nacosUser, Permission permission) {
-        //update password
-        if (AuthConstants.UPDATE_PASSWORD_ENTRY_POINT.equals(permission.getResource().getName())) {
+        // All authenticated users are allowed to access normal resources.
+        if (permission.getResource().getName().startsWith(AuthConstants.RESOURCE_NORMAL_PREFIX)) {
             return true;
         }
         
@@ -129,16 +129,9 @@ public class NacosRoleServiceImpl {
         }
         
         // Global admin pass:
-        for (RoleInfo roleInfo : roleInfoList) {
-            if (AuthConstants.GLOBAL_ADMIN_ROLE.equals(roleInfo.getRole())) {
-                nacosUser.setGlobalAdmin(true);
-                return true;
-            }
-        }
-        
-        // Old global admin can pass resource 'console/':
-        if (permission.getResource().getName().startsWith(AuthConstants.CONSOLE_RESOURCE_NAME_PREFIX)) {
-            return false;
+        // TODO: maybe we could cache the admin role of users.
+        if (hasGlobalAdminRole(nacosUser.getUserName())) {
+            return true;
         }
         
         // For other roles, use a pattern match to decide if pass or not.

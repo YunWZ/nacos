@@ -74,14 +74,6 @@ public class LdapAuthConfig {
     
     @Bean
     @Conditional(ConditionOnLdapAuth.class)
-    public LdapAuthenticationProvider ldapAuthenticationProvider(LdapTemplate ldapTemplate,
-            NacosUserDetailsServiceImpl userDetailsService, NacosRoleServiceImpl nacosRoleService) {
-        return new LdapAuthenticationProvider(ldapTemplate, userDetailsService, nacosRoleService, filterPrefix,
-                caseSensitive);
-    }
-    
-    @Bean
-    @Conditional(ConditionOnLdapAuth.class)
     public IAuthenticationManager ldapAuthenticatoinManager(LdapTemplate ldapTemplate,
             NacosUserDetailsServiceImpl userDetailsService, JwtTokenManager jwtTokenManager,
             NacosRoleServiceImpl roleService) {

@@ -17,22 +17,11 @@
 package com.alibaba.nacos.plugin.auth.impl;
 
 import com.alibaba.nacos.common.utils.CollectionUtils;
-import com.alibaba.nacos.core.utils.Loggers;
 import com.alibaba.nacos.plugin.auth.impl.constant.AuthConstants;
 import com.alibaba.nacos.plugin.auth.impl.persistence.RoleInfo;
-import com.alibaba.nacos.plugin.auth.impl.persistence.User;
 import com.alibaba.nacos.plugin.auth.impl.roles.NacosRoleServiceImpl;
-import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetails;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetailsServiceImpl;
-import com.alibaba.nacos.plugin.auth.impl.utils.PasswordEncoderUtil;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.ldap.core.LdapTemplate;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 
@@ -42,7 +31,7 @@ import java.util.List;
  * @author zjw
  */
 @Deprecated
-public class LdapAuthenticationProvider implements AuthenticationProvider {
+public class LdapAuthenticationProvider {
     
     private final NacosUserDetailsServiceImpl userDetailsService;
     
@@ -63,67 +52,5 @@ public class LdapAuthenticationProvider implements AuthenticationProvider {
         this.caseSensitive = caseSensitive;
     }
     
-    @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        String username = (String) authentication.getPrincipal();
-        String password = (String) authentication.getCredentials();
-        
-        if (isAdmin(username)) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (PasswordEncoderUtil.matches(password, userDetails.getPassword())) {
-                return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
-            } else {
-                return null;
-            }
-        }
-        
-        if (!caseSensitive) {
-            username = StringUtils.lowerCase(username);
-        }
-        
-        try {
-            if (!ldapLogin(username, password)) {
-                return null;
-            }
-        } catch (Exception e) {
-            Loggers.AUTH.error("[LDAP-LOGIN] failed", e);
-            return null;
-        }
-        
-        UserDetails userDetails;
-        try {
-            userDetails = userDetailsService.loadUserByUsername(AuthConstants.LDAP_PREFIX + username);
-        } catch (UsernameNotFoundException exception) {
-            String nacosPassword = PasswordEncoderUtil.encode(AuthConstants.LDAP_DEFAULT_PASSWORD);
-            userDetailsService.createUser(AuthConstants.LDAP_PREFIX + username, nacosPassword);
-            User user = new User();
-            user.setUsername(AuthConstants.LDAP_PREFIX + username);
-            user.setPassword(nacosPassword);
-            userDetails = new NacosUserDetails(user);
-        }
-        return new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
-    }
-    
-    private boolean isAdmin(String username) {
-        List<RoleInfo> roleInfos = nacosRoleService.getRoles(username);
-        if (CollectionUtils.isEmpty(roleInfos)) {
-            return false;
-        }
-        for (RoleInfo roleinfo : roleInfos) {
-            if (AuthConstants.GLOBAL_ADMIN_ROLE.equals(roleinfo.getRole())) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    private boolean ldapLogin(String username, String password) throws AuthenticationException {
-        return ldapTemplate.authenticate("", "(" + filterPrefix + "=" + username + ")", password);
-    }
-    
-    @Override
-    public boolean supports(Class<?> aClass) {
-        return aClass.equals(UsernamePasswordAuthenticationToken.class);
-    }
     
 }

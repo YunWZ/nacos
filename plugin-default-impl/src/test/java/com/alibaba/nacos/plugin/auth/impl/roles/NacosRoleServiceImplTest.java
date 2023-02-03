@@ -17,7 +17,6 @@
 package com.alibaba.nacos.plugin.auth.impl.roles;
 
 import com.alibaba.nacos.auth.config.AuthConfigs;
-import com.alibaba.nacos.config.server.model.Page;
 import com.alibaba.nacos.plugin.auth.api.Permission;
 import com.alibaba.nacos.plugin.auth.api.Resource;
 import com.alibaba.nacos.plugin.auth.impl.constant.AuthConstants;
@@ -26,6 +25,7 @@ import com.alibaba.nacos.plugin.auth.impl.persistence.PermissionPersistService;
 import com.alibaba.nacos.plugin.auth.impl.persistence.RoleInfo;
 import com.alibaba.nacos.plugin.auth.impl.persistence.RolePersistService;
 import com.alibaba.nacos.plugin.auth.impl.persistence.User;
+import com.alibaba.nacos.plugin.auth.impl.persistence.model.Page;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUser;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetailsServiceImpl;
 import org.junit.Assert;
