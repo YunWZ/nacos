@@ -17,6 +17,8 @@
 package com.alibaba.nacos.api.remote.request;
 
 import com.alibaba.nacos.api.remote.Payload;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -28,6 +30,7 @@ import java.util.TreeMap;
 @SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
 public abstract class Request implements Payload {
     
+    @JsonIgnore
     private final Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     
     private String requestId;

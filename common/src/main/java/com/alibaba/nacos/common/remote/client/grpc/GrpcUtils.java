@@ -32,8 +32,6 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.UnsafeByteOperations;
 
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * gRPC utils, use to parse request and response.
@@ -62,9 +60,7 @@ public class GrpcUtils {
         
         // request body .
         byte[] jsonBytes = convertRequestToByte(request);
-        return payloadBuilder
-                .setBody(Any.newBuilder().setValue(UnsafeByteOperations.unsafeWrap(jsonBytes)))
-                .build();
+        return payloadBuilder.setBody(Any.newBuilder().setValue(UnsafeByteOperations.unsafeWrap(jsonBytes))).build();
         
     }
     
@@ -83,8 +79,7 @@ public class GrpcUtils {
         
         Payload.Builder builder = Payload.newBuilder();
         
-        return builder
-                .setBody(Any.newBuilder().setValue(UnsafeByteOperations.unsafeWrap(jsonBytes)))
+        return builder.setBody(Any.newBuilder().setValue(UnsafeByteOperations.unsafeWrap(jsonBytes)))
                 .setMetadata(newMeta).build();
         
     }
@@ -99,16 +94,15 @@ public class GrpcUtils {
         byte[] jsonBytes = JacksonUtils.toJsonBytes(response);
         
         Metadata.Builder metaBuilder = Metadata.newBuilder().setType(response.getClass().getSimpleName());
-        return Payload.newBuilder()
-                .setBody(Any.newBuilder().setValue(UnsafeByteOperations.unsafeWrap(jsonBytes)))
+        return Payload.newBuilder().setBody(Any.newBuilder().setValue(UnsafeByteOperations.unsafeWrap(jsonBytes)))
                 .setMetadata(metaBuilder.build()).build();
     }
     
     private static byte[] convertRequestToByte(Request request) {
-        Map<String, String> requestHeaders = new HashMap<>(request.getHeaders());
-        request.clearHeaders();
+        //        Map<String, String> requestHeaders = new HashMap<>(request.getHeaders());
+        //        request.clearHeaders();
         byte[] jsonBytes = JacksonUtils.toJsonBytes(request);
-        request.putAllHeader(requestHeaders);
+        //        request.putAllHeader(requestHeaders);
         return jsonBytes;
     }
     
