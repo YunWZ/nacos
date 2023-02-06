@@ -1,0 +1,261 @@
+    public abstract class Request implements Payload {
+
+          @JsonIgnore
+          public String getHeader(String key) {
+              return headers.get(key);
+          }
+    }
+
+    private static ServerCheckRequest createRequest() {
+        ServerCheckRequest serverCheckRequest = new ServerCheckRequest();
+        serverCheckRequest.putHeader("module", "naming");
+        serverCheckRequest.putHeader("source1", "sdk");
+        serverCheckRequest.putHeader("source2", "sdk");
+        serverCheckRequest.putHeader("source3", "sdk");
+        serverCheckRequest.putHeader("source4", "sdk");
+        serverCheckRequest.putHeader("source5", "sdk");
+        serverCheckRequest.putHeader("source6", "sdk");
+        serverCheckRequest.putHeader("source7", "sdk");
+        serverCheckRequest.putHeader("source8", "sdk");
+        serverCheckRequest.putHeader("source9", "sdk");
+        serverCheckRequest.putHeader("source10", "sdk");
+        serverCheckRequest.putHeader("source11", "sdk");
+        serverCheckRequest.putHeader("source12", "sdk");
+
+        return serverCheckRequest;
+    }
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=20752984575000 -javaagent:/Users/yuntiankong/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=59233:/Users/yuntiankong/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.alibaba.nacos.common.remote.client.grpc.GrpcUtilsBenchmark.measureConvertRequest
+
+# Run progress: 0.00% complete, ETA 00:20:00
+# Fork: 1 of 2
+# Warmup Iteration   1: 0.001 ops/ns
+# Warmup Iteration   2: 0.001 ops/ns
+# Warmup Iteration   3: 0.001 ops/ns
+# Warmup Iteration   4: 0.001 ops/ns
+# Warmup Iteration   5: 0.001 ops/ns
+Iteration   1: 0.001 ops/ns
+Iteration   2: 0.001 ops/ns
+Iteration   3: 0.001 ops/ns
+Iteration   4: 0.001 ops/ns
+Iteration   5: 0.001 ops/ns
+Iteration   6: 0.001 ops/ns
+Iteration   7: 0.001 ops/ns
+Iteration   8: 0.001 ops/ns
+Iteration   9: 0.001 ops/ns
+Iteration  10: 0.001 ops/ns
+
+# Run progress: 12.50% complete, ETA 00:17:42
+# Fork: 2 of 2
+# Warmup Iteration   1: 0.001 ops/ns
+# Warmup Iteration   2: 0.001 ops/ns
+# Warmup Iteration   3: 0.001 ops/ns
+# Warmup Iteration   4: 0.001 ops/ns
+# Warmup Iteration   5: 0.001 ops/ns
+Iteration   1: 0.001 ops/ns
+Iteration   2: 0.001 ops/ns
+Iteration   3: 0.001 ops/ns
+Iteration   4: 0.001 ops/ns
+Iteration   5: 0.001 ops/ns
+Iteration   6: 0.001 ops/ns
+Iteration   7: 0.001 ops/ns
+Iteration   8: 0.001 ops/ns
+Iteration   9: 0.001 ops/ns
+Iteration  10: 0.001 ops/ns
+
+
+Result "com.alibaba.nacos.common.remote.client.grpc.GrpcUtilsBenchmark.measureConvertRequest":
+  0.001 ±(99.9%) 0.001 ops/ns [Average]
+  (min, avg, max) = (0.001, 0.001, 0.001), stdev = 0.001
+  CI (99.9%): [0.001, 0.001] (assumes normal distribution)
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=20752984575000 -javaagent:/Users/yuntiankong/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=59233:/Users/yuntiankong/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Throughput, ops/time
+# Benchmark: com.alibaba.nacos.common.remote.client.grpc.GrpcUtilsBenchmark.measureParse
+
+# Run progress: 25.00% complete, ETA 00:15:10
+# Fork: 1 of 2
+# Warmup Iteration   1: 0.001 ops/ns
+# Warmup Iteration   2: 0.001 ops/ns
+# Warmup Iteration   3: 0.001 ops/ns
+# Warmup Iteration   4: 0.001 ops/ns
+# Warmup Iteration   5: 0.001 ops/ns
+Iteration   1: 0.001 ops/ns
+Iteration   2: 0.001 ops/ns
+Iteration   3: 0.001 ops/ns
+Iteration   4: 0.001 ops/ns
+Iteration   5: 0.001 ops/ns
+Iteration   6: 0.001 ops/ns
+Iteration   7: 0.001 ops/ns
+Iteration   8: 0.001 ops/ns
+Iteration   9: 0.001 ops/ns
+Iteration  10: 0.001 ops/ns
+
+# Run progress: 37.50% complete, ETA 00:12:38
+# Fork: 2 of 2
+# Warmup Iteration   1: 0.001 ops/ns
+# Warmup Iteration   2: 0.001 ops/ns
+# Warmup Iteration   3: 0.001 ops/ns
+# Warmup Iteration   4: 0.001 ops/ns
+# Warmup Iteration   5: 0.001 ops/ns
+Iteration   1: 0.001 ops/ns
+Iteration   2: 0.001 ops/ns
+Iteration   3: 0.001 ops/ns
+Iteration   4: 0.001 ops/ns
+Iteration   5: 0.001 ops/ns
+Iteration   6: 0.001 ops/ns
+Iteration   7: 0.001 ops/ns
+Iteration   8: 0.001 ops/ns
+Iteration   9: 0.001 ops/ns
+Iteration  10: 0.001 ops/ns
+
+
+Result "com.alibaba.nacos.common.remote.client.grpc.GrpcUtilsBenchmark.measureParse":
+  0.001 ±(99.9%) 0.001 ops/ns [Average]
+  (min, avg, max) = (0.001, 0.001, 0.001), stdev = 0.001
+  CI (99.9%): [0.001, 0.001] (assumes normal distribution)
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=20752984575000 -javaagent:/Users/yuntiankong/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=59233:/Users/yuntiankong/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.alibaba.nacos.common.remote.client.grpc.GrpcUtilsBenchmark.measureConvertRequest
+
+# Run progress: 50.00% complete, ETA 00:10:06
+# Fork: 1 of 2
+# Warmup Iteration   1: 1618.236 ns/op
+# Warmup Iteration   2: 1553.259 ns/op
+# Warmup Iteration   3: 1507.537 ns/op
+# Warmup Iteration   4: 1506.606 ns/op
+# Warmup Iteration   5: 1517.009 ns/op
+Iteration   1: 1511.708 ns/op
+Iteration   2: 1509.617 ns/op
+Iteration   3: 1503.186 ns/op
+Iteration   4: 1521.926 ns/op
+Iteration   5: 1510.397 ns/op
+Iteration   6: 1513.897 ns/op
+Iteration   7: 1498.172 ns/op
+Iteration   8: 1508.492 ns/op
+Iteration   9: 1503.264 ns/op
+Iteration  10: 1500.919 ns/op
+
+# Run progress: 62.50% complete, ETA 00:07:35
+# Fork: 2 of 2
+# Warmup Iteration   1: 1765.786 ns/op
+# Warmup Iteration   2: 1632.660 ns/op
+# Warmup Iteration   3: 1636.322 ns/op
+# Warmup Iteration   4: 1642.044 ns/op
+# Warmup Iteration   5: 1632.508 ns/op
+Iteration   1: 1644.338 ns/op
+Iteration   2: 1657.392 ns/op
+Iteration   3: 1643.403 ns/op
+Iteration   4: 1658.686 ns/op
+Iteration   5: 1651.133 ns/op
+Iteration   6: 1646.271 ns/op
+Iteration   7: 1638.674 ns/op
+Iteration   8: 1644.275 ns/op
+Iteration   9: 1640.420 ns/op
+Iteration  10: 1631.532 ns/op
+
+
+Result "com.alibaba.nacos.common.remote.client.grpc.GrpcUtilsBenchmark.measureConvertRequest":
+  1576.885 ±(99.9%) 61.574 ns/op [Average]
+  (min, avg, max) = (1498.172, 1576.885, 1658.686), stdev = 70.909
+  CI (99.9%): [1515.311, 1638.460] (assumes normal distribution)
+
+
+# JMH version: 1.35
+# VM version: JDK 1.8.0_351, Java HotSpot(TM) 64-Bit Server VM, 25.351-b10
+# VM invoker: /Library/Java/JavaVirtualMachines/jdk1.8.0_351.jdk/Contents/Home/jre/bin/java
+# VM options: -Dvisualvm.id=20752984575000 -javaagent:/Users/yuntiankong/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=59233:/Users/yuntiankong/Library/Application Support/JetBrains/Toolbox/apps/IDEA-U/ch-0/223.8617.56/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8
+# Blackhole mode: full + dont-inline hint (auto-detected, use -Djmh.blackhole.autoDetect=false to disable)
+# Warmup: 5 iterations, 10 s each
+# Measurement: 10 iterations, 10 s each
+# Timeout: 10 min per iteration
+# Threads: 1 thread, will synchronize iterations
+# Benchmark mode: Average time, time/op
+# Benchmark: com.alibaba.nacos.common.remote.client.grpc.GrpcUtilsBenchmark.measureParse
+
+# Run progress: 75.00% complete, ETA 00:05:03
+# Fork: 1 of 2
+# Warmup Iteration   1: 1097.183 ns/op
+# Warmup Iteration   2: 1025.392 ns/op
+# Warmup Iteration   3: 1047.217 ns/op
+# Warmup Iteration   4: 1025.541 ns/op
+# Warmup Iteration   5: 1103.321 ns/op
+Iteration   1: 1104.702 ns/op
+Iteration   2: 1096.972 ns/op
+Iteration   3: 1107.677 ns/op
+Iteration   4: 1103.747 ns/op
+Iteration   5: 1105.232 ns/op
+Iteration   6: 1093.326 ns/op
+Iteration   7: 1100.196 ns/op
+Iteration   8: 1108.025 ns/op
+Iteration   9: 1113.810 ns/op
+Iteration  10: 1109.596 ns/op
+
+# Run progress: 87.50% complete, ETA 00:02:31
+# Fork: 2 of 2
+# Warmup Iteration   1: 1143.823 ns/op
+# Warmup Iteration   2: 1133.066 ns/op
+# Warmup Iteration   3: 1109.487 ns/op
+# Warmup Iteration   4: 1131.839 ns/op
+# Warmup Iteration   5: 1135.771 ns/op
+Iteration   1: 1132.952 ns/op
+Iteration   2: 1126.201 ns/op
+Iteration   3: 1130.630 ns/op
+Iteration   4: 1162.960 ns/op
+Iteration   5: 1124.042 ns/op
+Iteration   6: 1137.578 ns/op
+Iteration   7: 1131.988 ns/op
+Iteration   8: 1135.283 ns/op
+Iteration   9: 1131.069 ns/op
+Iteration  10: 1127.864 ns/op
+
+
+Result "com.alibaba.nacos.common.remote.client.grpc.GrpcUtilsBenchmark.measureParse":
+  1119.193 ±(99.9%) 15.212 ns/op [Average]
+  (min, avg, max) = (1093.326, 1119.193, 1162.960), stdev = 17.518
+  CI (99.9%): [1103.981, 1134.404] (assumes normal distribution)
+
+
+# Run complete. Total time: 00:20:13
+
+REMEMBER: The numbers below are just data. To gain reusable insights, you need to follow up on
+why the numbers are the way they are. Use profilers (see -prof, -lprof), design factorial
+experiments, perform baseline and negative tests that provide experimental control, make sure
+the benchmarking environment is safe on JVM/OS/HW level, ask for reviews from the domain experts.
+Do not assume the numbers tell you what you want them to tell.
+
+Benchmark                                  Mode  Cnt     Score    Error   Units
+GrpcUtilsBenchmark.measureConvertRequest  thrpt   20     0.001 ±  0.001  ops/ns
+GrpcUtilsBenchmark.measureParse           thrpt   20     0.001 ±  0.001  ops/ns
+GrpcUtilsBenchmark.measureConvertRequest   avgt   20  1576.885 ± 61.574   ns/op
+GrpcUtilsBenchmark.measureParse            avgt   20  1119.193 ± 15.212   ns/op
+
+Process finished with exit code 0
