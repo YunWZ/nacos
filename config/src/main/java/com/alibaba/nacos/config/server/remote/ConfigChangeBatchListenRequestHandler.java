@@ -51,7 +51,7 @@ public class ConfigChangeBatchListenRequestHandler
     public ConfigChangeBatchListenResponse handle(ConfigBatchListenRequest configChangeListenRequest, RequestMeta meta)
             throws NacosException {
         String connectionId = StringPool.get(meta.getConnectionId());
-        String tag = configChangeListenRequest.getHeader(Constants.VIPSERVER_TAG);
+        String tag = "";//configChangeListenRequest.getHeader(Constants.VIPSERVER_TAG);
         
         ConfigChangeBatchListenResponse configChangeBatchListenResponse = new ConfigChangeBatchListenResponse();
         for (ConfigBatchListenRequest.ConfigListenContext listenContext : configChangeListenRequest

@@ -21,6 +21,7 @@ import com.alibaba.nacos.api.grpc.auto.Metadata;
 import com.alibaba.nacos.api.grpc.auto.Payload;
 import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
+import com.alibaba.nacos.api.remote.request.RequestWrapper;
 import com.alibaba.nacos.api.remote.response.Response;
 import com.alibaba.nacos.api.utils.NetUtils;
 import com.alibaba.nacos.common.remote.PayloadRegistry;
@@ -52,9 +53,9 @@ public class GrpcUtils {
         //meta.
         Payload.Builder payloadBuilder = Payload.newBuilder();
         Metadata.Builder metaBuilder = Metadata.newBuilder();
-        if (meta != null) {
+/*        if (meta != null) {
             metaBuilder.putAllHeaders(request.getHeaders()).setType(request.getClass().getSimpleName());
-        }
+        }*/
         metaBuilder.setClientIp(NetUtils.localIP());
         payloadBuilder.setMetadata(metaBuilder.build());
         
@@ -62,6 +63,10 @@ public class GrpcUtils {
         byte[] jsonBytes = convertRequestToByte(request);
         return payloadBuilder.setBody(Any.newBuilder().setValue(UnsafeByteOperations.unsafeWrap(jsonBytes))).build();
         
+    }
+    
+    public static Payload convert(RequestWrapper request) {
+        return convert(request.getWrappedRequest());
     }
     
     /**
@@ -73,7 +78,7 @@ public class GrpcUtils {
     public static Payload convert(Request request) {
         
         Metadata newMeta = Metadata.newBuilder().setType(request.getClass().getSimpleName())
-                .setClientIp(NetUtils.localIP()).putAllHeaders(request.getHeaders()).build();
+                .setClientIp(NetUtils.localIP()).build();
         
         byte[] jsonBytes = convertRequestToByte(request);
         
@@ -119,7 +124,7 @@ public class GrpcUtils {
             ByteBuffer byteBuffer = byteString.asReadOnlyByteBuffer();
             Object obj = JacksonUtils.toObj(new ByteBufferBackedInputStream(byteBuffer), classType);
             if (obj instanceof Request) {
-                ((Request) obj).putAllHeader(payload.getMetadata().getHeadersMap());
+                obj = RequestWrapper.wrap((Request) obj, payload.getMetadata().getHeadersMap());
             }
             return obj;
         } else {

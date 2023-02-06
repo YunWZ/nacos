@@ -71,7 +71,7 @@ public class RemoteRequestAuthFilter extends AbstractRequestFilter {
                     return null;
                 }
                 String clientIp = meta.getClientIp();
-                request.putHeader(Constants.Identity.X_REAL_IP, clientIp);
+//                request.putHeader(Constants.Identity.X_REAL_IP, clientIp);
                 Resource resource = protocolAuthService.parseResource(request, secured);
                 IdentityContext identityContext = protocolAuthService.parseIdentity(request);
                 boolean result = protocolAuthService.validateIdentity(identityContext, resource);

@@ -58,16 +58,16 @@ public class GrpcIdentityContextBuilder implements IdentityContextBuilder<Reques
             return result;
         }
         Set<String> identityNames = new HashSet<>(authPluginService.get().identityNames());
-        Map<String, String> map = request.getHeaders();
+/*        Map<String, String> map = request.getHeaders();
         for (Map.Entry<String, String> entry : map.entrySet()) {
             if (identityNames.contains(entry.getKey())) {
                 result.setParameter(entry.getKey(), entry.getValue());
             }
-        }
+        }*/
         return result;
     }
     
     private void getRemoteIp(Request request, IdentityContext result) {
-        result.setParameter(Constants.Identity.REMOTE_IP, request.getHeader(Constants.Identity.X_REAL_IP));
+//        result.setParameter(Constants.Identity.REMOTE_IP, request.getHeader(Constants.Identity.X_REAL_IP));
     }
 }

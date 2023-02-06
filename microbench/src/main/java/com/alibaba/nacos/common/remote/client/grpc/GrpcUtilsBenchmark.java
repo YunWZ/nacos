@@ -18,6 +18,7 @@ package com.alibaba.nacos.common.remote.client.grpc;
 
 import com.alibaba.nacos.api.grpc.auto.Payload;
 import com.alibaba.nacos.api.remote.request.Request;
+import com.alibaba.nacos.api.remote.request.RequestWrapper;
 import com.alibaba.nacos.api.remote.request.ServerCheckRequest;
 import com.alibaba.nacos.common.remote.PayloadRegistry;
 import com.alibaba.nacos.microbench.AbstractMicrobenchmark;
@@ -44,7 +45,7 @@ public class GrpcUtilsBenchmark extends AbstractMicrobenchmark {
     
     private Payload payload;
     
-    private Request request;
+    private RequestWrapper<Request> request;
     
     @Setup(Level.Iteration)
     public void setup() {
@@ -53,23 +54,24 @@ public class GrpcUtilsBenchmark extends AbstractMicrobenchmark {
         payload = GrpcUtils.convert(request);
     }
     
-    private static ServerCheckRequest createRequest() {
-        ServerCheckRequest serverCheckRequest = new ServerCheckRequest();
-        serverCheckRequest.putHeader("module", "naming");
-        serverCheckRequest.putHeader("source1", "sdk");
-        serverCheckRequest.putHeader("source2", "sdk");
-        serverCheckRequest.putHeader("source3", "sdk");
-        serverCheckRequest.putHeader("source4", "sdk");
-        serverCheckRequest.putHeader("source5", "sdk");
-        serverCheckRequest.putHeader("source6", "sdk");
-        serverCheckRequest.putHeader("source7", "sdk");
-        serverCheckRequest.putHeader("source8", "sdk");
-        serverCheckRequest.putHeader("source9", "sdk");
-        serverCheckRequest.putHeader("source10", "sdk");
-        serverCheckRequest.putHeader("source11", "sdk");
-        serverCheckRequest.putHeader("source12", "sdk");
+    private static RequestWrapper createRequest() {
+        RequestWrapper request = RequestWrapper.wrap(new ServerCheckRequest());
+        request.setRequestId("aaa");
+        request.putHeader("module", "naming");
+        request.putHeader("source1", "sdk");
+        request.putHeader("source2", "sdk");
+        request.putHeader("source3", "sdk");
+        request.putHeader("source4", "sdk");
+        request.putHeader("source5", "sdk");
+        request.putHeader("source6", "sdk");
+        request.putHeader("source7", "sdk");
+        request.putHeader("source8", "sdk");
+        request.putHeader("source9", "sdk");
+        request.putHeader("source10", "sdk");
+        request.putHeader("source11", "sdk");
+        request.putHeader("source12", "sdk");
         
-        return serverCheckRequest;
+        return request;
     }
     
     @Benchmark

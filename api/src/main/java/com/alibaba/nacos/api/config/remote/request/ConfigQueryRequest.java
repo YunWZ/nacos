@@ -16,8 +16,6 @@
 
 package com.alibaba.nacos.api.config.remote.request;
 
-import com.alibaba.nacos.api.common.Constants;
-
 /**
  * request to query config content.
  *
@@ -123,7 +121,8 @@ public class ConfigQueryRequest extends AbstractConfigRequest {
     }
     
     public boolean isNotify() {
-        String notify = getHeader(Constants.Config.NOTIFY_HEADER, Boolean.FALSE.toString());
-        return Boolean.parseBoolean(notify);
+        /*String notify = getHeader(Constants.Config.NOTIFY_HEADER, Boolean.FALSE.toString());
+        return Boolean.parseBoolean(notify);*/
+        return true;
     }
 }

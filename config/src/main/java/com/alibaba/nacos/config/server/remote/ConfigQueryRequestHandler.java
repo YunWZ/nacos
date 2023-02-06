@@ -36,8 +36,8 @@ import com.alibaba.nacos.config.server.utils.GroupKey2;
 import com.alibaba.nacos.config.server.utils.LogUtil;
 import com.alibaba.nacos.config.server.utils.PropertyUtil;
 import com.alibaba.nacos.config.server.utils.TimeUtils;
-import com.alibaba.nacos.core.remote.RequestHandler;
 import com.alibaba.nacos.core.control.TpsControl;
+import com.alibaba.nacos.core.remote.RequestHandler;
 import com.alibaba.nacos.plugin.auth.constant.ActionTypes;
 import com.alibaba.nacos.plugin.auth.constant.SignType;
 import org.apache.commons.io.FileUtils;
@@ -100,10 +100,11 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
         String tag = configQueryRequest.getTag();
         ConfigQueryResponse response = new ConfigQueryResponse();
         
-        final String groupKey = GroupKey2
-                .getKey(configQueryRequest.getDataId(), configQueryRequest.getGroup(), configQueryRequest.getTenant());
+        final String groupKey = GroupKey2.getKey(configQueryRequest.getDataId(), configQueryRequest.getGroup(),
+                configQueryRequest.getTenant());
         
-        String autoTag = configQueryRequest.getHeader(com.alibaba.nacos.api.common.Constants.VIPSERVER_TAG);
+        String autoTag = "";
+        //configQueryRequest.getHeader(com.alibaba.nacos.api.common.Constants.VIPSERVER_TAG);
         
         String requestIpApp = meta.getLabels().get(CLIENT_APPNAME_HEADER);
         
@@ -150,7 +151,8 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
                                 }
                             }
                             if (PropertyUtil.isDirectRead()) {
-                                configInfoBase = configInfoTagPersistService.findConfigInfo4Tag(dataId, group, tenant, autoTag);
+                                configInfoBase = configInfoTagPersistService.findConfigInfo4Tag(dataId, group, tenant,
+                                        autoTag);
                             } else {
                                 file = DiskUtil.targetTagFile(dataId, group, tenant, autoTag);
                             }
@@ -258,9 +260,8 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
         } else if (lockResult == 0) {
             
             // FIXME CacheItem No longer exists. It is impossible to simply calculate the push delayed. Here, simply record it as - 1.
-            ConfigTraceService
-                    .logPullEvent(dataId, group, tenant, requestIpApp, -1, ConfigTraceService.PULL_EVENT_NOTFOUND, -1,
-                            clientIp, notify);
+            ConfigTraceService.logPullEvent(dataId, group, tenant, requestIpApp, -1,
+                    ConfigTraceService.PULL_EVENT_NOTFOUND, -1, clientIp, notify);
             response.setErrorInfo(ConfigQueryResponse.CONFIG_NOT_FOUND, "config data not exist");
             
         } else {

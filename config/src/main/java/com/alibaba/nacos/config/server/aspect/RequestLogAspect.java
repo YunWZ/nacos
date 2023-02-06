@@ -187,7 +187,8 @@ public class RequestLogAspect {
      * Client api request log rt | status | requestIp | opType | dataId | group | datumId | md5.
      */
     private Object logClientRequest(String requestType, ProceedingJoinPoint pjp, HttpServletRequest request,
-            HttpServletResponse response, String dataId, String group, String tenant, String md5, AtomicLong rtHolder) throws Throwable {
+            HttpServletResponse response, String dataId, String group, String tenant, String md5, AtomicLong rtHolder)
+            throws Throwable {
         final String requestIp = RequestUtil.getRemoteIp(request);
         String appName = request.getHeader(RequestUtil.CLIENT_APPNAME_HEADER);
         final long st = System.currentTimeMillis();
@@ -198,9 +199,8 @@ public class RequestLogAspect {
         }
         // rt | status | requestIp | opType | dataId | group | datumId | md5 |
         // appName
-        LogUtil.CLIENT_LOG
-                .info("{}|{}|{}|{}|{}|{}|{}|{}|{}", rt, retVal, requestIp, requestType, dataId, group, tenant, md5,
-                        appName);
+        LogUtil.CLIENT_LOG.info("{}|{}|{}|{}|{}|{}|{}|{}|{}", rt, retVal, requestIp, requestType, dataId, group, tenant,
+                md5, appName);
         return retVal;
     }
     
@@ -210,7 +210,8 @@ public class RequestLogAspect {
     private Object logClientRequestRpc(String requestType, ProceedingJoinPoint pjp, Request request, RequestMeta meta,
             String dataId, String group, String tenant, String md5, AtomicLong rtHolder) throws Throwable {
         final String requestIp = meta.getClientIp();
-        String appName = request.getHeader(RequestUtil.CLIENT_APPNAME_HEADER);
+        //        String appName = request.getHeader(RequestUtil.CLIENT_APPNAME_HEADER);
+        String appName = "";
         final long st = System.currentTimeMillis();
         Response retVal = (Response) pjp.proceed();
         final long rt = System.currentTimeMillis() - st;
@@ -229,19 +230,20 @@ public class RequestLogAspect {
      * GetConfig.
      */
     @Around(CLIENT_INTERFACE_LISTEN_CONFIG_RPC)
-    public Object interfaceListenConfigRpc(ProceedingJoinPoint pjp, ConfigBatchListenRequest request,
-            RequestMeta meta) throws Throwable {
+    public Object interfaceListenConfigRpc(ProceedingJoinPoint pjp, ConfigBatchListenRequest request, RequestMeta meta)
+            throws Throwable {
         MetricsMonitor.getConfigMonitor().incrementAndGet();
         final String requestIp = meta.getClientIp();
-        String appName = request.getHeader(RequestUtil.CLIENT_APPNAME_HEADER);
+        String appName = "";
+        //request.getHeader(RequestUtil.CLIENT_APPNAME_HEADER);
         final long st = System.currentTimeMillis();
         Response retVal = (Response) pjp.proceed();
         final long rt = System.currentTimeMillis() - st;
         // rt | status | requestIp | opType | listen size | listen or cancel | empty | empty |
         // appName
         LogUtil.CLIENT_LOG.info("{}|{}|{}|{}|{}|{}|{}|{}|{}", rt,
-                retVal.isSuccess() ? retVal.getResultCode() : retVal.getErrorCode(), requestIp, "listen", request.getConfigListenContexts().size(),
-                request.isListen(), "", "", appName);
+                retVal.isSuccess() ? retVal.getResultCode() : retVal.getErrorCode(), requestIp, "listen",
+                request.getConfigListenContexts().size(), request.isListen(), "", "", appName);
         return retVal;
     }
 }
