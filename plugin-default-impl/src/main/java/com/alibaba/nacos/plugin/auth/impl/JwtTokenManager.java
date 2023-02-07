@@ -20,20 +20,12 @@ import com.alibaba.nacos.common.event.ServerConfigChangeEvent;
 import com.alibaba.nacos.common.notify.Event;
 import com.alibaba.nacos.common.notify.NotifyCenter;
 import com.alibaba.nacos.common.notify.listener.Subscriber;
-import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.plugin.auth.exception.AccessException;
 import com.alibaba.nacos.plugin.auth.impl.constant.AuthConstants;
 import com.alibaba.nacos.plugin.auth.impl.jwt.NacosJwtParser;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUser;
 import com.alibaba.nacos.sys.env.EnvUtil;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * JWT token manager.
@@ -43,9 +35,6 @@ import java.util.List;
  */
 @Component
 public class JwtTokenManager extends Subscriber<ServerConfigChangeEvent> {
-    
-    @Deprecated
-    private static final String AUTHORITIES_KEY = "auth";
     
     /**
      * Token validity time(seconds).
@@ -78,38 +67,11 @@ public class JwtTokenManager extends Subscriber<ServerConfigChangeEvent> {
     /**
      * Create token.
      *
-     * @param authentication auth info
-     * @return token
-     */
-    @Deprecated
-    public String createToken(Authentication authentication) {
-        return createToken(authentication.getName());
-    }
-    
-    /**
-     * Create token.
-     *
      * @param userName auth info
      * @return token
      */
     public String createToken(String userName) {
         return jwtParser.jwtBuilder().setUserName(userName).setExpiredTime(this.tokenValidityInSeconds).compact();
-    }
-    
-    /**
-     * Get auth Info.
-     *
-     * @param token token
-     * @return auth info
-     */
-    @Deprecated
-    public Authentication getAuthentication(String token) throws AccessException {
-        NacosUser nacosUser = jwtParser.parse(token);
-        
-        List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(StringUtils.EMPTY);
-        
-        User principal = new User(nacosUser.getUserName(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
     
     /**

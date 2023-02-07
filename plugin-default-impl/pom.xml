@@ -56,11 +56,10 @@
             <groupId>org.springframework.ldap</groupId>
             <artifactId>spring-ldap-core</artifactId>
         </dependency>
-<!--        <dependency>
+        <dependency>
             <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-config</artifactId>
-            <version>6.0.1</version>
-            <scope>compile</scope>
-        </dependency>-->
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+
     </dependencies>
 </project>

@@ -19,7 +19,6 @@ package com.alibaba.nacos.plugin.auth.impl.controller;
 import com.alibaba.nacos.api.common.Constants;
 import com.alibaba.nacos.auth.annotation.Secured;
 import com.alibaba.nacos.auth.config.AuthConfigs;
-import com.alibaba.nacos.common.model.RestResult;
 import com.alibaba.nacos.common.model.RestResultUtils;
 import com.alibaba.nacos.common.utils.JacksonUtils;
 import com.alibaba.nacos.config.server.model.Page;
@@ -40,13 +39,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.HttpSessionRequiredException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,10 +66,6 @@ public class UserController {
     private JwtTokenManager jwtTokenManager;
     
     @Autowired
-    @Deprecated
-    private AuthenticationManager authenticationManager;
-    
-    @Autowired
     private NacosUserDetailsServiceImpl userDetailsService;
     
     @Autowired
@@ -86,7 +75,8 @@ public class UserController {
     private AuthConfigs authConfigs;
     
     @Autowired
-    private IAuthenticationManager iAuthenticationManager;
+    @Qualifier("authenticationManager")
+    private IAuthenticationManager authenticationManager;
     
     /**
      * Create a new user.
@@ -216,75 +206,28 @@ public class UserController {
      * @param username username of user
      * @param password password
      * @param response http response
-     * @param request  http request
      * @return new token of the user
      * @throws AccessException if user info is incorrect
      */
     @PostMapping("/login")
-    public Object login(@RequestParam String username, @RequestParam String password, HttpServletResponse response,
-            HttpServletRequest request) throws AccessException {
+    public Object login(@RequestParam String username, @RequestParam String password, HttpServletResponse response) throws AccessException {
         
         if (AuthSystemTypes.NACOS.name().equalsIgnoreCase(authConfigs.getNacosAuthSystemType())
                 || AuthSystemTypes.LDAP.name().equalsIgnoreCase(authConfigs.getNacosAuthSystemType())) {
-            NacosUser user = iAuthenticationManager.authenticate(request);
+            NacosUser user = authenticationManager.authenticate(username, password);
             
             response.addHeader(AuthConstants.AUTHORIZATION_HEADER, AuthConstants.TOKEN_PREFIX + user.getToken());
             
             ObjectNode result = JacksonUtils.createEmptyJsonNode();
             result.put(Constants.ACCESS_TOKEN, user.getToken());
             result.put(Constants.TOKEN_TTL, jwtTokenManager.getTokenValidityInSeconds());
-            result.put(Constants.GLOBAL_ADMIN, iAuthenticationManager.hasGlobalAdminRole(user));
+            result.put(Constants.GLOBAL_ADMIN, authenticationManager.hasGlobalAdminRole(user));
             result.put(Constants.USERNAME, user.getUserName());
             return result;
         }
         
-        // create Authentication class through username and password, the implement class is UsernamePasswordAuthenticationToken
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,
-                password);
-        
-        try {
-            // use the method authenticate of AuthenticationManager(default implement is ProviderManager) to valid Authentication
-            Authentication authentication = authenticationManager.authenticate(authenticationToken);
-            // bind SecurityContext to Authentication
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            // generate Token
-            String token = jwtTokenManager.createToken(authentication);
-            // write Token to Http header
-            response.addHeader(AuthConstants.AUTHORIZATION_HEADER, "Bearer " + token);
-            return RestResultUtils.success("Bearer " + token);
-        } catch (BadCredentialsException authentication) {
-            return RestResultUtils.failed(HttpStatus.UNAUTHORIZED.value(), null, "Login failed");
-        }
+        throw new AccessException("unsupported plugin: " + authConfigs.getNacosAuthSystemType());
     }
-    
-    /**
-     * Update password.
-     *
-     * @param oldPassword old password
-     * @param newPassword new password
-     * @return Code 200 if update successfully, Code 401 if old password invalid, otherwise 500
-     */
-    @PutMapping("/password")
-    @Deprecated
-    public RestResult<String> updatePassword(@RequestParam(value = "oldPassword") String oldPassword,
-            @RequestParam(value = "newPassword") String newPassword) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = ((UserDetails) principal).getUsername();
-        User user = userDetailsService.getUserFromDatabase(username);
-        String password = user.getPassword();
-        
-        // TODO: throw out more fine grained exceptions
-        try {
-            if (PasswordEncoderUtil.matches(oldPassword, password)) {
-                userDetailsService.updateUserPassword(username, PasswordEncoderUtil.encode(newPassword));
-                return RestResultUtils.success("Update password success");
-            }
-            return RestResultUtils.failed(HttpStatus.UNAUTHORIZED.value(), "Old password is invalid");
-        } catch (Exception e) {
-            return RestResultUtils.failed(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Update userpassword failed");
-        }
-    }
-    
     
     /**
      * Fuzzy matching username.

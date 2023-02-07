@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.alibaba.nacos.plugin.auth.impl;
+package com.alibaba.nacos.plugin.auth.impl.configuration;
 
+import com.alibaba.nacos.plugin.auth.impl.JwtTokenManager;
+import com.alibaba.nacos.plugin.auth.impl.NacosLdapContextSource;
 import com.alibaba.nacos.plugin.auth.impl.authenticate.IAuthenticationManager;
 import com.alibaba.nacos.plugin.auth.impl.authenticate.LdapAuthenticationManager;
-import com.alibaba.nacos.plugin.auth.impl.configuration.ConditionOnLdapAuth;
 import com.alibaba.nacos.plugin.auth.impl.constant.AuthConstants;
 import com.alibaba.nacos.plugin.auth.impl.roles.NacosRoleServiceImpl;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserDetailsServiceImpl;
@@ -70,14 +71,6 @@ public class LdapAuthConfig {
     @Bean
     public LdapContextSource ldapContextSource() {
         return new NacosLdapContextSource(ldapUrl, ldapBaseDc, userDn, password, ldapTimeOut);
-    }
-    
-    @Bean
-    @Conditional(ConditionOnLdapAuth.class)
-    public LdapAuthenticationProvider ldapAuthenticationProvider(LdapTemplate ldapTemplate,
-            NacosUserDetailsServiceImpl userDetailsService, NacosRoleServiceImpl nacosRoleService) {
-        return new LdapAuthenticationProvider(ldapTemplate, userDetailsService, nacosRoleService, filterPrefix,
-                caseSensitive);
     }
     
     @Bean

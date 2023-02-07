@@ -69,4 +69,5 @@ public interface AddressServerConstants {
     String ADDRESS_SERVER_REQUEST_URL =
             UtilsAndCommons.NACOS_SERVER_CONTEXT + UtilsAndCommons.NACOS_SERVER_VERSION + "/as";
     
+    String REOUSRCE_PREFIX = "normal/";
 }

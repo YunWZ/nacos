@@ -63,7 +63,7 @@
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
         </dependency>
-        <!--        <dependency>
+        <dependency>
                     <groupId>com.google.api.grpc</groupId>
                     <artifactId>proto-google-common-protos</artifactId>
                 </dependency>-->
@@ -75,7 +75,7 @@
             <groupId>io.grpc</groupId>
             <artifactId>protoc-gen-grpc-java</artifactId>
             <type>pom</type>
-        </dependency>-->
+        </dependency>
         <!-- https://mvnrepository.com/artifact/io.envoyproxy.controlplane/api -->
         <dependency>
             <groupId>io.envoyproxy.controlplane</groupId>
