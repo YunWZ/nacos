@@ -21,6 +21,7 @@ import com.alibaba.nacos.api.common.Constants;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.remote.RequestCallBack;
 import com.alibaba.nacos.api.remote.RequestFuture;
+import com.alibaba.nacos.api.remote.request.AbstractRequestPayloadBody;
 import com.alibaba.nacos.api.remote.request.ClientDetectionRequest;
 import com.alibaba.nacos.api.remote.request.ConnectResetRequest;
 import com.alibaba.nacos.api.remote.request.HealthCheckRequest;
@@ -381,7 +382,7 @@ public abstract class RpcClient implements Closeable {
         
         // register client detection request.
         registerServerRequestHandler(request -> {
-            if (request instanceof ClientDetectionRequest) {
+            if (request.getPayloadBody() instanceof ClientDetectionRequest) {
                 return new ClientDetectionResponse();
             }
             
@@ -394,13 +395,13 @@ public abstract class RpcClient implements Closeable {
         
         @Override
         public Response requestReply(Request request) {
-            
-            if (request instanceof ConnectResetRequest) {
+            AbstractRequestPayloadBody body = request.getPayloadBody();
+            if (body instanceof ConnectResetRequest) {
                 
                 try {
                     synchronized (RpcClient.this) {
                         if (isRunning()) {
-                            ConnectResetRequest connectResetRequest = (ConnectResetRequest) request;
+                            ConnectResetRequest connectResetRequest = (ConnectResetRequest) body;
                             if (StringUtils.isNotBlank(connectResetRequest.getServerIp())) {
                                 ServerInfo serverInfo = resolveServerInfo(
                                         connectResetRequest.getServerIp() + Constants.COLON + connectResetRequest
@@ -441,7 +442,7 @@ public abstract class RpcClient implements Closeable {
             reTryTimes--;
             try {
                 Response response = this.currentConnection
-                        .request(healthCheckRequest, rpcClientConfig.healthCheckTimeOut());
+                        .request(Request.of(healthCheckRequest), rpcClientConfig.healthCheckTimeOut());
                 // not only check server is ok, also check connection is register.
                 return response != null && response.isSuccess();
             } catch (NacosException e) {
@@ -812,7 +813,7 @@ public abstract class RpcClient implements Closeable {
     protected Response handleServerRequest(final Request request) {
         
         LoggerUtils.printIfInfoEnabled(LOGGER, "[{}] Receive server push request, request = {}, requestId = {}",
-                rpcClientConfig.name(), request.getClass().getSimpleName(), request.getRequestId());
+                rpcClientConfig.name(), request.getPayloadBodyType(), request.getRequestId());
         lastActiveTimeStamp = System.currentTimeMillis();
         for (ServerRequestHandler serverRequestHandler : serverRequestHandlers) {
             try {

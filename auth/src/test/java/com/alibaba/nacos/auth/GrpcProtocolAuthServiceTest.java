@@ -18,14 +18,15 @@ package com.alibaba.nacos.auth;
 
 import com.alibaba.nacos.api.config.remote.request.ConfigPublishRequest;
 import com.alibaba.nacos.api.naming.remote.request.AbstractNamingRequest;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.auth.annotation.Secured;
+import com.alibaba.nacos.auth.config.AuthConfigs;
+import com.alibaba.nacos.auth.mock.MockAuthPluginService;
 import com.alibaba.nacos.plugin.auth.api.IdentityContext;
 import com.alibaba.nacos.plugin.auth.api.Permission;
 import com.alibaba.nacos.plugin.auth.api.Resource;
-import com.alibaba.nacos.auth.config.AuthConfigs;
 import com.alibaba.nacos.plugin.auth.constant.SignType;
 import com.alibaba.nacos.plugin.auth.exception.AccessException;
-import com.alibaba.nacos.auth.mock.MockAuthPluginService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -80,7 +81,7 @@ public class GrpcProtocolAuthServiceTest {
     @Secured(resource = "testResource")
     public void testParseResourceWithSpecifiedResource() throws NoSuchMethodException {
         Secured secured = getMethodSecure("testParseResourceWithSpecifiedResource");
-        Resource actual = protocolAuthService.parseResource(namingRequest, secured);
+        Resource actual = protocolAuthService.parseResource(Request.of(namingRequest), secured);
         assertEquals("testResource", actual.getName());
         assertEquals(SignType.SPECIFIED, actual.getType());
         assertNull(actual.getNamespaceId());
@@ -92,7 +93,7 @@ public class GrpcProtocolAuthServiceTest {
     @Secured(signType = "non-exist")
     public void testParseResourceWithNonExistType() throws NoSuchMethodException {
         Secured secured = getMethodSecure("testParseResourceWithNonExistType");
-        Resource actual = protocolAuthService.parseResource(namingRequest, secured);
+        Resource actual = protocolAuthService.parseResource(Request.of(namingRequest), secured);
         assertEquals(Resource.EMPTY_RESOURCE, actual);
     }
     
@@ -100,7 +101,7 @@ public class GrpcProtocolAuthServiceTest {
     @Secured()
     public void testParseResourceWithNamingType() throws NoSuchMethodException {
         Secured secured = getMethodSecure("testParseResourceWithNamingType");
-        Resource actual = protocolAuthService.parseResource(namingRequest, secured);
+        Resource actual = protocolAuthService.parseResource(Request.of(namingRequest), secured);
         assertEquals(SignType.NAMING, actual.getType());
         assertEquals("testS", actual.getName());
         assertEquals("testNNs", actual.getNamespaceId());
@@ -112,7 +113,7 @@ public class GrpcProtocolAuthServiceTest {
     @Secured(signType = SignType.CONFIG)
     public void testParseResourceWithConfigType() throws NoSuchMethodException {
         Secured secured = getMethodSecure("testParseResourceWithConfigType");
-        Resource actual = protocolAuthService.parseResource(configRequest, secured);
+        Resource actual = protocolAuthService.parseResource(Request.of(configRequest), secured);
         assertEquals(SignType.CONFIG, actual.getType());
         assertEquals("testD", actual.getName());
         assertEquals("testCNs", actual.getNamespaceId());
@@ -122,7 +123,7 @@ public class GrpcProtocolAuthServiceTest {
     
     @Test
     public void testParseIdentity() {
-        IdentityContext actual = protocolAuthService.parseIdentity(namingRequest);
+        IdentityContext actual = protocolAuthService.parseIdentity(Request.of(namingRequest));
         assertNotNull(actual);
     }
     

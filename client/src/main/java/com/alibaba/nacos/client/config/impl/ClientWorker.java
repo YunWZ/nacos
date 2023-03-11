@@ -35,14 +35,14 @@ import com.alibaba.nacos.api.config.remote.response.ConfigQueryResponse;
 import com.alibaba.nacos.api.config.remote.response.ConfigRemoveResponse;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.remote.RemoteConstants;
+import com.alibaba.nacos.api.remote.request.AbstractRequestPayloadBody;
 import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.response.Response;
-import com.alibaba.nacos.client.env.NacosClientProperties;
-import com.alibaba.nacos.plugin.auth.api.RequestResource;
 import com.alibaba.nacos.client.config.common.GroupKey;
 import com.alibaba.nacos.client.config.filter.impl.ConfigFilterChainManager;
 import com.alibaba.nacos.client.config.filter.impl.ConfigResponse;
 import com.alibaba.nacos.client.config.utils.ContentUtils;
+import com.alibaba.nacos.client.env.NacosClientProperties;
 import com.alibaba.nacos.client.monitor.MetricsMonitor;
 import com.alibaba.nacos.client.naming.utils.CollectionUtils;
 import com.alibaba.nacos.client.utils.AppNameUtils;
@@ -65,6 +65,7 @@ import com.alibaba.nacos.common.utils.MD5Utils;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.common.utils.ThreadUtils;
 import com.alibaba.nacos.common.utils.VersionUtils;
+import com.alibaba.nacos.plugin.auth.api.RequestResource;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
@@ -600,8 +601,9 @@ public class ClientWorker implements Closeable {
              * Register Config Change /Config ReSync Handler
              */
             rpcClientInner.registerServerRequestHandler((request) -> {
-                if (request instanceof ConfigChangeNotifyRequest) {
-                    ConfigChangeNotifyRequest configChangeNotifyRequest = (ConfigChangeNotifyRequest) request;
+                AbstractRequestPayloadBody body = request.getPayloadBody();
+                if (body instanceof ConfigChangeNotifyRequest) {
+                    ConfigChangeNotifyRequest configChangeNotifyRequest = (ConfigChangeNotifyRequest) body;
                     LOGGER.info("[{}] [server-push] config changed. dataId={}, group={},tenant={}",
                             rpcClientInner.getName(), configChangeNotifyRequest.getDataId(),
                             configChangeNotifyRequest.getGroup(), configChangeNotifyRequest.getTenant());
@@ -623,9 +625,10 @@ public class ClientWorker implements Closeable {
             });
             
             rpcClientInner.registerServerRequestHandler((request) -> {
-                if (request instanceof ClientConfigMetricRequest) {
+                AbstractRequestPayloadBody body = request.getPayloadBody();
+                if (body instanceof ClientConfigMetricRequest) {
                     ClientConfigMetricResponse response = new ClientConfigMetricResponse();
-                    response.setMetrics(getMetrics(((ClientConfigMetricRequest) request).getMetricsKeys()));
+                    response.setMetrics(getMetrics(((ClientConfigMetricRequest) body).getMetricsKeys()));
                     return response;
                 }
                 return null;
@@ -720,6 +723,7 @@ public class ClientWorker implements Closeable {
         }
         
         @Override
+        @SuppressWarnings("checkstyle:LineLength")
         public void executeConfigListen() {
             
             Map<String, List<CacheData>> listenCachesMap = new HashMap<>(16);
@@ -783,15 +787,14 @@ public class ClientWorker implements Closeable {
                     try {
                         RpcClient rpcClient = ensureRpcClient(taskId);
                         ConfigChangeBatchListenResponse configChangeBatchListenResponse = (ConfigChangeBatchListenResponse) requestProxy(
-                                rpcClient, configChangeListenRequest);
+                                rpcClient, Request.of(configChangeListenRequest));
                         if (configChangeBatchListenResponse.isSuccess()) {
                             
                             Set<String> changeKeys = new HashSet<>();
                             //handle changed keys,notify listener
                             if (!CollectionUtils.isEmpty(configChangeBatchListenResponse.getChangedConfigs())) {
                                 hasChangedKeys = true;
-                                for (ConfigChangeBatchListenResponse.ConfigContext changeConfig
-                                        : configChangeBatchListenResponse.getChangedConfigs()) {
+                                for (ConfigChangeBatchListenResponse.ConfigContext changeConfig : configChangeBatchListenResponse.getChangedConfigs()) {
                                     String changeKey = GroupKey.getKeyTenant(changeConfig.getDataId(),
                                             changeConfig.getGroup(), changeConfig.getTenant());
                                     changeKeys.add(changeKey);
@@ -932,16 +935,17 @@ public class ClientWorker implements Closeable {
          */
         private boolean unListenConfigChange(RpcClient rpcClient, ConfigBatchListenRequest configChangeListenRequest)
                 throws NacosException {
-            
+    
             ConfigChangeBatchListenResponse response = (ConfigChangeBatchListenResponse) requestProxy(rpcClient,
-                    configChangeListenRequest);
+                    Request.of(configChangeListenRequest));
             return response.isSuccess();
         }
         
         @Override
         public ConfigResponse queryConfig(String dataId, String group, String tenant, long readTimeouts, boolean notify)
                 throws NacosException {
-            ConfigQueryRequest request = ConfigQueryRequest.build(dataId, group, tenant);
+            AbstractRequestPayloadBody abstractRequestPayloadBody = ConfigQueryRequest.build(dataId, group, tenant);
+            Request<ConfigQueryRequest> request = Request.of(abstractRequestPayloadBody);
             request.putHeader(NOTIFY_HEADER, String.valueOf(notify));
             RpcClient rpcClient = getOneRunningClient();
             if (notify) {
@@ -1000,10 +1004,9 @@ public class ClientWorker implements Closeable {
             } catch (Exception e) {
                 throw new NacosException(NacosException.CLIENT_INVALID_PARAM, e);
             }
-            JsonObject asJsonObjectTemp = new Gson().toJsonTree(request).getAsJsonObject();
-            asJsonObjectTemp.remove("headers");
+            JsonObject asJsonObjectTemp = new Gson().toJsonTree(request.getPayloadBody()).getAsJsonObject();
             asJsonObjectTemp.remove("requestId");
-            boolean limit = Limiter.isLimit(request.getClass() + asJsonObjectTemp.toString());
+            boolean limit = Limiter.isLimit(request.getPayloadBody().getClass() + asJsonObjectTemp.toString());
             if (limit) {
                 throw new NacosException(NacosException.CLIENT_OVER_THRESHOLD,
                         "More than client-side current limit threshold");
@@ -1012,23 +1015,24 @@ public class ClientWorker implements Closeable {
         }
         
         private RequestResource resourceBuild(Request request) {
-            if (request instanceof ConfigQueryRequest) {
-                String tenant = ((ConfigQueryRequest) request).getTenant();
-                String group = ((ConfigQueryRequest) request).getGroup();
-                String dataId = ((ConfigQueryRequest) request).getDataId();
+            AbstractRequestPayloadBody body = request.getPayloadBody();
+            if (body instanceof ConfigQueryRequest) {
+                String tenant = ((ConfigQueryRequest) body).getTenant();
+                String group = ((ConfigQueryRequest) body).getGroup();
+                String dataId = ((ConfigQueryRequest) body).getDataId();
                 return buildResource(tenant, group, dataId);
             }
-            if (request instanceof ConfigPublishRequest) {
-                String tenant = ((ConfigPublishRequest) request).getTenant();
-                String group = ((ConfigPublishRequest) request).getGroup();
-                String dataId = ((ConfigPublishRequest) request).getDataId();
+            if (body instanceof ConfigPublishRequest) {
+                String tenant = ((ConfigPublishRequest) body).getTenant();
+                String group = ((ConfigPublishRequest) body).getGroup();
+                String dataId = ((ConfigPublishRequest) body).getDataId();
                 return buildResource(tenant, group, dataId);
             }
             
-            if (request instanceof ConfigRemoveRequest) {
-                String tenant = ((ConfigRemoveRequest) request).getTenant();
-                String group = ((ConfigRemoveRequest) request).getGroup();
-                String dataId = ((ConfigRemoveRequest) request).getDataId();
+            if (body instanceof ConfigRemoveRequest) {
+                String tenant = ((ConfigRemoveRequest) body).getTenant();
+                String group = ((ConfigRemoveRequest) body).getGroup();
+                String dataId = ((ConfigRemoveRequest) body).getDataId();
                 return buildResource(tenant, group, dataId);
             }
             return RequestResource.configBuilder().build();
@@ -1050,7 +1054,8 @@ public class ClientWorker implements Closeable {
                 request.putAdditionalParam(BETAIPS_PARAM, betaIps);
                 request.putAdditionalParam(TYPE_PARAM, type);
                 request.putAdditionalParam(ENCRYPTED_DATA_KEY_PARAM, encryptedDataKey == null ? "" : encryptedDataKey);
-                ConfigPublishResponse response = (ConfigPublishResponse) requestProxy(getOneRunningClient(), request);
+                ConfigPublishResponse response = (ConfigPublishResponse) requestProxy(getOneRunningClient(),
+                        Request.of(request));
                 if (!response.isSuccess()) {
                     LOGGER.warn("[{}] [publish-single] fail, dataId={}, group={}, tenant={}, code={}, msg={}",
                             this.getName(), dataId, group, tenant, response.getErrorCode(), response.getMessage());
@@ -1070,7 +1075,8 @@ public class ClientWorker implements Closeable {
         @Override
         public boolean removeConfig(String dataId, String group, String tenant, String tag) throws NacosException {
             ConfigRemoveRequest request = new ConfigRemoveRequest(dataId, group, tenant, tag);
-            ConfigRemoveResponse response = (ConfigRemoveResponse) requestProxy(getOneRunningClient(), request);
+            ConfigRemoveResponse response = (ConfigRemoveResponse) requestProxy(getOneRunningClient(),
+                    Request.of(request));
             return response.isSuccess();
         }
         

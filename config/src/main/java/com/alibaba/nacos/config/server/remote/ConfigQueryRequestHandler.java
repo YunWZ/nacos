@@ -16,9 +16,11 @@
 
 package com.alibaba.nacos.config.server.remote;
 
+import com.alibaba.nacos.api.common.Constants.Config;
 import com.alibaba.nacos.api.config.remote.request.ConfigQueryRequest;
 import com.alibaba.nacos.api.config.remote.response.ConfigQueryResponse;
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.response.ResponseCode;
 import com.alibaba.nacos.auth.annotation.Secured;
@@ -36,8 +38,8 @@ import com.alibaba.nacos.config.server.utils.GroupKey2;
 import com.alibaba.nacos.config.server.utils.LogUtil;
 import com.alibaba.nacos.config.server.utils.PropertyUtil;
 import com.alibaba.nacos.config.server.utils.TimeUtils;
-import com.alibaba.nacos.core.remote.RequestHandler;
 import com.alibaba.nacos.core.control.TpsControl;
+import com.alibaba.nacos.core.remote.RequestHandler;
 import com.alibaba.nacos.plugin.auth.constant.ActionTypes;
 import com.alibaba.nacos.plugin.auth.constant.SignType;
 import org.apache.commons.io.FileUtils;
@@ -81,18 +83,24 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
     @Override
     @TpsControl(pointName = "ConfigQuery")
     @Secured(action = ActionTypes.READ, signType = SignType.CONFIG)
-    public ConfigQueryResponse handle(ConfigQueryRequest request, RequestMeta meta) throws NacosException {
+    public ConfigQueryResponse handle(Request<ConfigQueryRequest> request, RequestMeta meta) throws NacosException {
         
         try {
-            return getContext(request, meta, request.isNotify());
+            return getContext(request, meta, isNotify(request));
         } catch (Exception e) {
             return ConfigQueryResponse.buildFailResponse(ResponseCode.FAIL.getCode(), e.getMessage());
         }
         
     }
     
-    private ConfigQueryResponse getContext(ConfigQueryRequest configQueryRequest, RequestMeta meta, boolean notify)
+    public boolean isNotify(Request request) {
+        String notify = request.getHeader(Config.NOTIFY_HEADER, Boolean.FALSE.toString());
+        return Boolean.parseBoolean(notify);
+    }
+    
+    private ConfigQueryResponse getContext(Request<ConfigQueryRequest> request, RequestMeta meta, boolean notify)
             throws UnsupportedEncodingException {
+        ConfigQueryRequest configQueryRequest = request.getPayloadBody();
         String dataId = configQueryRequest.getDataId();
         String group = configQueryRequest.getGroup();
         String tenant = configQueryRequest.getTenant();
@@ -103,7 +111,7 @@ public class ConfigQueryRequestHandler extends RequestHandler<ConfigQueryRequest
         final String groupKey = GroupKey2
                 .getKey(configQueryRequest.getDataId(), configQueryRequest.getGroup(), configQueryRequest.getTenant());
         
-        String autoTag = configQueryRequest.getHeader(com.alibaba.nacos.api.common.Constants.VIPSERVER_TAG);
+        String autoTag = request.getHeader(com.alibaba.nacos.api.common.Constants.VIPSERVER_TAG);
         
         String requestIpApp = meta.getLabels().get(CLIENT_APPNAME_HEADER);
         

@@ -35,6 +35,7 @@ import com.alibaba.nacos.api.naming.remote.response.SubscribeServiceResponse;
 import com.alibaba.nacos.api.remote.DefaultRequestFuture;
 import com.alibaba.nacos.api.remote.RequestCallBack;
 import com.alibaba.nacos.api.remote.RequestFuture;
+import com.alibaba.nacos.api.remote.request.AbstractRequestPayloadBody;
 import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.response.ErrorResponse;
 import com.alibaba.nacos.api.remote.response.Response;
@@ -156,8 +157,9 @@ public class NamingGrpcClientProxyTest {
     public void testRegisterService() throws NacosException {
         client.registerService(SERVICE_NAME, GROUP_NAME, instance);
         verify(this.rpcClient, times(1)).request(argThat(request -> {
-            if (request instanceof InstanceRequest) {
-                InstanceRequest request1 = (InstanceRequest) request;
+            AbstractRequestPayloadBody payloadBody = request.getPayloadBody();
+            if (payloadBody instanceof InstanceRequest) {
+                InstanceRequest request1 = (InstanceRequest) payloadBody;
                 return request1.getType().equals(NamingRemoteConstants.REGISTER_INSTANCE);
             }
             return false;
@@ -200,8 +202,9 @@ public class NamingGrpcClientProxyTest {
     public void testDeregisterService() throws NacosException {
         client.deregisterService(SERVICE_NAME, GROUP_NAME, instance);
         verify(this.rpcClient, times(1)).request(argThat(request -> {
-            if (request instanceof InstanceRequest) {
-                InstanceRequest request1 = (InstanceRequest) request;
+            AbstractRequestPayloadBody payloadBody = request.getPayloadBody();
+            if (payloadBody instanceof InstanceRequest) {
+                InstanceRequest request1 = (InstanceRequest) payloadBody;
                 return request1.getType().equals(NamingRemoteConstants.DE_REGISTER_INSTANCE);
             }
             return false;
@@ -217,8 +220,9 @@ public class NamingGrpcClientProxyTest {
         when(this.rpcClient.request(any())).thenReturn(response);
         client.batchRegisterService(SERVICE_NAME, GROUP_NAME, instanceList);
         verify(this.rpcClient, times(1)).request(argThat(request -> {
-            if (request instanceof BatchInstanceRequest) {
-                BatchInstanceRequest request1 = (BatchInstanceRequest) request;
+            AbstractRequestPayloadBody payloadBody = request.getPayloadBody();
+            if (payloadBody instanceof BatchInstanceRequest) {
+                BatchInstanceRequest request1 = (BatchInstanceRequest) payloadBody;
                 request1.setRequestId("1");
                 return request1.getType().equals(NamingRemoteConstants.BATCH_REGISTER_INSTANCE);
             }
@@ -277,8 +281,9 @@ public class NamingGrpcClientProxyTest {
         instanceList.add(instance);
         client.batchDeregisterService(SERVICE_NAME, GROUP_NAME, instanceList);
         verify(this.rpcClient, times(1)).request(argThat(request -> {
-            if (request instanceof BatchInstanceRequest) {
-                BatchInstanceRequest request1 = (BatchInstanceRequest) request;
+            AbstractRequestPayloadBody payloadBody = request.getPayloadBody();
+            if (payloadBody instanceof BatchInstanceRequest) {
+                BatchInstanceRequest request1 = (BatchInstanceRequest) payloadBody;
                 request1.setRequestId("1");
                 return request1.getInstances().size() == 1 && request1.getType().equals(NamingRemoteConstants.BATCH_REGISTER_INSTANCE);
             }
@@ -361,8 +366,9 @@ public class NamingGrpcClientProxyTest {
         when(this.rpcClient.request(any())).thenReturn(res);
         client.unsubscribe(SERVICE_NAME, GROUP_NAME, CLUSTERS);
         verify(this.rpcClient, times(1)).request(argThat(request -> {
-            if (request instanceof SubscribeServiceRequest) {
-                SubscribeServiceRequest request1 = (SubscribeServiceRequest) request;
+            AbstractRequestPayloadBody payloadBody = request.getPayloadBody();
+            if (payloadBody instanceof SubscribeServiceRequest) {
+                SubscribeServiceRequest request1 = (SubscribeServiceRequest) payloadBody;
                 
                 // verify request fields
                 return !request1.isSubscribe() && SERVICE_NAME.equals(request1.getServiceName()) && GROUP_NAME

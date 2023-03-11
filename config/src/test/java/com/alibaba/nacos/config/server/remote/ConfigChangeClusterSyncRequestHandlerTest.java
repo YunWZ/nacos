@@ -19,6 +19,7 @@ package com.alibaba.nacos.config.server.remote;
 import com.alibaba.nacos.api.config.remote.request.cluster.ConfigChangeClusterSyncRequest;
 import com.alibaba.nacos.api.config.remote.response.cluster.ConfigChangeClusterSyncResponse;
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.response.ResponseCode;
 import com.alibaba.nacos.config.server.service.dump.DumpService;
@@ -33,17 +34,17 @@ import java.io.IOException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConfigChangeClusterSyncRequestHandlerTest extends TestCase {
-
+    
     private ConfigChangeClusterSyncRequestHandler configChangeClusterSyncRequestHandler;
-
+    
     @Mock
     private DumpService dumpService;
-
+    
     @Before
     public void setUp() throws IOException {
         configChangeClusterSyncRequestHandler = new ConfigChangeClusterSyncRequestHandler(dumpService);
     }
-
+    
     @Test
     public void testHandle() throws NacosException {
         ConfigChangeClusterSyncRequest configChangeSyncRequest = new ConfigChangeClusterSyncRequest();
@@ -54,7 +55,8 @@ public class ConfigChangeClusterSyncRequestHandlerTest extends TestCase {
         configChangeSyncRequest.setBeta(false);
         RequestMeta meta = new RequestMeta();
         meta.setClientIp("1.1.1.1");
-        ConfigChangeClusterSyncResponse configChangeClusterSyncResponse = configChangeClusterSyncRequestHandler.handle(configChangeSyncRequest, meta);
+        ConfigChangeClusterSyncResponse configChangeClusterSyncResponse = configChangeClusterSyncRequestHandler.handle(
+                Request.of(configChangeSyncRequest), meta);
         assertEquals(configChangeClusterSyncResponse.getResultCode(), ResponseCode.SUCCESS.getCode());
     }
 }

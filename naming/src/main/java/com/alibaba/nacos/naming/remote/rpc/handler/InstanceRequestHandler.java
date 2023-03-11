@@ -20,6 +20,7 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.remote.NamingRemoteConstants;
 import com.alibaba.nacos.api.naming.remote.request.InstanceRequest;
 import com.alibaba.nacos.api.naming.remote.response.InstanceResponse;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.auth.annotation.Secured;
 import com.alibaba.nacos.common.notify.NotifyCenter;
@@ -48,17 +49,18 @@ public class InstanceRequestHandler extends RequestHandler<InstanceRequest, Inst
     
     @Override
     @Secured(action = ActionTypes.WRITE)
-    public InstanceResponse handle(InstanceRequest request, RequestMeta meta) throws NacosException {
+    public InstanceResponse handle(Request<InstanceRequest> request, RequestMeta meta) throws NacosException {
+        InstanceRequest payloadBody = request.getPayloadBody();
         Service service = Service
-                .newService(request.getNamespace(), request.getGroupName(), request.getServiceName(), true);
-        switch (request.getType()) {
+                .newService(payloadBody.getNamespace(), payloadBody.getGroupName(), payloadBody.getServiceName(), true);
+        switch (payloadBody.getType()) {
             case NamingRemoteConstants.REGISTER_INSTANCE:
-                return registerInstance(service, request, meta);
+                return registerInstance(service, payloadBody, meta);
             case NamingRemoteConstants.DE_REGISTER_INSTANCE:
-                return deregisterInstance(service, request, meta);
+                return deregisterInstance(service, payloadBody, meta);
             default:
                 throw new NacosException(NacosException.INVALID_PARAM,
-                        String.format("Unsupported request type %s", request.getType()));
+                        String.format("Unsupported request type %s", payloadBody.getType()));
         }
     }
     

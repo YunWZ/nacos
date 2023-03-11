@@ -19,6 +19,7 @@ package com.alibaba.nacos.config.server.remote;
 import com.alibaba.nacos.api.config.remote.request.ConfigPublishRequest;
 import com.alibaba.nacos.api.config.remote.response.ConfigPublishResponse;
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.response.ResponseCode;
 import com.alibaba.nacos.config.server.service.repository.ConfigInfoBetaPersistService;
@@ -62,7 +63,7 @@ public class ConfigPublishRequestHandlerTest {
         configPublishRequest.setContent("content");
         RequestMeta requestMeta = new RequestMeta();
         requestMeta.setClientIp("127.0.0.1");
-        ConfigPublishResponse response = configPublishRequestHandler.handle(configPublishRequest, requestMeta);
+        ConfigPublishResponse response = configPublishRequestHandler.handle(Request.of(configPublishRequest), requestMeta);
         Assert.assertEquals(ResponseCode.SUCCESS.getCode(), response.getResultCode());
     }
 }

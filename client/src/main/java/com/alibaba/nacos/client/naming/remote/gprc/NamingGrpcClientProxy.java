@@ -35,6 +35,7 @@ import com.alibaba.nacos.api.naming.remote.response.ServiceListResponse;
 import com.alibaba.nacos.api.naming.remote.response.SubscribeServiceResponse;
 import com.alibaba.nacos.api.naming.utils.NamingUtils;
 import com.alibaba.nacos.api.remote.RemoteConstants;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.response.Response;
 import com.alibaba.nacos.api.remote.response.ResponseCode;
 import com.alibaba.nacos.api.selector.AbstractSelector;
@@ -349,11 +350,12 @@ public class NamingGrpcClientProxy extends AbstractNamingClientProxy {
     
     private <T extends Response> T requestToServer(AbstractNamingRequest request, Class<T> responseClass)
             throws NacosException {
+        Request re = Request.of(request);
         try {
-            request.putAllHeader(
+            re.putAllHeader(
                     getSecurityHeaders(request.getNamespace(), request.getGroupName(), request.getServiceName()));
             Response response =
-                    requestTimeout < 0 ? rpcClient.request(request) : rpcClient.request(request, requestTimeout);
+                    requestTimeout < 0 ? rpcClient.request(re) : rpcClient.request(re, requestTimeout);
             if (ResponseCode.SUCCESS.getCode() != response.getResultCode()) {
                 throw new NacosException(response.getErrorCode(), response.getMessage());
             }

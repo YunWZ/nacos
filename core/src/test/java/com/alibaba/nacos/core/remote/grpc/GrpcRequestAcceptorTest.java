@@ -22,6 +22,7 @@ import com.alibaba.nacos.api.grpc.auto.Payload;
 import com.alibaba.nacos.api.grpc.auto.RequestGrpc;
 import com.alibaba.nacos.api.naming.remote.request.InstanceRequest;
 import com.alibaba.nacos.api.remote.request.HealthCheckRequest;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.request.ServerCheckRequest;
 import com.alibaba.nacos.api.remote.response.ErrorResponse;
@@ -118,7 +119,7 @@ public class GrpcRequestAcceptorTest {
         metadata.setConnectionId(connectId);
         ServerCheckRequest serverCheckRequest = new ServerCheckRequest();
         serverCheckRequest.setRequestId(requestId);
-        Payload request = GrpcUtils.convert(serverCheckRequest, metadata);
+        Payload request = GrpcUtils.convert(Request.of(serverCheckRequest), metadata);
         
         StreamObserver<Payload> streamObserver = new StreamObserver<Payload>() {
             @Override
@@ -152,7 +153,7 @@ public class GrpcRequestAcceptorTest {
         metadata.setConnectionId(connectId);
         ServerCheckRequest serverCheckRequest = new ServerCheckRequest();
         serverCheckRequest.setRequestId(requestId);
-        Payload request = GrpcUtils.convert(serverCheckRequest, metadata);
+        Payload request = GrpcUtils.convert(Request.of(serverCheckRequest), metadata);
         
         StreamObserver<Payload> streamObserver = new StreamObserver<Payload>() {
             @Override
@@ -185,7 +186,7 @@ public class GrpcRequestAcceptorTest {
         metadata.setConnectionId(connectId);
         InstanceRequest instanceRequest = new InstanceRequest();
         instanceRequest.setRequestId(requestId);
-        Payload request = GrpcUtils.convert(instanceRequest, metadata);
+        Payload request = GrpcUtils.convert(Request.of(instanceRequest), metadata);
         
         StreamObserver<Payload> streamObserver = new StreamObserver<Payload>() {
             @Override
@@ -224,7 +225,7 @@ public class GrpcRequestAcceptorTest {
         metadata.setConnectionId(connectId);
         InstanceRequest instanceRequest = new InstanceRequest();
         instanceRequest.setRequestId(requestId);
-        Payload request = GrpcUtils.convert(instanceRequest, metadata);
+        Payload request = GrpcUtils.convert(Request.of(instanceRequest), metadata);
         
         StreamObserver<Payload> streamObserver = new StreamObserver<Payload>() {
             @Override
@@ -299,7 +300,7 @@ public class GrpcRequestAcceptorTest {
         metadata.setClientIp("127.0.0.1");
         metadata.setConnectionId(connectId);
         HealthCheckRequest mockRequest = new HealthCheckRequest();
-        Payload payload = GrpcUtils.convert(mockRequest, metadata);
+        Payload payload = GrpcUtils.convert(Request.of(mockRequest), metadata);
         
         StreamObserver<Payload> streamObserver = new StreamObserver<Payload>() {
             @Override
@@ -334,7 +335,7 @@ public class GrpcRequestAcceptorTest {
         metadata.setClientIp("127.0.0.1");
         metadata.setConnectionId(connectId);
         InstanceRequest instanceRequest = new InstanceRequest();
-        Payload payload = GrpcUtils.convert(instanceRequest, metadata);
+        Payload payload = GrpcUtils.convert(Request.of(instanceRequest), metadata);
         
         StreamObserver<Payload> streamObserver = new StreamObserver<Payload>() {
             @Override
@@ -368,12 +369,12 @@ public class GrpcRequestAcceptorTest {
     class MockRequestHandler extends RequestHandler<HealthCheckRequest, HealthCheckResponse> {
         
         @Override
-        public Response handleRequest(HealthCheckRequest request, RequestMeta meta) throws NacosException {
+        public Response handleRequest(Request<HealthCheckRequest> request, RequestMeta meta) throws NacosException {
             return handle(request, meta);
         }
         
         @Override
-        public HealthCheckResponse handle(HealthCheckRequest request, RequestMeta meta) throws NacosException {
+        public HealthCheckResponse handle(Request<HealthCheckRequest> request, RequestMeta meta) throws NacosException {
             System.out.println("MockHandler get request: " + request + " meta: " + meta);
             return new HealthCheckResponse();
         }

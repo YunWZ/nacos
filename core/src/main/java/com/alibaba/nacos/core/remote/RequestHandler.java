@@ -17,6 +17,7 @@
 package com.alibaba.nacos.core.remote;
 
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.remote.request.AbstractRequestPayloadBody;
 import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.response.Response;
@@ -30,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author xiweng.yy
  */
 @SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
-public abstract class RequestHandler<T extends Request, S extends Response> {
+public abstract class RequestHandler<T extends AbstractRequestPayloadBody, S extends Response> {
     
     @Autowired
     private RequestFilters requestFilters;
@@ -43,7 +44,7 @@ public abstract class RequestHandler<T extends Request, S extends Response> {
      * @return response
      * @throws NacosException nacos exception when handle request has problem.
      */
-    public Response handleRequest(T request, RequestMeta meta) throws NacosException {
+    public Response handleRequest(Request<T> request, RequestMeta meta) throws NacosException {
         for (AbstractRequestFilter filter : requestFilters.filters) {
             try {
                 Response filterResult = filter.filter(request, meta, this.getClass());
@@ -66,6 +67,6 @@ public abstract class RequestHandler<T extends Request, S extends Response> {
      * @return response
      * @throws NacosException nacos exception when handle request has problem.
      */
-    public abstract S handle(T request, RequestMeta meta) throws NacosException;
+    public abstract S handle(Request<T> request, RequestMeta meta) throws NacosException;
     
 }

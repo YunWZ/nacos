@@ -19,6 +19,7 @@ package com.alibaba.nacos.config.server.remote;
 import com.alibaba.nacos.api.config.remote.request.cluster.ConfigChangeClusterSyncRequest;
 import com.alibaba.nacos.api.config.remote.response.cluster.ConfigChangeClusterSyncResponse;
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.config.server.service.dump.DumpService;
 import com.alibaba.nacos.core.remote.RequestHandler;
@@ -43,9 +44,10 @@ public class ConfigChangeClusterSyncRequestHandler
     
     @TpsControl(pointName = "ClusterConfigChangeNotify")
     @Override
-    public ConfigChangeClusterSyncResponse handle(ConfigChangeClusterSyncRequest configChangeSyncRequest,
+    public ConfigChangeClusterSyncResponse handle(Request<ConfigChangeClusterSyncRequest> request,
             RequestMeta meta) throws NacosException {
-        
+        ConfigChangeClusterSyncRequest configChangeSyncRequest = request.getPayloadBody();
+    
         if (configChangeSyncRequest.isBeta()) {
             dumpService.dump(configChangeSyncRequest.getDataId(), configChangeSyncRequest.getGroup(),
                     configChangeSyncRequest.getTenant(), configChangeSyncRequest.getLastModified(), meta.getClientIp(),

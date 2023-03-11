@@ -19,6 +19,7 @@ package com.alibaba.nacos.config.server.remote;
 import com.alibaba.nacos.api.config.remote.request.ConfigBatchListenRequest;
 import com.alibaba.nacos.api.config.remote.response.ConfigChangeBatchListenResponse;
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.config.server.service.ConfigCacheService;
 import com.alibaba.nacos.config.server.utils.GroupKey2;
@@ -72,7 +73,7 @@ public class ConfigChangeBatchListenRequestHandlerTest extends TestCase {
         configChangeListenRequest.addConfigListenContext(group, dataId, tenant, " ");
         try {
             ConfigChangeBatchListenResponse configChangeBatchListenResponse = configQueryRequestHandler
-                    .handle(configChangeListenRequest, requestMeta);
+                    .handle(Request.of(configChangeListenRequest), requestMeta);
             boolean hasChange = false;
             for (ConfigChangeBatchListenResponse.ConfigContext changedConfig : configChangeBatchListenResponse.getChangedConfigs()) {
                 if (changedConfig.getDataId().equals(dataId)) {

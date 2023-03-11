@@ -19,6 +19,7 @@ package com.alibaba.nacos.config.server.remote;
 import com.alibaba.nacos.api.config.remote.request.ConfigQueryRequest;
 import com.alibaba.nacos.api.config.remote.response.ConfigQueryResponse;
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.config.server.model.CacheItem;
 import com.alibaba.nacos.config.server.service.ConfigCacheService;
@@ -85,7 +86,7 @@ public class ConfigQueryRequestHandlerTest {
         configQueryRequest.setGroup("group");
         RequestMeta requestMeta = new RequestMeta();
         requestMeta.setClientIp("127.0.0.1");
-        ConfigQueryResponse response = configQueryRequestHandler.handle(configQueryRequest, requestMeta);
+        ConfigQueryResponse response = configQueryRequestHandler.handle(Request.of(configQueryRequest), requestMeta);
         Assert.assertEquals(response.getContent(), "content");
         
         configCacheServiceMockedStatic.close();

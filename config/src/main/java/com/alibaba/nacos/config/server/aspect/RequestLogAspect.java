@@ -107,14 +107,14 @@ public class RequestLogAspect {
      * PublishSingle.
      */
     @Around(CLIENT_INTERFACE_PUBLISH_SINGLE_CONFIG_RPC)
-    public Object interfacePublishSingleRpc(ProceedingJoinPoint pjp, ConfigPublishRequest request, RequestMeta meta)
-            throws Throwable {
-        final String md5 =
-                request.getContent() == null ? null : MD5Utils.md5Hex(request.getContent(), Constants.ENCODE);
+    public Object interfacePublishSingleRpc(ProceedingJoinPoint pjp, Request<ConfigPublishRequest> request,
+            RequestMeta meta) throws Throwable {
+        ConfigPublishRequest body = request.getPayloadBody();
+        final String md5 = body.getContent() == null ? null : MD5Utils.md5Hex(body.getContent(), Constants.ENCODE);
         MetricsMonitor.getPublishMonitor().incrementAndGet();
         AtomicLong rtHolder = new AtomicLong();
-        Object retVal = logClientRequestRpc("publish", pjp, request, meta, request.getDataId(), request.getGroup(),
-                request.getTenant(), md5, rtHolder);
+        Object retVal = logClientRequestRpc("publish", pjp, request, meta, body.getDataId(), body.getGroup(),
+                body.getTenant(), md5, rtHolder);
         MetricsMonitor.getWriteConfigRpcRtTimer().record(rtHolder.get(), TimeUnit.MILLISECONDS);
         return retVal;
     }
@@ -146,10 +146,11 @@ public class RequestLogAspect {
      * RemoveAll.
      */
     @Around(CLIENT_INTERFACE_REMOVE_ALL_CONFIG_RPC)
-    public Object interfaceRemoveAllRpc(ProceedingJoinPoint pjp, ConfigRemoveRequest request, RequestMeta meta)
+    public Object interfaceRemoveAllRpc(ProceedingJoinPoint pjp, Request<ConfigRemoveRequest> request, RequestMeta meta)
             throws Throwable {
-        return logClientRequestRpc("remove", pjp, request, meta, request.getDataId(), request.getGroup(),
-                request.getTenant(), null, null);
+        ConfigRemoveRequest payloadBody = request.getPayloadBody();
+        return logClientRequestRpc("remove", pjp, request, meta, payloadBody.getDataId(), payloadBody.getGroup(),
+                payloadBody.getTenant(), null, null);
     }
     
     /**
@@ -171,14 +172,16 @@ public class RequestLogAspect {
      * GetConfig.
      */
     @Around(CLIENT_INTERFACE_GET_CONFIG_RPC)
-    public Object interfaceGetConfigRpc(ProceedingJoinPoint pjp, ConfigQueryRequest request, RequestMeta meta)
+    public Object interfaceGetConfigRpc(ProceedingJoinPoint pjp, Request<ConfigQueryRequest> request, RequestMeta meta)
             throws Throwable {
-        final String groupKey = GroupKey2.getKey(request.getDataId(), request.getGroup(), request.getTenant());
+        ConfigQueryRequest payloadBody = request.getPayloadBody();
+        final String groupKey = GroupKey2.getKey(payloadBody.getDataId(), payloadBody.getGroup(),
+                payloadBody.getTenant());
         final String md5 = ConfigCacheService.getContentMd5(groupKey);
         MetricsMonitor.getConfigMonitor().incrementAndGet();
         AtomicLong rtHolder = new AtomicLong();
-        Object retVal = logClientRequestRpc("get", pjp, request, meta, request.getDataId(), request.getGroup(),
-                request.getTenant(), md5, rtHolder);
+        Object retVal = logClientRequestRpc("get", pjp, request, meta, payloadBody.getDataId(), payloadBody.getGroup(),
+                payloadBody.getTenant(), md5, rtHolder);
         MetricsMonitor.getReadConfigRpcRtTimer().record(rtHolder.get(), TimeUnit.MILLISECONDS);
         return retVal;
     }
@@ -187,7 +190,8 @@ public class RequestLogAspect {
      * Client api request log rt | status | requestIp | opType | dataId | group | datumId | md5.
      */
     private Object logClientRequest(String requestType, ProceedingJoinPoint pjp, HttpServletRequest request,
-            HttpServletResponse response, String dataId, String group, String tenant, String md5, AtomicLong rtHolder) throws Throwable {
+            HttpServletResponse response, String dataId, String group, String tenant, String md5, AtomicLong rtHolder)
+            throws Throwable {
         final String requestIp = RequestUtil.getRemoteIp(request);
         String appName = request.getHeader(RequestUtil.CLIENT_APPNAME_HEADER);
         final long st = System.currentTimeMillis();
@@ -198,9 +202,8 @@ public class RequestLogAspect {
         }
         // rt | status | requestIp | opType | dataId | group | datumId | md5 |
         // appName
-        LogUtil.CLIENT_LOG
-                .info("{}|{}|{}|{}|{}|{}|{}|{}|{}", rt, retVal, requestIp, requestType, dataId, group, tenant, md5,
-                        appName);
+        LogUtil.CLIENT_LOG.info("{}|{}|{}|{}|{}|{}|{}|{}|{}", rt, retVal, requestIp, requestType, dataId, group, tenant,
+                md5, appName);
         return retVal;
     }
     
@@ -229,8 +232,9 @@ public class RequestLogAspect {
      * GetConfig.
      */
     @Around(CLIENT_INTERFACE_LISTEN_CONFIG_RPC)
-    public Object interfaceListenConfigRpc(ProceedingJoinPoint pjp, ConfigBatchListenRequest request,
+    public Object interfaceListenConfigRpc(ProceedingJoinPoint pjp, Request<ConfigBatchListenRequest> request,
             RequestMeta meta) throws Throwable {
+        ConfigBatchListenRequest payloadBody = request.getPayloadBody();
         MetricsMonitor.getConfigMonitor().incrementAndGet();
         final String requestIp = meta.getClientIp();
         String appName = request.getHeader(RequestUtil.CLIENT_APPNAME_HEADER);
@@ -240,8 +244,8 @@ public class RequestLogAspect {
         // rt | status | requestIp | opType | listen size | listen or cancel | empty | empty |
         // appName
         LogUtil.CLIENT_LOG.info("{}|{}|{}|{}|{}|{}|{}|{}|{}", rt,
-                retVal.isSuccess() ? retVal.getResultCode() : retVal.getErrorCode(), requestIp, "listen", request.getConfigListenContexts().size(),
-                request.isListen(), "", "", appName);
+                retVal.isSuccess() ? retVal.getResultCode() : retVal.getErrorCode(), requestIp, "listen",
+                payloadBody.getConfigListenContexts().size(), payloadBody.isListen(), "", "", appName);
         return retVal;
     }
 }

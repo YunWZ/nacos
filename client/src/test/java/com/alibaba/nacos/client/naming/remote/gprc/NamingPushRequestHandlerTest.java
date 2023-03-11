@@ -21,6 +21,7 @@ package com.alibaba.nacos.client.naming.remote.gprc;
 import com.alibaba.nacos.api.naming.pojo.ServiceInfo;
 import com.alibaba.nacos.api.naming.remote.request.NotifySubscriberRequest;
 import com.alibaba.nacos.api.naming.remote.response.NotifySubscriberResponse;
+import com.alibaba.nacos.api.remote.request.AbstractRequestPayloadBody;
 import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.response.Response;
 import com.alibaba.nacos.client.naming.cache.ServiceInfoHolder;
@@ -39,7 +40,8 @@ public class NamingPushRequestHandlerTest {
         ServiceInfoHolder holder = mock(ServiceInfoHolder.class);
         NamingPushRequestHandler handler = new NamingPushRequestHandler(holder);
         ServiceInfo info = new ServiceInfo("name", "cluster1");
-        Request req = NotifySubscriberRequest.buildNotifySubscriberRequest(info);
+        AbstractRequestPayloadBody abstractRequestPayloadBody = NotifySubscriberRequest.buildNotifySubscriberRequest(info);
+        Request req = Request.of(abstractRequestPayloadBody);
         //when
         Response response = handler.requestReply(req);
         //then

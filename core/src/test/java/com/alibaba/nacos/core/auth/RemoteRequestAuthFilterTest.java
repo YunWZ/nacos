@@ -18,6 +18,7 @@
 package com.alibaba.nacos.core.auth;
 
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.remote.request.AbstractRequestPayloadBody;
 import com.alibaba.nacos.api.remote.request.HealthCheckRequest;
 import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
@@ -51,8 +52,8 @@ public class RemoteRequestAuthFilterTest {
     @Test
     public void testFilter() {
         Mockito.when(authConfigs.isAuthEnabled()).thenReturn(true);
-        
-        Request healthCheckRequest = new HealthCheckRequest();
+    
+        Request healthCheckRequest = Request.of((AbstractRequestPayloadBody) new HealthCheckRequest());
         
         try {
             Response healthCheckResponse = remoteRequestAuthFilter

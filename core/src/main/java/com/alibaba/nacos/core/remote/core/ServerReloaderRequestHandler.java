@@ -18,6 +18,7 @@ package com.alibaba.nacos.core.remote.core;
 
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.remote.RemoteConstants;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.request.ServerReloadRequest;
 import com.alibaba.nacos.api.remote.response.ServerReloadResponse;
@@ -44,11 +45,12 @@ public class ServerReloaderRequestHandler extends RequestHandler<ServerReloadReq
     private ConnectionManager connectionManager;
     
     @Override
-    public ServerReloadResponse handle(ServerReloadRequest request, RequestMeta meta) throws NacosException {
+    public ServerReloadResponse handle(Request<ServerReloadRequest> request, RequestMeta meta) throws NacosException {
+        ServerReloadRequest body = request.getPayloadBody();
         ServerReloadResponse response = new ServerReloadResponse();
         Loggers.REMOTE.info("server reload request receive,reload count={},redirectServer={},requestIp={}",
-                request.getReloadCount(), request.getReloadServer(), meta.getClientIp());
-        int reloadCount = request.getReloadCount();
+                body.getReloadCount(), body.getReloadServer(), meta.getClientIp());
+        int reloadCount = body.getReloadCount();
         Map<String, String> filter = new HashMap<>(2);
         filter.put(RemoteConstants.LABEL_SOURCE, RemoteConstants.LABEL_SOURCE_SDK);
         int sdkCount = connectionManager.currentClientsCount(filter);
@@ -56,7 +58,7 @@ public class ServerReloaderRequestHandler extends RequestHandler<ServerReloadReq
             response.setMessage("ignore");
         } else {
             reloadCount = (int) Math.max(reloadCount, sdkCount * (1 - RemoteUtils.LOADER_FACTOR));
-            connectionManager.loadCount(reloadCount, request.getReloadServer());
+            connectionManager.loadCount(reloadCount, body.getReloadServer());
             response.setMessage("ok");
         }
         return response;

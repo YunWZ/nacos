@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.api.naming.remote.request;
 
-import com.alibaba.nacos.api.remote.request.Request;
+import com.alibaba.nacos.api.remote.request.AbstractRequestPayloadBody;
 
 import static com.alibaba.nacos.api.common.Constants.Naming.NAMING_MODULE;
 
@@ -25,7 +25,7 @@ import static com.alibaba.nacos.api.common.Constants.Naming.NAMING_MODULE;
  *
  * @author liuzunfei
  */
-public abstract class AbstractNamingRequest extends Request {
+public abstract class AbstractNamingRequest extends AbstractRequestPayloadBody {
     
     private String namespace;
     

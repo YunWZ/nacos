@@ -19,6 +19,7 @@ package com.alibaba.nacos.auth.parser.grpc;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.naming.CommonParams;
 import com.alibaba.nacos.api.naming.remote.request.AbstractNamingRequest;
+import com.alibaba.nacos.api.remote.request.AbstractRequestPayloadBody;
 import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.common.utils.ReflectUtils;
 import com.alibaba.nacos.common.utils.StringUtils;
@@ -32,30 +33,33 @@ public class NamingGrpcResourceParser extends AbstractGrpcResourceParser {
     
     @Override
     protected String getNamespaceId(Request request) {
-        if (request instanceof AbstractNamingRequest) {
-            return ((AbstractNamingRequest) request).getNamespace();
+        AbstractRequestPayloadBody body = request.getPayloadBody();
+        if (body instanceof AbstractNamingRequest) {
+            return ((AbstractNamingRequest) body).getNamespace();
         }
-        return (String) ReflectUtils.getFieldValue(request, PropertyKeyConst.NAMESPACE, StringUtils.EMPTY);
+        return (String) ReflectUtils.getFieldValue(body, PropertyKeyConst.NAMESPACE, StringUtils.EMPTY);
     }
     
     @Override
     protected String getGroup(Request request) {
+        AbstractRequestPayloadBody body = request.getPayloadBody();
         String groupName;
-        if (request instanceof AbstractNamingRequest) {
-            groupName = ((AbstractNamingRequest) request).getGroupName();
+        if (body instanceof AbstractNamingRequest) {
+            groupName = ((AbstractNamingRequest) body).getGroupName();
         } else {
-            groupName = (String) ReflectUtils.getFieldValue(request, CommonParams.GROUP_NAME, StringUtils.EMPTY);
+            groupName = (String) ReflectUtils.getFieldValue(body, CommonParams.GROUP_NAME, StringUtils.EMPTY);
         }
         return StringUtils.isBlank(groupName) ? StringUtils.EMPTY : groupName;
     }
     
     @Override
     protected String getResourceName(Request request) {
+        AbstractRequestPayloadBody body = request.getPayloadBody();
         String serviceName;
-        if (request instanceof AbstractNamingRequest) {
-            serviceName = ((AbstractNamingRequest) request).getServiceName();
+        if (body instanceof AbstractNamingRequest) {
+            serviceName = ((AbstractNamingRequest) body).getServiceName();
         } else {
-            serviceName = (String) ReflectUtils.getFieldValue(request, CommonParams.SERVICE_NAME, "");
+            serviceName = (String) ReflectUtils.getFieldValue(body, CommonParams.SERVICE_NAME, "");
         }
         return StringUtils.isBlank(serviceName) ? StringUtils.EMPTY : serviceName;
     }

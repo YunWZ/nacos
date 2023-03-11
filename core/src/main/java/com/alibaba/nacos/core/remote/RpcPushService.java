@@ -18,6 +18,7 @@ package com.alibaba.nacos.core.remote;
 
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.remote.AbstractRequestCallBack;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.ServerRequest;
 import com.alibaba.nacos.api.remote.PushCallBack;
 import com.alibaba.nacos.api.remote.response.Response;
@@ -52,7 +53,7 @@ public class RpcPushService {
         Connection connection = connectionManager.getConnection(connectionId);
         if (connection != null) {
             try {
-                connection.asyncRequest(request, new AbstractRequestCallBack(requestCallBack.getTimeout()) {
+                connection.asyncRequest(Request.of(request), new AbstractRequestCallBack(requestCallBack.getTimeout()) {
                     
                     @Override
                     public Executor getExecutor() {
@@ -97,7 +98,7 @@ public class RpcPushService {
         Connection connection = connectionManager.getConnection(connectionId);
         if (connection != null) {
             try {
-                connection.request(request, 3000L);
+                connection.request(Request.of(request), 3000L);
             } catch (ConnectionAlreadyClosedException e) {
                 connectionManager.unregister(connectionId);
             } catch (Exception e) {

@@ -17,6 +17,7 @@
 package com.alibaba.nacos.api.remote.request;
 
 import com.alibaba.nacos.api.remote.Payload;
+
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -25,13 +26,44 @@ import java.util.TreeMap;
  *
  * @author liuzunfei
  */
-@SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
-public abstract class Request implements Payload {
-    
+public class Request<T extends AbstractRequestPayloadBody> implements Payload {
+
     private final Map<String, String> headers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
+    private final T payloadBody;
+
+    private Request(T payloadBody) {
+        this.payloadBody = payloadBody;
+    }
     
-    private String requestId;
+    /**
+     * Wrap request payload body.
+     *
+     * @param body request payload body
+     * @param <R> subclass of AbstractRequestPayloadBody
+     * @return Request instance
+     */
+    public static <R extends AbstractRequestPayloadBody> Request<R> of(R body) {
+        return new Request<>(body);
+    }
     
+    /**
+     * Wrap request payload body with headers.
+     *
+     * @param body request payload body
+     * @param <R> subclass of AbstractRequestPayloadBody
+     * @return Request instance
+     */
+    public static <R extends AbstractRequestPayloadBody> Request<R> of(R body, Map<String, String> headersMap) {
+        Request<R> request = new Request<>(body);
+        request.putAllHeader(headersMap);
+        return request;
+    }
+
+    public T getPayloadBody() {
+        return payloadBody;
+    }
+
     /**
      * put header.
      *
@@ -41,7 +73,7 @@ public abstract class Request implements Payload {
     public void putHeader(String key, String value) {
         headers.put(key, value);
     }
-    
+
     /**
      * put headers .
      *
@@ -53,7 +85,7 @@ public abstract class Request implements Payload {
         }
         this.headers.putAll(headers);
     }
-    
+
     /**
      * get a header value .
      *
@@ -63,7 +95,7 @@ public abstract class Request implements Payload {
     public String getHeader(String key) {
         return headers.get(key);
     }
-    
+
     /**
      * get a header value of default value.
      *
@@ -75,32 +107,34 @@ public abstract class Request implements Payload {
         String value = headers.get(key);
         return (value == null) ? defaultValue : value;
     }
-    
+
     /**
      * Getter method for property <tt>requestId</tt>.
      *
      * @return property value of requestId
      */
     public String getRequestId() {
-        return requestId;
+        return payloadBody.getRequestId();
     }
-    
+
     /**
      * Setter method for property <tt>requestId</tt>.
      *
      * @param requestId value to be assigned to property requestId
      */
     public void setRequestId(String requestId) {
-        this.requestId = requestId;
+        payloadBody.setRequestId(requestId);
     }
-    
+
     /**
      * Getter method for property <tt>type</tt>.
      *
      * @return property value of type
      */
-    public abstract String getModule();
-    
+    public String getModule() {
+        return payloadBody.getModule();
+    }
+
     /**
      * Getter method for property <tt>headers</tt>.
      *
@@ -109,13 +143,17 @@ public abstract class Request implements Payload {
     public Map<String, String> getHeaders() {
         return headers;
     }
-    
+
     public void clearHeaders() {
         this.headers.clear();
     }
-    
+
+    public String getPayloadBodyType() {
+        return payloadBody.getClass().getSimpleName();
+    }
+
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + "{" + "headers=" + headers + ", requestId='" + requestId + '\'' + '}';
+        return getPayloadBodyType() + "{" + "headers=" + headers + ", requestId='" + payloadBody.getRequestId() + '\'' + '}';
     }
 }

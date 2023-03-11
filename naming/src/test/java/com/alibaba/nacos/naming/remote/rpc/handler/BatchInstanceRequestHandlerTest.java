@@ -21,6 +21,7 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.alibaba.nacos.api.naming.remote.NamingRemoteConstants;
 import com.alibaba.nacos.api.naming.remote.request.BatchInstanceRequest;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.naming.core.v2.service.impl.EphemeralClientOperationServiceImpl;
 import org.junit.Assert;
@@ -58,11 +59,11 @@ public class BatchInstanceRequestHandlerTest {
         instanceList.add(instance);
         batchInstanceRequest.setInstances(instanceList);
         RequestMeta requestMeta = new RequestMeta();
-        batchInstanceRequestHandler.handle(batchInstanceRequest, requestMeta);
+        batchInstanceRequestHandler.handle(Request.of(batchInstanceRequest), requestMeta);
         Mockito.verify(clientOperationService).batchRegisterInstance(Mockito.any(), Mockito.any(), Mockito.anyString());
         batchInstanceRequest.setType("google");
         try {
-            batchInstanceRequestHandler.handle(batchInstanceRequest, requestMeta);
+            batchInstanceRequestHandler.handle(Request.of(batchInstanceRequest), requestMeta);
         } catch (Exception e) {
             Assert.assertEquals(((NacosException) e).getErrCode(), NacosException.INVALID_PARAM);
         }

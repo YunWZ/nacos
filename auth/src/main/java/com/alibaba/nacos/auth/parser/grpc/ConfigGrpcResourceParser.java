@@ -17,6 +17,7 @@
 package com.alibaba.nacos.auth.parser.grpc;
 
 import com.alibaba.nacos.api.config.remote.request.ConfigBatchListenRequest;
+import com.alibaba.nacos.api.remote.request.AbstractRequestPayloadBody;
 import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.common.utils.ReflectUtils;
 import com.alibaba.nacos.common.utils.StringUtils;
@@ -32,15 +33,16 @@ public class ConfigGrpcResourceParser extends AbstractGrpcResourceParser {
     
     @Override
     protected String getNamespaceId(Request request) {
+        AbstractRequestPayloadBody body = request.getPayloadBody();
         String namespaceId = StringUtils.EMPTY;
-        if (request instanceof ConfigBatchListenRequest) {
-            List<ConfigBatchListenRequest.ConfigListenContext> configListenContexts = ((ConfigBatchListenRequest) request)
+        if (body instanceof ConfigBatchListenRequest) {
+            List<ConfigBatchListenRequest.ConfigListenContext> configListenContexts = ((ConfigBatchListenRequest) body)
                     .getConfigListenContexts();
             if (!configListenContexts.isEmpty()) {
-                namespaceId = ((ConfigBatchListenRequest) request).getConfigListenContexts().get(0).getTenant();
+                namespaceId = ((ConfigBatchListenRequest) body).getConfigListenContexts().get(0).getTenant();
             }
         } else {
-            namespaceId = (String) ReflectUtils.getFieldValue(request, "tenant", StringUtils.EMPTY);
+            namespaceId = (String) ReflectUtils.getFieldValue(body, "tenant", StringUtils.EMPTY);
         }
         return namespaceId;
     }

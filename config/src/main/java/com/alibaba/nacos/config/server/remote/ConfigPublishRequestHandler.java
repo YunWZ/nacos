@@ -19,6 +19,7 @@ package com.alibaba.nacos.config.server.remote;
 import com.alibaba.nacos.api.config.remote.request.ConfigPublishRequest;
 import com.alibaba.nacos.api.config.remote.response.ConfigPublishResponse;
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.response.ResponseCode;
 import com.alibaba.nacos.auth.annotation.Secured;
@@ -72,32 +73,32 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
     @Override
     @TpsControl(pointName = "ConfigPublish")
     @Secured(action = ActionTypes.WRITE, signType = SignType.CONFIG)
-    public ConfigPublishResponse handle(ConfigPublishRequest request, RequestMeta meta) throws NacosException {
-        
+    public ConfigPublishResponse handle(Request<ConfigPublishRequest> request, RequestMeta meta) throws NacosException {
+        ConfigPublishRequest payloadBody = request.getPayloadBody();
         try {
-            String dataId = request.getDataId();
-            String group = request.getGroup();
-            String content = request.getContent();
-            final String tenant = request.getTenant();
+            String dataId = payloadBody.getDataId();
+            String group = payloadBody.getGroup();
+            String content = payloadBody.getContent();
+            final String tenant = payloadBody.getTenant();
             
             final String srcIp = meta.getClientIp();
-            final String requestIpApp = request.getAdditionParam("requestIpApp");
-            final String tag = request.getAdditionParam("tag");
-            final String appName = request.getAdditionParam("appName");
-            final String type = request.getAdditionParam("type");
-            final String srcUser = request.getAdditionParam("src_user");
-            final String encryptedDataKey = request.getAdditionParam("encryptedDataKey");
+            final String requestIpApp = payloadBody.getAdditionParam("requestIpApp");
+            final String tag = payloadBody.getAdditionParam("tag");
+            final String appName = payloadBody.getAdditionParam("appName");
+            final String type = payloadBody.getAdditionParam("type");
+            final String srcUser = payloadBody.getAdditionParam("src_user");
+            final String encryptedDataKey = payloadBody.getAdditionParam("encryptedDataKey");
             
             // check tenant
             ParamUtils.checkParam(dataId, group, "datumId", content);
             ParamUtils.checkParam(tag);
             Map<String, Object> configAdvanceInfo = new HashMap<>(10);
-            MapUtil.putIfValNoNull(configAdvanceInfo, "config_tags", request.getAdditionParam("config_tags"));
-            MapUtil.putIfValNoNull(configAdvanceInfo, "desc", request.getAdditionParam("desc"));
-            MapUtil.putIfValNoNull(configAdvanceInfo, "use", request.getAdditionParam("use"));
-            MapUtil.putIfValNoNull(configAdvanceInfo, "effect", request.getAdditionParam("effect"));
+            MapUtil.putIfValNoNull(configAdvanceInfo, "config_tags", payloadBody.getAdditionParam("config_tags"));
+            MapUtil.putIfValNoNull(configAdvanceInfo, "desc", payloadBody.getAdditionParam("desc"));
+            MapUtil.putIfValNoNull(configAdvanceInfo, "use", payloadBody.getAdditionParam("use"));
+            MapUtil.putIfValNoNull(configAdvanceInfo, "effect", payloadBody.getAdditionParam("effect"));
             MapUtil.putIfValNoNull(configAdvanceInfo, "type", type);
-            MapUtil.putIfValNoNull(configAdvanceInfo, "schema", request.getAdditionParam("schema"));
+            MapUtil.putIfValNoNull(configAdvanceInfo, "schema", payloadBody.getAdditionParam("schema"));
             ParamUtils.checkParam(configAdvanceInfo);
             
             if (AggrWhitelist.isAggrDataId(dataId)) {
@@ -108,13 +109,13 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
             
             final Timestamp time = TimeUtils.getCurrentTime();
             ConfigInfo configInfo = new ConfigInfo(dataId, group, tenant, appName, content);
-            configInfo.setMd5(request.getCasMd5());
+            configInfo.setMd5(payloadBody.getCasMd5());
             configInfo.setType(type);
             configInfo.setEncryptedDataKey(encryptedDataKey);
-            String betaIps = request.getAdditionParam("betaIps");
+            String betaIps = payloadBody.getAdditionParam("betaIps");
             if (StringUtils.isBlank(betaIps)) {
                 if (StringUtils.isBlank(tag)) {
-                    if (StringUtils.isNotBlank(request.getCasMd5())) {
+                    if (StringUtils.isNotBlank(payloadBody.getCasMd5())) {
                         boolean casSuccess = configInfoPersistService
                                 .insertOrUpdateCas(srcIp, srcUser, configInfo, time, configAdvanceInfo, false);
                         if (!casSuccess) {
@@ -127,7 +128,7 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
                     ConfigChangePublisher.notifyConfigChange(
                             new ConfigDataChangeEvent(false, dataId, group, tenant, time.getTime()));
                 } else {
-                    if (StringUtils.isNotBlank(request.getCasMd5())) {
+                    if (StringUtils.isNotBlank(payloadBody.getCasMd5())) {
                         boolean casSuccess = configInfoTagPersistService
                                 .insertOrUpdateTagCas(configInfo, tag, srcIp, srcUser, time, false);
                         if (!casSuccess) {
@@ -143,7 +144,7 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
                 }
             } else {
                 // beta publish
-                if (StringUtils.isNotBlank(request.getCasMd5())) {
+                if (StringUtils.isNotBlank(payloadBody.getCasMd5())) {
                     boolean casSuccess = configInfoBetaPersistService
                             .insertOrUpdateBetaCas(configInfo, betaIps, srcIp, srcUser, time, false);
                     if (!casSuccess) {

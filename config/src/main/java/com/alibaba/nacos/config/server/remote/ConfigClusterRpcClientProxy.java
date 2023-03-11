@@ -19,6 +19,7 @@ package com.alibaba.nacos.config.server.remote;
 import com.alibaba.nacos.api.config.remote.request.cluster.ConfigChangeClusterSyncRequest;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.remote.RequestCallBack;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.core.cluster.Member;
 import com.alibaba.nacos.core.cluster.remote.ClusterRpcClientProxy;
 import org.springframework.stereotype.Service;
@@ -49,7 +50,7 @@ public class ConfigClusterRpcClientProxy {
     public void syncConfigChange(Member member, ConfigChangeClusterSyncRequest request, RequestCallBack callBack)
             throws NacosException {
     
-        clusterRpcClientProxy.asyncRequest(member, request, callBack);
+        clusterRpcClientProxy.asyncRequest(member, Request.of(request), callBack);
         
     }
 }

@@ -77,7 +77,7 @@ public class DistroClientTransportAgent implements DistroTransportAgent {
             return false;
         }
         try {
-            Response response = clusterRpcClientProxy.sendRequest(member, request);
+            Response response = clusterRpcClientProxy.sendRequest(member, request.toRequest());
             return checkResponse(response);
         } catch (NacosException e) {
             Loggers.DISTRO.error("[DISTRO-FAILED] Sync distro data failed! key: {}", data.getDistroKey(), e);
@@ -101,7 +101,7 @@ public class DistroClientTransportAgent implements DistroTransportAgent {
             return;
         }
         try {
-            clusterRpcClientProxy.asyncRequest(member, request, new DistroRpcCallbackWrapper(callback, member));
+            clusterRpcClientProxy.asyncRequest(member, request.toRequest(), new DistroRpcCallbackWrapper(callback, member));
         } catch (NacosException nacosException) {
             callback.onFailed(nacosException);
         }
@@ -123,7 +123,7 @@ public class DistroClientTransportAgent implements DistroTransportAgent {
             return false;
         }
         try {
-            Response response = clusterRpcClientProxy.sendRequest(member, request);
+            Response response = clusterRpcClientProxy.sendRequest(member, request.toRequest());
             return checkResponse(response);
         } catch (NacosException e) {
             Loggers.DISTRO.error("[DISTRO-FAILED] Verify distro data failed! key: {} ", verifyData.getDistroKey(), e);
@@ -149,7 +149,7 @@ public class DistroClientTransportAgent implements DistroTransportAgent {
         try {
             DistroVerifyCallbackWrapper wrapper = new DistroVerifyCallbackWrapper(targetServer,
                     verifyData.getDistroKey().getResourceKey(), callback, member);
-            clusterRpcClientProxy.asyncRequest(member, request, wrapper);
+            clusterRpcClientProxy.asyncRequest(member, request.toRequest(), wrapper);
         } catch (NacosException nacosException) {
             callback.onFailed(nacosException);
         }
@@ -169,7 +169,7 @@ public class DistroClientTransportAgent implements DistroTransportAgent {
         request.setDistroData(distroData);
         request.setDataOperation(DataOperation.QUERY);
         try {
-            Response response = clusterRpcClientProxy.sendRequest(member, request);
+            Response response = clusterRpcClientProxy.sendRequest(member, request.toRequest());
             if (checkResponse(response)) {
                 return ((DistroDataResponse) response).getDistroData();
             } else {
@@ -193,7 +193,7 @@ public class DistroClientTransportAgent implements DistroTransportAgent {
         request.setDataOperation(DataOperation.SNAPSHOT);
         try {
             Response response = clusterRpcClientProxy
-                    .sendRequest(member, request, DistroConfig.getInstance().getLoadDataTimeoutMillis());
+                    .sendRequest(member, request.toRequest(), DistroConfig.getInstance().getLoadDataTimeoutMillis());
             if (checkResponse(response)) {
                 return ((DistroDataResponse) response).getDistroData();
             } else {

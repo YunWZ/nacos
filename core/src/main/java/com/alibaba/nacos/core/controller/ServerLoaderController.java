@@ -18,6 +18,8 @@ package com.alibaba.nacos.core.controller;
 
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.remote.RequestCallBack;
+import com.alibaba.nacos.api.remote.request.AbstractRequestPayloadBody;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.request.ServerLoaderInfoRequest;
 import com.alibaba.nacos.api.remote.request.ServerReloadRequest;
@@ -191,7 +193,7 @@ public class ServerLoaderController {
             
             if (serverMemberManager.getSelf().equals(member)) {
                 try {
-                    serverReloaderRequestHandler.handle(serverLoaderInfoRequest, new RequestMeta());
+                    serverReloaderRequestHandler.handle(Request.of(serverLoaderInfoRequest), new RequestMeta());
                 } catch (NacosException e) {
                     LOGGER.error("Fail to loader self server", e);
                     result.set(false);
@@ -199,7 +201,7 @@ public class ServerLoaderController {
             } else {
                 
                 try {
-                    clusterRpcClientProxy.asyncRequest(member, serverLoaderInfoRequest, new RequestCallBack() {
+                    clusterRpcClientProxy.asyncRequest(member, Request.of(serverLoaderInfoRequest), new RequestCallBack() {
                         @Override
                         public Executor getExecutor() {
                             return null;
@@ -275,7 +277,7 @@ public class ServerLoaderController {
                 ServerLoaderInfoRequest serverLoaderInfoRequest = new ServerLoaderInfoRequest();
                 
                 try {
-                    clusterRpcClientProxy.asyncRequest(member, serverLoaderInfoRequest, new RequestCallBack() {
+                    clusterRpcClientProxy.asyncRequest(member, Request.of(serverLoaderInfoRequest), new RequestCallBack() {
                         @Override
                         public Executor getExecutor() {
                             return null;
@@ -313,8 +315,9 @@ public class ServerLoaderController {
         }
         
         try {
+            AbstractRequestPayloadBody abstractRequestPayloadBody = new ServerLoaderInfoRequest();
             ServerLoaderInfoResponse handle = serverLoaderInfoRequestHandler
-                    .handle(new ServerLoaderInfoRequest(), new RequestMeta());
+                    .handle(Request.of(abstractRequestPayloadBody), new RequestMeta());
             ServerLoaderMetrics metrics = new ServerLoaderMetrics();
             metrics.setAddress(serverMemberManager.getSelf().getAddress());
             metrics.setMetric(handle.getLoaderMetrics());

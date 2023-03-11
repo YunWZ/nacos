@@ -21,6 +21,7 @@ import com.alibaba.nacos.api.naming.pojo.ServiceInfo;
 import com.alibaba.nacos.api.naming.remote.request.SubscribeServiceRequest;
 import com.alibaba.nacos.api.naming.remote.response.SubscribeServiceResponse;
 import com.alibaba.nacos.api.naming.utils.NamingUtils;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.response.ResponseCode;
 import com.alibaba.nacos.auth.annotation.Secured;
@@ -61,19 +62,20 @@ public class SubscribeServiceRequestHandler extends RequestHandler<SubscribeServ
     
     @Override
     @Secured(action = ActionTypes.READ)
-    public SubscribeServiceResponse handle(SubscribeServiceRequest request, RequestMeta meta) throws NacosException {
-        String namespaceId = request.getNamespace();
-        String serviceName = request.getServiceName();
-        String groupName = request.getGroupName();
+    public SubscribeServiceResponse handle(Request<SubscribeServiceRequest> request, RequestMeta meta) throws NacosException {
+        SubscribeServiceRequest body = request.getPayloadBody();
+        String namespaceId = body.getNamespace();
+        String serviceName = body.getServiceName();
+        String groupName = body.getGroupName();
         String app = request.getHeader("app", "unknown");
         String groupedServiceName = NamingUtils.getGroupedName(serviceName, groupName);
         Service service = Service.newService(namespaceId, groupName, serviceName, true);
         Subscriber subscriber = new Subscriber(meta.getClientIp(), meta.getClientVersion(), app, meta.getClientIp(),
-                namespaceId, groupedServiceName, 0, request.getClusters());
+                namespaceId, groupedServiceName, 0, body.getClusters());
         ServiceInfo serviceInfo = ServiceUtil.selectInstancesWithHealthyProtection(serviceStorage.getData(service),
                 metadataManager.getServiceMetadata(service).orElse(null), subscriber.getCluster(), false,
                 true, subscriber.getIp());
-        if (request.isSubscribe()) {
+        if (body.isSubscribe()) {
             clientOperationService.subscribeService(service, subscriber, meta.getConnectionId());
             NotifyCenter.publishEvent(new SubscribeServiceTraceEvent(System.currentTimeMillis(),
                     meta.getClientIp(), service.getNamespace(), service.getGroup(), service.getName()));

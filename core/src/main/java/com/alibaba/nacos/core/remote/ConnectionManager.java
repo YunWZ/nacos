@@ -22,6 +22,7 @@ import com.alibaba.nacos.api.common.Constants;
 import com.alibaba.nacos.api.remote.RemoteConstants;
 import com.alibaba.nacos.api.remote.RpcScheduledExecutor;
 import com.alibaba.nacos.api.remote.request.ConnectResetRequest;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.common.remote.exception.ConnectionAlreadyClosedException;
 import com.alibaba.nacos.common.spi.NacosServiceLoader;
 import com.alibaba.nacos.common.utils.StringUtils;
@@ -276,7 +277,7 @@ public class ConnectionManager {
                     connectResetRequest.setServerPort(split[1]);
                 }
                 try {
-                    connection.request(connectResetRequest, 3000L);
+                    connection.request(Request.of(connectResetRequest), 3000L);
                 } catch (ConnectionAlreadyClosedException e) {
                     unregister(connectionId);
                 } catch (Exception e) {

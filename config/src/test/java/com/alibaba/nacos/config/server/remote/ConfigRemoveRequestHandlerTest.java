@@ -19,6 +19,7 @@ package com.alibaba.nacos.config.server.remote;
 import com.alibaba.nacos.api.config.remote.request.ConfigRemoveRequest;
 import com.alibaba.nacos.api.config.remote.response.ConfigRemoveResponse;
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.response.ResponseCode;
 import com.alibaba.nacos.config.server.service.repository.ConfigInfoPersistService;
@@ -60,7 +61,8 @@ public class ConfigRemoveRequestHandlerTest {
         RequestMeta meta = new RequestMeta();
         meta.setClientIp("1.1.1.1");
         try {
-            ConfigRemoveResponse configRemoveResponse = configRemoveRequestHandler.handle(configRemoveRequest, meta);
+            ConfigRemoveResponse configRemoveResponse = configRemoveRequestHandler.handle(
+                    Request.of(configRemoveRequest), meta);
             Assert.assertEquals(ResponseCode.SUCCESS.getCode(), configRemoveResponse.getResultCode());
         } catch (NacosException e) {
             e.printStackTrace();

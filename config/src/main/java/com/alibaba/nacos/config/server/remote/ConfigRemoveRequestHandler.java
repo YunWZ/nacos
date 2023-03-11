@@ -19,6 +19,7 @@ package com.alibaba.nacos.config.server.remote;
 import com.alibaba.nacos.api.config.remote.request.ConfigRemoveRequest;
 import com.alibaba.nacos.api.config.remote.response.ConfigRemoveResponse;
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.auth.annotation.Secured;
 import com.alibaba.nacos.common.utils.StringUtils;
@@ -60,8 +61,9 @@ public class ConfigRemoveRequestHandler extends RequestHandler<ConfigRemoveReque
     @Override
     @TpsControl(pointName = "ConfigRemove")
     @Secured(action = ActionTypes.WRITE, signType = SignType.CONFIG)
-    public ConfigRemoveResponse handle(ConfigRemoveRequest configRemoveRequest, RequestMeta meta)
+    public ConfigRemoveResponse handle(Request<ConfigRemoveRequest> request, RequestMeta meta)
             throws NacosException {
+        ConfigRemoveRequest configRemoveRequest = request.getPayloadBody();
         // check tenant
         String tenant = configRemoveRequest.getTenant();
         String dataId = configRemoveRequest.getDataId();

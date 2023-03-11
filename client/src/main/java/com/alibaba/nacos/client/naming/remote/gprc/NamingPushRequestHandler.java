@@ -18,6 +18,7 @@ package com.alibaba.nacos.client.naming.remote.gprc;
 
 import com.alibaba.nacos.api.naming.remote.request.NotifySubscriberRequest;
 import com.alibaba.nacos.api.naming.remote.response.NotifySubscriberResponse;
+import com.alibaba.nacos.api.remote.request.AbstractRequestPayloadBody;
 import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.response.Response;
 import com.alibaba.nacos.client.naming.cache.ServiceInfoHolder;
@@ -38,8 +39,9 @@ public class NamingPushRequestHandler implements ServerRequestHandler {
     
     @Override
     public Response requestReply(Request request) {
-        if (request instanceof NotifySubscriberRequest) {
-            NotifySubscriberRequest notifyRequest = (NotifySubscriberRequest) request;
+        AbstractRequestPayloadBody payloadBody = request.getPayloadBody();
+        if (payloadBody instanceof NotifySubscriberRequest) {
+            NotifySubscriberRequest notifyRequest = (NotifySubscriberRequest) payloadBody;
             serviceInfoHolder.processServiceInfo(notifyRequest.getServiceInfo());
             return new NotifySubscriberResponse();
         }

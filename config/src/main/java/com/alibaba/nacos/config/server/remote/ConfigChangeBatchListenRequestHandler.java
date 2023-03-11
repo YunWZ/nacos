@@ -20,6 +20,7 @@ import com.alibaba.nacos.api.common.Constants;
 import com.alibaba.nacos.api.config.remote.request.ConfigBatchListenRequest;
 import com.alibaba.nacos.api.config.remote.response.ConfigChangeBatchListenResponse;
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.auth.annotation.Secured;
 import com.alibaba.nacos.config.server.service.ConfigCacheService;
@@ -48,10 +49,11 @@ public class ConfigChangeBatchListenRequestHandler
     @Override
     @TpsControl(pointName = "ConfigListen")
     @Secured(action = ActionTypes.READ, signType = SignType.CONFIG)
-    public ConfigChangeBatchListenResponse handle(ConfigBatchListenRequest configChangeListenRequest, RequestMeta meta)
+    public ConfigChangeBatchListenResponse handle(Request<ConfigBatchListenRequest> request, RequestMeta meta)
             throws NacosException {
+        ConfigBatchListenRequest configChangeListenRequest = request.getPayloadBody();
         String connectionId = StringPool.get(meta.getConnectionId());
-        String tag = configChangeListenRequest.getHeader(Constants.VIPSERVER_TAG);
+        String tag = request.getHeader(Constants.VIPSERVER_TAG);
         
         ConfigChangeBatchListenResponse configChangeBatchListenResponse = new ConfigChangeBatchListenResponse();
         for (ConfigBatchListenRequest.ConfigListenContext listenContext : configChangeListenRequest

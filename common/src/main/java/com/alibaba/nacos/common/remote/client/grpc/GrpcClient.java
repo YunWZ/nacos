@@ -192,7 +192,7 @@ public abstract class GrpcClient extends RpcClient {
                 return null;
             }
             ServerCheckRequest serverCheckRequest = new ServerCheckRequest();
-            Payload grpcRequest = GrpcUtils.convert(serverCheckRequest);
+            Payload grpcRequest = GrpcUtils.convert(Request.of(serverCheckRequest));
             ListenableFuture<Payload> responseFuture = requestBlockingStub.request(grpcRequest);
             Payload response = responseFuture.get(clientConfig.serverCheckTimeOut(), TimeUnit.MILLISECONDS);
             //receive connection unregister response here,not check response is success.
@@ -329,7 +329,7 @@ public abstract class GrpcClient extends RpcClient {
                 conSetupRequest.setLabels(super.getLabels());
                 conSetupRequest.setAbilities(super.clientAbilities);
                 conSetupRequest.setTenant(super.getTenant());
-                grpcConn.sendRequest(conSetupRequest);
+                grpcConn.sendRequest(Request.of(conSetupRequest));
                 //wait to register connection setup
                 Thread.sleep(100L);
                 return grpcConn;

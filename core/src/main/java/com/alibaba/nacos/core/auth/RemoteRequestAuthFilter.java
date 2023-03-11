@@ -88,7 +88,7 @@ public class RemoteRequestAuthFilter extends AbstractRequestFilter {
             }
         } catch (AccessException e) {
             if (Loggers.AUTH.isDebugEnabled()) {
-                Loggers.AUTH.debug("access denied, request: {}, reason: {}", request.getClass().getSimpleName(),
+                Loggers.AUTH.debug("access denied, request: {}, reason: {}", request.getPayloadBodyType(),
                         e.getErrMsg());
             }
             Response defaultResponseInstance = getDefaultResponseInstance(handlerClazz);

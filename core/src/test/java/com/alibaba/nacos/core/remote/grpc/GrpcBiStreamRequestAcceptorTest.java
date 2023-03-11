@@ -21,6 +21,7 @@ import com.alibaba.nacos.api.grpc.auto.BiRequestStreamGrpc;
 import com.alibaba.nacos.api.grpc.auto.Payload;
 import com.alibaba.nacos.api.remote.request.ConnectResetRequest;
 import com.alibaba.nacos.api.remote.request.ConnectionSetupRequest;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.response.ConnectResetResponse;
 import com.alibaba.nacos.api.remote.response.Response;
@@ -134,7 +135,7 @@ public class GrpcBiStreamRequestAcceptorTest {
         ConnectionSetupRequest connectionSetupRequest = new ConnectionSetupRequest();
         connectionSetupRequest.setRequestId(requestId);
         connectionSetupRequest.setClientVersion("2.0.3");
-        Payload payload = GrpcUtils.convert(connectionSetupRequest, metadata);
+        Payload payload = GrpcUtils.convert(Request.of(connectionSetupRequest), metadata);
         payloadStreamObserver.onNext(payload);
     }
 }

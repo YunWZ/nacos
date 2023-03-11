@@ -20,6 +20,7 @@ package com.alibaba.nacos.naming.remote.rpc.handler;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.remote.request.ServiceListRequest;
 import com.alibaba.nacos.api.naming.remote.response.ServiceListResponse;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.naming.core.v2.ServiceManager;
 import com.alibaba.nacos.naming.core.v2.pojo.Service;
@@ -57,7 +58,7 @@ public class ServiceListRequestHandlerTest {
         serviceListRequest.setPageSize(10);
         serviceListRequest.setGroupName("B");
         ServiceListRequestHandler serviceListRequestHandler = new ServiceListRequestHandler();
-        ServiceListResponse serviceListResponse = serviceListRequestHandler.handle(serviceListRequest, new RequestMeta());
+        ServiceListResponse serviceListResponse = serviceListRequestHandler.handle(Request.of(serviceListRequest), new RequestMeta());
         Assert.assertEquals(serviceListResponse.getCount(), 1);
         Assert.assertTrue(serviceListResponse.getServiceNames().contains("C"));
     }

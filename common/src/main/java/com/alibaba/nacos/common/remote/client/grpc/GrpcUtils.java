@@ -19,6 +19,7 @@ package com.alibaba.nacos.common.remote.client.grpc;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.grpc.auto.Metadata;
 import com.alibaba.nacos.api.grpc.auto.Payload;
+import com.alibaba.nacos.api.remote.request.AbstractRequestPayloadBody;
 import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.response.Response;
@@ -55,16 +56,14 @@ public class GrpcUtils {
         Payload.Builder payloadBuilder = Payload.newBuilder();
         Metadata.Builder metaBuilder = Metadata.newBuilder();
         if (meta != null) {
-            metaBuilder.putAllHeaders(request.getHeaders()).setType(request.getClass().getSimpleName());
+            metaBuilder.putAllHeaders(request.getHeaders()).setType(request.getPayloadBodyType());
         }
         metaBuilder.setClientIp(NetUtils.localIP());
         payloadBuilder.setMetadata(metaBuilder.build());
         
         // request body .
         byte[] jsonBytes = convertRequestToByte(request);
-        return payloadBuilder
-                .setBody(Any.newBuilder().setValue(UnsafeByteOperations.unsafeWrap(jsonBytes)))
-                .build();
+        return payloadBuilder.setBody(Any.newBuilder().setValue(UnsafeByteOperations.unsafeWrap(jsonBytes))).build();
         
     }
     
@@ -76,15 +75,14 @@ public class GrpcUtils {
      */
     public static Payload convert(Request request) {
         
-        Metadata newMeta = Metadata.newBuilder().setType(request.getClass().getSimpleName())
-                .setClientIp(NetUtils.localIP()).putAllHeaders(request.getHeaders()).build();
-        
-        byte[] jsonBytes = convertRequestToByte(request);
+        Metadata newMeta = Metadata.newBuilder().setType(request.getPayloadBodyType()).setClientIp(NetUtils.localIP())
+                .putAllHeaders(request.getHeaders()).build();
+    
+        byte[] jsonBytes = JacksonUtils.toJsonBytes(request.getPayloadBody());
         
         Payload.Builder builder = Payload.newBuilder();
         
-        return builder
-                .setBody(Any.newBuilder().setValue(UnsafeByteOperations.unsafeWrap(jsonBytes)))
+        return builder.setBody(Any.newBuilder().setValue(UnsafeByteOperations.unsafeWrap(jsonBytes)))
                 .setMetadata(newMeta).build();
         
     }
@@ -99,11 +97,11 @@ public class GrpcUtils {
         byte[] jsonBytes = JacksonUtils.toJsonBytes(response);
         
         Metadata.Builder metaBuilder = Metadata.newBuilder().setType(response.getClass().getSimpleName());
-        return Payload.newBuilder()
-                .setBody(Any.newBuilder().setValue(UnsafeByteOperations.unsafeWrap(jsonBytes)))
+        return Payload.newBuilder().setBody(Any.newBuilder().setValue(UnsafeByteOperations.unsafeWrap(jsonBytes)))
                 .setMetadata(metaBuilder.build()).build();
     }
     
+    @Deprecated
     private static byte[] convertRequestToByte(Request request) {
         Map<String, String> requestHeaders = new HashMap<>(request.getHeaders());
         request.clearHeaders();
@@ -124,58 +122,45 @@ public class GrpcUtils {
             ByteString byteString = payload.getBody().getValue();
             ByteBuffer byteBuffer = byteString.asReadOnlyByteBuffer();
             Object obj = JacksonUtils.toObj(new ByteBufferBackedInputStream(byteBuffer), classType);
-            if (obj instanceof Request) {
-                ((Request) obj).putAllHeader(payload.getMetadata().getHeadersMap());
+            if (obj instanceof AbstractRequestPayloadBody) {
+                obj = Request.of((AbstractRequestPayloadBody) obj, payload.getMetadata().getHeadersMap());
             }
             return obj;
-        } else {
-            throw new RemoteException(NacosException.SERVER_ERROR,
-                    "Unknown payload type:" + payload.getMetadata().getType());
         }
         
+        throw new RemoteException(NacosException.SERVER_ERROR,
+                "Unknown payload type:" + payload.getMetadata().getType());
     }
     
-    public static class PlainRequest {
-        
-        String type;
-        
-        Object body;
-        
-        /**
-         * Getter method for property <tt>type</tt>.
-         *
-         * @return property value of type
-         */
-        public String getType() {
-            return type;
+    /**
+     * parse payload to request/response model.
+     *
+     * @param payload payload to be parsed.
+     * @return payload
+     */
+    public static Response parseToResponse(Payload payload) {
+        Object obj = parse(payload);
+        if (obj instanceof Response) {
+            return (Response) obj;
         }
         
-        /**
-         * Setter method for property <tt>type</tt>.
-         *
-         * @param type value to be assigned to property type
-         */
-        public void setType(String type) {
-            this.type = type;
-        }
-        
-        /**
-         * Getter method for property <tt>body</tt>.
-         *
-         * @return property value of body
-         */
-        public Object getBody() {
-            return body;
-        }
-        
-        /**
-         * Setter method for property <tt>body</tt>.
-         *
-         * @param body value to be assigned to property body
-         */
-        public void setBody(Object body) {
-            this.body = body;
-        }
+        throw new RemoteException(NacosException.SERVER_ERROR,
+                "Expect a response type, but received payload type:" + payload.getMetadata().getType());
     }
     
+    /**
+     * parse payload to request/response model.
+     *
+     * @param payload payload to be parsed.
+     * @return payload
+     */
+    public static <R extends AbstractRequestPayloadBody> Request<R> parseToRequest(Payload payload) {
+        Object obj = parse(payload);
+        if (obj instanceof Request) {
+            return (Request<R>) obj;
+        }
+        
+        throw new RemoteException(NacosException.SERVER_ERROR,
+                "Expect a response type, but received payload type:" + payload.getMetadata().getType());
+    }
 }

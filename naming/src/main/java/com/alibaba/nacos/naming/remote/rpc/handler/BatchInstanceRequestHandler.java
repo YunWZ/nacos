@@ -20,6 +20,7 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.remote.NamingRemoteConstants;
 import com.alibaba.nacos.api.naming.remote.request.BatchInstanceRequest;
 import com.alibaba.nacos.api.naming.remote.response.BatchInstanceResponse;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.auth.annotation.Secured;
 import com.alibaba.nacos.core.remote.RequestHandler;
@@ -44,15 +45,16 @@ public class BatchInstanceRequestHandler extends RequestHandler<BatchInstanceReq
     
     @Override
     @Secured(action = ActionTypes.WRITE)
-    public BatchInstanceResponse handle(BatchInstanceRequest request, RequestMeta meta) throws NacosException {
-        Service service = Service.newService(request.getNamespace(), request.getGroupName(), request.getServiceName(),
+    public BatchInstanceResponse handle(Request<BatchInstanceRequest> request, RequestMeta meta) throws NacosException {
+        BatchInstanceRequest body = request.getPayloadBody();
+        Service service = Service.newService(body.getNamespace(), body.getGroupName(), body.getServiceName(),
                 true);
-        switch (request.getType()) {
+        switch (body.getType()) {
             case NamingRemoteConstants.BATCH_REGISTER_INSTANCE:
-                return batchRegisterInstance(service, request, meta);
+                return batchRegisterInstance(service, body, meta);
             default:
                 throw new NacosException(NacosException.INVALID_PARAM,
-                        String.format("Unsupported request type %s", request.getType()));
+                        String.format("Unsupported request type %s", body.getType()));
         }
     }
     

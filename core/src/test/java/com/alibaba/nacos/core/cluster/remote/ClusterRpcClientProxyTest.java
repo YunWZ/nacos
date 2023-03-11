@@ -21,7 +21,9 @@ import com.alibaba.nacos.api.ability.ServerAbilities;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.remote.RequestCallBack;
 import com.alibaba.nacos.api.remote.ability.ServerRemoteAbility;
+import com.alibaba.nacos.api.remote.request.AbstractRequestPayloadBody;
 import com.alibaba.nacos.api.remote.request.HealthCheckRequest;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.response.Response;
 import com.alibaba.nacos.common.remote.ConnectionType;
 import com.alibaba.nacos.common.remote.client.RpcClient;
@@ -98,7 +100,8 @@ public class ClusterRpcClientProxyTest {
     @Test
     public void testSendRequest() {
         try {
-            Response response = clusterRpcClientProxy.sendRequest(member, new HealthCheckRequest());
+            Response response = clusterRpcClientProxy.sendRequest(member,
+                    Request.of((AbstractRequestPayloadBody) new HealthCheckRequest()));
         } catch (NacosException e) {
             Assert.assertEquals(-401, e.getErrCode());
         } catch (Exception e) {
@@ -132,7 +135,8 @@ public class ClusterRpcClientProxyTest {
         };
         
         try {
-            clusterRpcClientProxy.asyncRequest(member, new HealthCheckRequest(), requestCallBack);
+            clusterRpcClientProxy.asyncRequest(member,
+                    Request.of((AbstractRequestPayloadBody) new HealthCheckRequest()), requestCallBack);
         } catch (NacosException e) {
             Assert.assertEquals(500, e.getErrCode());
         }
@@ -141,7 +145,8 @@ public class ClusterRpcClientProxyTest {
     @Test
     public void testSendRequestToAllMembers() {
         try {
-            clusterRpcClientProxy.sendRequestToAllMembers(new HealthCheckRequest());
+            clusterRpcClientProxy.sendRequestToAllMembers(
+                    Request.of((AbstractRequestPayloadBody) new HealthCheckRequest()));
         } catch (NacosException e) {
             Assert.assertEquals(-401, e.getErrCode());
         }

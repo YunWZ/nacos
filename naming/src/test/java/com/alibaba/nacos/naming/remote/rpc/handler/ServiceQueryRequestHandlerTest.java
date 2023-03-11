@@ -22,6 +22,7 @@ import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.alibaba.nacos.api.naming.pojo.ServiceInfo;
 import com.alibaba.nacos.api.naming.remote.request.ServiceQueryRequest;
 import com.alibaba.nacos.api.naming.remote.response.QueryServiceResponse;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.naming.core.v2.index.ServiceStorage;
 import com.alibaba.nacos.naming.core.v2.metadata.NamingMetadataManager;
@@ -93,7 +94,7 @@ public class ServiceQueryRequestHandlerTest {
         serviceQueryRequest.setGroupName("B");
         serviceQueryRequest.setServiceName("C");
         serviceQueryRequest.setHealthyOnly(false);
-        QueryServiceResponse queryServiceResponse = serviceQueryRequestHandler.handle(serviceQueryRequest, new RequestMeta());
+        QueryServiceResponse queryServiceResponse = serviceQueryRequestHandler.handle(Request.of(serviceQueryRequest), new RequestMeta());
     
         Assert.assertEquals(queryServiceResponse.getServiceInfo().getName(), "C");
     }

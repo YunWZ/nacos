@@ -22,6 +22,7 @@ import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.alibaba.nacos.api.naming.pojo.ServiceInfo;
 import com.alibaba.nacos.api.naming.remote.request.SubscribeServiceRequest;
 import com.alibaba.nacos.api.naming.remote.response.SubscribeServiceResponse;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.naming.core.v2.index.ServiceStorage;
 import com.alibaba.nacos.naming.core.v2.metadata.NamingMetadataManager;
@@ -97,12 +98,14 @@ public class SubscribeServiceRequestHandlerTest {
         subscribeServiceRequest.setGroupName("B");
         subscribeServiceRequest.setServiceName("C");
         subscribeServiceRequest.setSubscribe(true);
-        SubscribeServiceResponse subscribeServiceResponse = subscribeServiceRequestHandler.handle(subscribeServiceRequest, new RequestMeta());
+        SubscribeServiceResponse subscribeServiceResponse = subscribeServiceRequestHandler.handle(
+                Request.of(subscribeServiceRequest), new RequestMeta());
         Assert.assertEquals(subscribeServiceResponse.getServiceInfo().getName(), "C");
         Mockito.verify(clientOperationService).subscribeService(Mockito.any(), Mockito.any(), Mockito.anyString());
     
         subscribeServiceRequest.setSubscribe(false);
-        subscribeServiceResponse = subscribeServiceRequestHandler.handle(subscribeServiceRequest, new RequestMeta());
+        subscribeServiceResponse = subscribeServiceRequestHandler.handle(Request.of(subscribeServiceRequest),
+                new RequestMeta());
         Assert.assertEquals(subscribeServiceResponse.getServiceInfo().getName(), "C");
         Mockito.verify(clientOperationService).subscribeService(Mockito.any(), Mockito.any(), Mockito.anyString());
     }

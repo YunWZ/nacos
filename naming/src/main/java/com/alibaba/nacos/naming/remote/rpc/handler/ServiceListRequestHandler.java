@@ -19,6 +19,7 @@ package com.alibaba.nacos.naming.remote.rpc.handler;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.remote.request.ServiceListRequest;
 import com.alibaba.nacos.api.naming.remote.response.ServiceListResponse;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.auth.annotation.Secured;
 import com.alibaba.nacos.core.remote.RequestHandler;
@@ -44,14 +45,15 @@ public class ServiceListRequestHandler extends RequestHandler<ServiceListRequest
     
     @Override
     @Secured(action = ActionTypes.READ)
-    public ServiceListResponse handle(ServiceListRequest request, RequestMeta meta) throws NacosException {
-        Collection<Service> serviceSet = ServiceManager.getInstance().getSingletons(request.getNamespace());
+    public ServiceListResponse handle(Request<ServiceListRequest> request, RequestMeta meta) throws NacosException {
+        ServiceListRequest body = request.getPayloadBody();
+        Collection<Service> serviceSet = ServiceManager.getInstance().getSingletons(body.getNamespace());
         ServiceListResponse result = ServiceListResponse.buildSuccessResponse(0, new LinkedList<>());
         if (!serviceSet.isEmpty()) {
-            Collection<String> serviceNameSet = selectServiceWithGroupName(serviceSet, request.getGroupName());
+            Collection<String> serviceNameSet = selectServiceWithGroupName(serviceSet, body.getGroupName());
             // TODO select service by selector
             List<String> serviceNameList = ServiceUtil
-                    .pageServiceName(request.getPageNo(), request.getPageSize(), serviceNameSet);
+                    .pageServiceName(body.getPageNo(), body.getPageSize(), serviceNameSet);
             result.setCount(serviceNameSet.size());
             result.setServiceNames(serviceNameList);
         }

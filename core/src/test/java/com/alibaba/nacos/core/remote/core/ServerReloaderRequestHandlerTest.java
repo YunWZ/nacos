@@ -18,6 +18,7 @@
 package com.alibaba.nacos.core.remote.core;
 
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.request.ServerReloadRequest;
 import com.alibaba.nacos.api.remote.response.ServerReloadResponse;
@@ -56,7 +57,7 @@ public class ServerReloaderRequestHandlerTest {
         meta.setClientIp("1.1.1.1");
         
         try {
-            ServerReloadResponse reloadResponse = handler.handle(reloadRequest, meta);
+            ServerReloadResponse reloadResponse = handler.handle(Request.of(reloadRequest), meta);
             Assert.assertEquals("ignore", reloadResponse.getMessage());
         } catch (NacosException e) {
             e.printStackTrace();
@@ -65,7 +66,7 @@ public class ServerReloaderRequestHandlerTest {
         
         reloadRequest.setReloadCount(1);
         try {
-            ServerReloadResponse reloadResponse = handler.handle(reloadRequest, meta);
+            ServerReloadResponse reloadResponse = handler.handle(Request.of(reloadRequest), meta);
             Assert.assertEquals("ok", reloadResponse.getMessage());
         } catch (NacosException e) {
             e.printStackTrace();

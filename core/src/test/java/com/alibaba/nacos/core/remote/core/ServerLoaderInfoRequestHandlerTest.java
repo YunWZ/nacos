@@ -18,6 +18,7 @@
 package com.alibaba.nacos.core.remote.core;
 
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.request.ServerLoaderInfoRequest;
 import com.alibaba.nacos.api.remote.response.ServerLoaderInfoResponse;
@@ -54,7 +55,7 @@ public class ServerLoaderInfoRequestHandlerTest {
         RequestMeta meta = new RequestMeta();
 
         try {
-            ServerLoaderInfoResponse response = handler.handle(request, meta);
+            ServerLoaderInfoResponse response = handler.handle(Request.of(request), meta);
             String sdkConCount = response.getMetricsValue("sdkConCount");
             Assert.assertEquals(sdkConCount, "1");
             

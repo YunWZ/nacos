@@ -18,6 +18,7 @@ package com.alibaba.nacos.config.server.controller;
 
 import com.alibaba.nacos.api.config.remote.request.ClientConfigMetricRequest;
 import com.alibaba.nacos.api.config.remote.response.ClientConfigMetricResponse;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.common.http.Callback;
 import com.alibaba.nacos.common.http.HttpClientBeanHolder;
 import com.alibaba.nacos.common.http.HttpUtils;
@@ -147,9 +148,9 @@ public class ClientMetricsController {
                     clientMetrics.getMetricsKeys().add(ClientConfigMetricRequest.MetricsKey
                             .build(SNAPSHOT_DATA, GroupKey2.getKey(dataId, group, tenant)));
                 }
-                
+    
                 ClientConfigMetricResponse request1 = (ClientConfigMetricResponse) connectionByIp
-                        .request(clientMetrics, 1000L);
+                        .request(Request.of(clientMetrics), 1000L);
                 metrics.putAll(request1.getMetrics());
             } catch (Exception e) {
                 Loggers.CORE.error("Get config metrics error from client ip={},dataId={},group={},tenant={},error={}", ip, dataId,

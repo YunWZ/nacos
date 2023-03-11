@@ -93,7 +93,7 @@ public class ConfigGrpcResourceParserTest {
         Secured secured = getMethodSecure();
         ConfigBatchListenRequest request = new ConfigBatchListenRequest();
         request.addConfigListenContext("testG", "testD", "testNs", "111");
-        Resource actual = resourceParser.parse(request, secured);
+        Resource actual = resourceParser.parse(Request.of(request), secured);
         assertEquals("testNs", actual.getNamespaceId());
         assertEquals(StringUtils.EMPTY, actual.getGroup());
         assertEquals(StringUtils.EMPTY, actual.getName());
@@ -105,7 +105,7 @@ public class ConfigGrpcResourceParserTest {
         request.setTenant(tenant);
         request.setGroup(group);
         request.setDataId(dataId);
-        return request;
+        return Request.of(request);
     }
     
     private Secured getMethodSecure() throws NoSuchMethodException {

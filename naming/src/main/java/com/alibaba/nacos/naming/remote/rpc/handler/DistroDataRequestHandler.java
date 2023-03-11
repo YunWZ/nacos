@@ -17,6 +17,7 @@
 package com.alibaba.nacos.naming.remote.rpc.handler;
 
 import com.alibaba.nacos.api.exception.NacosException;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.response.ResponseCode;
 import com.alibaba.nacos.core.distributed.distro.DistroProtocol;
@@ -44,19 +45,20 @@ public class DistroDataRequestHandler extends RequestHandler<DistroDataRequest, 
     }
     
     @Override
-    public DistroDataResponse handle(DistroDataRequest request, RequestMeta meta) throws NacosException {
+    public DistroDataResponse handle(Request<DistroDataRequest> request, RequestMeta meta) throws NacosException {
+        DistroDataRequest body = request.getPayloadBody();
         try {
-            switch (request.getDataOperation()) {
+            switch (body.getDataOperation()) {
                 case VERIFY:
-                    return handleVerify(request.getDistroData(), meta);
+                    return handleVerify(body.getDistroData(), meta);
                 case SNAPSHOT:
                     return handleSnapshot();
                 case ADD:
                 case CHANGE:
                 case DELETE:
-                    return handleSyncData(request.getDistroData());
+                    return handleSyncData(body.getDistroData());
                 case QUERY:
-                    return handleQueryData(request.getDistroData());
+                    return handleQueryData(body.getDistroData());
                 default:
                     return new DistroDataResponse();
             }

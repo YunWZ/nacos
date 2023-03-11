@@ -16,6 +16,7 @@
 
 package com.alibaba.nacos.core.remote;
 
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.api.remote.request.HealthCheckRequest;
 import com.alibaba.nacos.api.remote.response.HealthCheckResponse;
@@ -33,7 +34,7 @@ public class HealthCheckRequestHandler extends RequestHandler<HealthCheckRequest
     
     @Override
     @TpsControl(pointName = "HealthCheck")
-    public HealthCheckResponse handle(HealthCheckRequest request, RequestMeta meta) {
+    public HealthCheckResponse handle(Request<HealthCheckRequest> request, RequestMeta meta) {
         return new HealthCheckResponse();
     }
 }

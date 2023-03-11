@@ -20,6 +20,7 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.pojo.ServiceInfo;
 import com.alibaba.nacos.api.naming.remote.request.ServiceQueryRequest;
 import com.alibaba.nacos.api.naming.remote.response.QueryServiceResponse;
+import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
 import com.alibaba.nacos.auth.annotation.Secured;
 import com.alibaba.nacos.core.remote.RequestHandler;
@@ -50,13 +51,14 @@ public class ServiceQueryRequestHandler extends RequestHandler<ServiceQueryReque
     
     @Override
     @Secured(action = ActionTypes.READ)
-    public QueryServiceResponse handle(ServiceQueryRequest request, RequestMeta meta) throws NacosException {
-        String namespaceId = request.getNamespace();
-        String groupName = request.getGroupName();
-        String serviceName = request.getServiceName();
+    public QueryServiceResponse handle(Request<ServiceQueryRequest> request, RequestMeta meta) throws NacosException {
+        ServiceQueryRequest body = request.getPayloadBody();
+        String namespaceId = body.getNamespace();
+        String groupName = body.getGroupName();
+        String serviceName = body.getServiceName();
         Service service = Service.newService(namespaceId, groupName, serviceName);
-        String cluster = null == request.getCluster() ? "" : request.getCluster();
-        boolean healthyOnly = request.isHealthyOnly();
+        String cluster = null == body.getCluster() ? "" : body.getCluster();
+        boolean healthyOnly = body.isHealthyOnly();
         ServiceInfo result = serviceStorage.getData(service);
         ServiceMetadata serviceMetadata = metadataManager.getServiceMetadata(service).orElse(null);
         result = ServiceUtil.selectInstancesWithHealthyProtection(result, serviceMetadata, cluster, healthyOnly, true,
