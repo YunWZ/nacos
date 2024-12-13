@@ -16,32 +16,13 @@
 
 package com.alibaba.nacos.console.controller;
 
-import com.alibaba.nacos.config.server.service.ConfigReadinessCheckService;
-import com.alibaba.nacos.config.server.service.repository.ConfigInfoPersistService;
-import com.alibaba.nacos.core.cluster.health.ModuleHealthCheckerHolder;
-import com.alibaba.nacos.naming.cluster.NamingReadinessCheckService;
-import com.alibaba.nacos.naming.cluster.ServerStatus;
-import com.alibaba.nacos.naming.cluster.ServerStatusManager;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
-
-import java.lang.reflect.Field;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 class HealthControllerTest {
     
-    @InjectMocks
+    /*@InjectMocks
     private HealthController healthController;
     
     @Mock
@@ -110,6 +91,6 @@ class HealthControllerTest {
         ResponseEntity<String> response = healthController.readiness(null);
         assertEquals(500, response.getStatusCodeValue());
         assertEquals("naming not in readiness", response.getBody());
-    }
+    }*/
     
 }

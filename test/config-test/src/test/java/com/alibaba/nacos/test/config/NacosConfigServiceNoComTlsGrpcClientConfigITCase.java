@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.test.config;
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.api.config.ConfigChangeEvent;
 import com.alibaba.nacos.api.config.ConfigChangeItem;
 import com.alibaba.nacos.api.config.ConfigService;
@@ -49,24 +49,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {Nacos.class}, properties = {"nacos.standalone=true", RpcConstants.NACOS_SERVER_RPC + ".enableTls=true",
+@SpringBootTest(classes = {NacosConsole.class}, properties = {"nacos.standalone=true", RpcConstants.NACOS_SERVER_RPC + ".enableTls=true",
         RpcConstants.NACOS_SERVER_RPC + ".compatibility=false", RpcConstants.NACOS_SERVER_RPC + ".certChainFile=test-server-cert.pem",
         RpcConstants.NACOS_SERVER_RPC + ".certPrivateKey=test-server-key.pem"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class NacosConfigServiceNoComTlsGrpcClientConfigITCase {
-    
+
     public static AtomicInteger increment = new AtomicInteger(100);
-    
+
     @BeforeAll
     static void beforeClass() throws IOException {
         ConfigCleanUtils.changeToNewTestNacosHome(NacosConfigServiceNoComTlsGrpcClientConfigITCase.class.getSimpleName());
     }
-    
+
     @BeforeAll
     @AfterAll
     static void cleanClientCache() throws Exception {
         ConfigCleanUtils.cleanClientCache();
     }
-    
+
     @Test
     @Disabled("TODO, Fix cert expired problem")
     void testTlsServerAndTlsClient() throws Exception {
@@ -96,7 +96,7 @@ public class NacosConfigServiceNoComTlsGrpcClientConfigITCase {
         latch.await(5, TimeUnit.SECONDS);
         assertTrue(b);
     }
-    
+
     @Test
     void testTlsServerAndPlainClient() throws Exception {
         Properties propertiesfalse = new Properties();

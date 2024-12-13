@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.test.config;
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.config.ConfigService;
@@ -45,23 +45,23 @@ import java.util.concurrent.TimeUnit;
  **/
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = Nacos.class, properties = {
+@SpringBootTest(classes = NacosConsole.class, properties = {
         "server.servlet.context-path=/nacos"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class ConfigLongPollConfigITCase {
-    
+
     @LocalServerPort
     private int port;
-    
+
     private ConfigService configService;
-    
+
     @BeforeAll
     @AfterAll
     static void cleanClientCache() throws Exception {
         ConfigCleanUtils.cleanClientCache();
         ConfigCleanUtils.changeToNewTestNacosHome(ConfigLongPollConfigITCase.class.getSimpleName());
-        
+
     }
-    
+
     @BeforeEach
     void init() throws NacosException {
         Properties properties = new Properties();
@@ -71,7 +71,7 @@ class ConfigLongPollConfigITCase {
         properties.put(PropertyKeyConst.MAX_RETRY, "5");
         configService = NacosFactory.createConfigService(properties);
     }
-    
+
     @AfterEach
     void destroy() {
         try {
@@ -80,36 +80,36 @@ class ConfigLongPollConfigITCase {
             // ignore
         }
     }
-    
+
     @Test
     void test() throws InterruptedException, NacosException {
-        
+
         configService.addListener("test", "DEFAULT_GROUP", new Listener() {
             @Override
             public Executor getExecutor() {
                 return null;
             }
-            
+
             @Override
             public void receiveConfigInfo(String configInfo) {
                 System.out.println(configInfo);
             }
         });
-        
+
         configService.addListener("test-1", "DEFAULT_GROUP", new Listener() {
             @Override
             public Executor getExecutor() {
                 return null;
             }
-            
+
             @Override
             public void receiveConfigInfo(String configInfo) {
                 System.out.println(configInfo);
             }
         });
-        
+
         TimeUnit.SECONDS.sleep(10);
-        
+
     }
-    
+
 }

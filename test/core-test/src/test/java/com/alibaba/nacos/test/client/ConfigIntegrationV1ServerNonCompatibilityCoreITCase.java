@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.test.client;
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.api.config.remote.request.ConfigPublishRequest;
 import com.alibaba.nacos.api.remote.response.Response;
 import com.alibaba.nacos.common.remote.ConnectionType;
@@ -50,30 +50,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @TestConfiguration
-@SpringBootTest(classes = {Nacos.class}, properties = {"server.servlet.context-path=/nacos",
+@SpringBootTest(classes = {NacosConsole.class}, properties = {"server.servlet.context-path=/nacos",
         RpcConstants.NACOS_SERVER_RPC + ".compatibility=false", RpcConstants.NACOS_SERVER_RPC + ".enableTls=true",
         RpcConstants.NACOS_SERVER_RPC + ".certChainFile=test-server-cert.pem", RpcConstants.NACOS_SERVER_RPC
         + ".certPrivateKey=test-server-key.pem"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Disabled("TODO, Fix cert expired problem")
 public class ConfigIntegrationV1ServerNonCompatibilityCoreITCase {
-    
+
     public static AtomicInteger increment = new AtomicInteger(100);
-    
+
     @LocalServerPort
     private int port;
-    
+
     @BeforeAll
     static void beforeClass() throws IOException {
         ConfigCleanUtils.changeToNewTestNacosHome(
                 ConfigIntegrationV1ServerNonCompatibilityCoreITCase.class.getSimpleName());
     }
-    
+
     @BeforeAll
     @AfterAll
     static void cleanClientCache() throws Exception {
         ConfigCleanUtils.cleanClientCache();
     }
-    
+
     @Test
     void testTlsServer() throws Exception {
         RpcClient client = RpcClientFactory.createClient("testTlsServer", ConnectionType.GRPC,
@@ -81,11 +81,11 @@ public class ConfigIntegrationV1ServerNonCompatibilityCoreITCase {
         RpcClient.ServerInfo serverInfo = new RpcClient.ServerInfo();
         serverInfo.setServerIp("127.0.0.1");
         serverInfo.setServerPort(port);
-        
+
         Connection connection = client.connectToServer(serverInfo);
         assertNull(connection);
     }
-    
+
     @Test
     void testServerTlsTrustAll() throws Exception {
         RpcClientTlsConfig tlsConfig = new RpcClientTlsConfig();
@@ -94,7 +94,7 @@ public class ConfigIntegrationV1ServerNonCompatibilityCoreITCase {
         RpcClient.ServerInfo serverInfo = new RpcClient.ServerInfo();
         serverInfo.setServerIp("127.0.0.1");
         serverInfo.setServerPort(port);
-        
+
         RpcClient clientTrustCa = RpcClientFactory.createClient("testServerTlsTrustCa", ConnectionType.GRPC,
                 Collections.singletonMap("labelKey", "labelValue"), tlsConfig);
         Connection connectionTrustCa = clientTrustCa.connectToServer(serverInfo);
@@ -103,19 +103,19 @@ public class ConfigIntegrationV1ServerNonCompatibilityCoreITCase {
         configPublishRequest.setContent(content);
         configPublishRequest.setGroup("test-group" + increment.getAndIncrement());
         configPublishRequest.setDataId("test-data" + increment.getAndIncrement());
-        
+
         Response response = connectionTrustCa.request(configPublishRequest, TimeUnit.SECONDS.toMillis(3));
         assertTrue(response.isSuccess());
         connectionTrustCa.close();
     }
-    
+
     @Test
     void testServerTlsTrustCa() throws Exception {
-        
+
         RpcClient.ServerInfo serverInfo = new RpcClient.ServerInfo();
         serverInfo.setServerIp("127.0.0.1");
         serverInfo.setServerPort(port);
-        
+
         RpcClientTlsConfig tlsConfig = new RpcClientTlsConfig();
         tlsConfig.setEnableTls(true);
         tlsConfig.setTrustCollectionCertFile("test-ca-cert.pem");
@@ -124,7 +124,7 @@ public class ConfigIntegrationV1ServerNonCompatibilityCoreITCase {
         Connection connectionTrustCa = clientTrustCa.connectToServer(serverInfo);
         ConfigPublishRequest configPublishRequestCa = new ConfigPublishRequest();
         String contentCa = UUID.randomUUID().toString();
-        
+
         configPublishRequestCa.setContent(contentCa);
         configPublishRequestCa.setGroup("test-group" + increment.getAndIncrement());
         configPublishRequestCa.setDataId("test-data" + increment.getAndIncrement());

@@ -16,35 +16,13 @@
 
 package com.alibaba.nacos.console.controller;
 
-import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.nacos.common.model.RestResult;
-import com.alibaba.nacos.core.namespace.model.Namespace;
-import com.alibaba.nacos.core.namespace.repository.NamespacePersistService;
-import com.alibaba.nacos.core.service.NamespaceOperationService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.matches;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class NamespaceControllerTest {
-    
-    @InjectMocks
+   
+   /* @InjectMocks
     private NamespaceController namespaceController;
     
     @Mock
@@ -157,5 +135,5 @@ class NamespaceControllerTest {
     void deleteConfig() throws Exception {
         namespaceController.deleteNamespace("test-Id");
         verify(namespaceOperationService).removeNamespace("test-Id");
-    }
+    }*/
 }

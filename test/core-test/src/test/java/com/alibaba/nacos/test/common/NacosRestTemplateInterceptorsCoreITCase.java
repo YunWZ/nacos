@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.test.common;
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.common.http.HttpClientBeanHolder;
 import com.alibaba.nacos.common.http.HttpRestResult;
@@ -53,28 +53,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = Nacos.class, properties = {
+@SpringBootTest(classes = NacosConsole.class, properties = {
         "server.servlet.context-path=/nacos"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodName.class)
 class NacosRestTemplateInterceptorsCoreITCase {
-    
+
     private static final String CONFIG_PATH = "/nacos/v1/cs";
-    
+
     private final NacosRestTemplate nacosRestTemplate = HttpClientBeanHolder.getNacosRestTemplate(
             LoggerFactory.getLogger(NacosRestTemplateInterceptorsCoreITCase.class));
-    
+
     @SuppressWarnings("deprecation")
     @LocalServerPort
     private int port;
-    
+
     private String ip = null;
-    
+
     @BeforeEach
     void init() throws NacosException {
         nacosRestTemplate.setInterceptors(Collections.singletonList(new TerminationInterceptor()));
         ip = String.format("http://localhost:%d", port);
     }
-    
+
     @Test
     void testUrlPostConfig() throws Exception {
         String url = ip + CONFIG_PATH + "/configs";
@@ -88,9 +88,9 @@ class NacosRestTemplateInterceptorsCoreITCase {
         System.out.println(restResult.getData());
         System.out.println(restResult.getHeader());
     }
-    
+
     private static class TerminationInterceptor implements HttpClientRequestInterceptor {
-        
+
         @Override
         public HttpClientResponse intercept() {
             return new HttpClientResponse() {
@@ -98,33 +98,33 @@ class NacosRestTemplateInterceptorsCoreITCase {
                 public Header getHeaders() {
                     return Header.EMPTY;
                 }
-                
+
                 @Override
                 public InputStream getBody() throws IOException {
                     return new ByteArrayInputStream("Stop request".getBytes());
                 }
-                
+
                 @Override
                 public int getStatusCode() {
                     return NacosException.SERVER_ERROR;
                 }
-                
+
                 @Override
                 public String getStatusText() {
                     return null;
                 }
-                
+
                 @Override
                 public void close() {
-                
+
                 }
             };
         }
-        
+
         @Override
         public boolean isIntercept(URI uri, String httpMethod, RequestHttpEntity requestHttpEntity) {
             return true;
         }
-        
+
     }
 }

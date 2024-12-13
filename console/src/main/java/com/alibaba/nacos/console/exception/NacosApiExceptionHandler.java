@@ -27,7 +27,6 @@ import com.alibaba.nacos.plugin.auth.exception.AccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
@@ -39,11 +38,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.servlet.ServletException;
-import java.io.IOException;
-
 /**
  * Exception Handler for Nacos API.
+ *
  * @author dongyafei
  * @date 2022/7/22
  */
@@ -55,10 +52,17 @@ public class NacosApiExceptionHandler {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(NacosApiExceptionHandler.class);
     
+    /**
+     * Handle NacosApiException.
+     *
+     * @param e NacosApiException
+     * @return
+     */
     @ExceptionHandler(NacosApiException.class)
     public ResponseEntity<Result<String>> handleNacosApiException(NacosApiException e) {
         LOGGER.error("got exception. {} {}", e.getErrAbstract(), e.getErrMsg());
-        return ResponseEntity.status(e.getErrCode()).body(new Result<>(e.getDetailErrCode(), e.getErrAbstract(), e.getErrMsg()));
+        return ResponseEntity.status(e.getErrCode())
+                .body(new Result<>(e.getDetailErrCode(), e.getErrAbstract(), e.getErrMsg()));
     }
     
     @ExceptionHandler(NacosException.class)
@@ -66,7 +70,7 @@ public class NacosApiExceptionHandler {
         LOGGER.error("got exception. {}", e.getErrMsg());
         return ResponseEntity.status(e.getErrCode()).body(Result.failure(ErrorCode.SERVER_ERROR, e.getErrMsg()));
     }
-
+    
     @ExceptionHandler(NacosRuntimeException.class)
     public ResponseEntity<Result<String>> handleNacosRuntimeException(NacosRuntimeException e) {
         LOGGER.error("got exception. {} {}", e.getMessage(), ExceptionUtil.getAllExceptionMsg(e));
@@ -123,7 +127,7 @@ public class NacosApiExceptionHandler {
     }
     
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(value = {DataAccessException.class, ServletException.class, IOException.class})
+    //@ExceptionHandler(value = {DataAccessException.class, ServletException.class, IOException.class})
     public Result<String> handleDataAccessException(Exception e) {
         LOGGER.error("got exception. {} {}", e.getMessage(), ExceptionUtil.getAllExceptionMsg(e));
         return Result.failure(ErrorCode.DATA_ACCESS_ERROR, e.getMessage());

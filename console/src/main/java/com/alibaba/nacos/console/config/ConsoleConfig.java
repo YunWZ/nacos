@@ -16,21 +16,24 @@
 
 package com.alibaba.nacos.console.config;
 
+import com.alibaba.nacos.common.event.ServerConfigChangeEvent;
+import com.alibaba.nacos.common.notify.Event;
+import com.alibaba.nacos.common.notify.listener.Subscriber;
 import com.alibaba.nacos.console.filter.XssFilter;
-import com.alibaba.nacos.core.code.ControllerMethodsCache;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import javax.annotation.PostConstruct;
 import java.time.ZoneId;
+import java.util.List;
 
 /**
  * Console config.
@@ -42,23 +45,27 @@ import java.time.ZoneId;
 @Component
 @EnableScheduling
 @PropertySource("/application.properties")
-public class ConsoleConfig {
+public class ConsoleConfig extends Subscriber<ServerConfigChangeEvent> {
     
-    @Autowired
-    private ControllerMethodsCache methodsCache;
+    //    @Autowired
+    //    private ControllerMethodsCache methodsCache;
     
     @Value("${nacos.console.ui.enabled:true}")
     private boolean consoleUiEnabled;
+    
+    @Value("${nacos.console.serverlist}")
+    private List<String> serverList;
     
     /**
      * Init.
      */
     @PostConstruct
     public void init() {
-        methodsCache.initClassMethod("com.alibaba.nacos.core.controller");
-        methodsCache.initClassMethod("com.alibaba.nacos.naming.controllers");
-        methodsCache.initClassMethod("com.alibaba.nacos.config.server.controller");
-        methodsCache.initClassMethod("com.alibaba.nacos.console.controller");
+        refreshProperty();
+        //        methodsCache.initClassMethod("com.alibaba.nacos.core.controller");
+        //        methodsCache.initClassMethod("com.alibaba.nacos.naming.controllers");
+        //        methodsCache.initClassMethod("com.alibaba.nacos.config.server.controller");
+        //        methodsCache.initClassMethod("com.alibaba.nacos.console.controller");
     }
     
     @Bean
@@ -84,7 +91,30 @@ public class ConsoleConfig {
         return jacksonObjectMapperBuilder -> jacksonObjectMapperBuilder.timeZone(ZoneId.systemDefault().toString());
     }
     
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+    
     public boolean isConsoleUiEnabled() {
         return consoleUiEnabled;
+    }
+    
+    public List<String> getServerList() {
+        return serverList;
+    }
+    
+    @Override
+    public void onEvent(ServerConfigChangeEvent event) {
+        refreshProperty();
+    }
+    
+    private void refreshProperty() {
+    
+    }
+    
+    @Override
+    public Class<? extends Event> subscribeType() {
+        return ServerConfigChangeEvent.class;
     }
 }

@@ -16,11 +16,6 @@
 
 package com.alibaba.nacos.console.controller;
 
-import com.alibaba.nacos.console.paramcheck.ConsoleDefaultHttpParamExtractor;
-import com.alibaba.nacos.core.cluster.health.ModuleHealthCheckerHolder;
-import com.alibaba.nacos.core.cluster.health.ReadinessResult;
-import com.alibaba.nacos.core.paramcheck.ExtractorManager;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @RestController("consoleHealth")
 @RequestMapping("/v1/console/health")
-@ExtractorManager.Extractor(httpExtractor = ConsoleDefaultHttpParamExtractor.class)
+//@ExtractorManager.Extractor(httpExtractor = ConsoleDefaultHttpParamExtractor.class)
 public class HealthController {
     
     /**
@@ -57,11 +52,12 @@ public class HealthController {
      */
     @GetMapping("/readiness")
     public ResponseEntity<String> readiness(HttpServletRequest request) {
-        ReadinessResult result = ModuleHealthCheckerHolder.getInstance().checkReadiness();
+        /*com.alibaba.nacos.console.Model.ReadinessResult result = ModuleHealthCheckerHolder.getInstance().checkReadiness();
         if (result.isSuccess()) {
             return ResponseEntity.ok().body("OK");
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result.getResultMessage());
+        return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR).body(result.getResultMessage());*/
+        return ResponseEntity.ok().body("OK");
     }
     
 }

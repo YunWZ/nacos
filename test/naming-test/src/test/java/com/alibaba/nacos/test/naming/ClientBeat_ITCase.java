@@ -17,7 +17,7 @@
 package com.alibaba.nacos.test.naming;
 
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.api.naming.NamingFactory;
 import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.pojo.Instance;
@@ -37,15 +37,15 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(classes = Nacos.class, properties = {
+@SpringBootTest(classes = NacosConsole.class, properties = {
         "server.servlet.context-path=/nacos"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class ClientBeat_ITCase extends NamingBase {
-    
+
     private NamingService naming;
-    
+
     @LocalServerPort
     private int port;
-    
+
     @BeforeEach
     void init() throws Exception {
         NamingBase.prepareServer(port);
@@ -62,23 +62,23 @@ class ClientBeat_ITCase extends NamingBase {
         String url = String.format("http://localhost:%d/", port);
         this.base = new URL(url);
     }
-    
+
     @Test
     void testLightBeat() throws Exception {
-        
+
         String serviceName = randomDomainName();
-        
+
         naming.registerInstance(serviceName, "1.2.3.4", 81);
-        
+
         Instance instance = new Instance();
         instance.setIp("1.2.3.4");
         instance.setPort(80);
         instance.addMetadata("k1", "v1");
         instance.addMetadata("k2", "v2");
         naming.registerInstance(serviceName, instance);
-        
+
         TimeUnit.SECONDS.sleep(2L);
-        
+
         List<Instance> list = naming.getAllInstances(serviceName);
         assertEquals(1, list.size());
         for (Instance instance1 : list) {
@@ -89,10 +89,10 @@ class ClientBeat_ITCase extends NamingBase {
                 assertEquals("v2", instance1.getMetadata().getOrDefault("k2", StringUtils.EMPTY));
             }
         }
-        
+
         // Sleep 35 seconds and see if instance list not changed:
         TimeUnit.SECONDS.sleep(35L);
-        
+
         list = naming.getAllInstances(serviceName);
         assertEquals(1, list.size());
         for (Instance instance1 : list) {
@@ -103,17 +103,17 @@ class ClientBeat_ITCase extends NamingBase {
                 assertEquals("v2", instance1.getMetadata().getOrDefault("k2", StringUtils.EMPTY));
             }
         }
-        
+
         // Change the light beat switch of server:
         ResponseEntity<String> response = request(NamingBase.NAMING_CONTROLLER_PATH + "/operator/switches",
                 Params.newParams().appendParam("entry", "lightBeatEnabled").appendParam("value", "false").done(), String.class,
                 HttpMethod.PUT);
-        
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
-        
+
         // Sleep 35 seconds and see if instance list not changed:
         TimeUnit.SECONDS.sleep(35L);
-        
+
         list = naming.getAllInstances(serviceName);
         assertEquals(1, list.size());
         for (Instance instance1 : list) {
@@ -124,12 +124,12 @@ class ClientBeat_ITCase extends NamingBase {
                 assertEquals("v2", instance1.getMetadata().getOrDefault("k2", StringUtils.EMPTY));
             }
         }
-        
+
         // Reset the light beat switch of server:
         response = request(NamingBase.NAMING_CONTROLLER_PATH + "/operator/switches",
                 Params.newParams().appendParam("entry", "lightBeatEnabled").appendParam("value", "true").done(), String.class,
                 HttpMethod.PUT);
-        
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
     }
 }

@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.test.naming;
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingFactory;
 import com.alibaba.nacos.api.naming.NamingService;
@@ -41,59 +41,59 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author nkorange
  */
-@SpringBootTest(classes = Nacos.class, properties = {
+@SpringBootTest(classes = NacosConsole.class, properties = {
         "server.servlet.context-path=/nacos"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class ServiceListTest_ITCase {
-    
+
     private static int listenseCount = 0;
-    
+
     private NamingService naming;
-    
+
     private volatile List<Instance> instances = Collections.emptyList();
-    
+
     @LocalServerPort
     private int port;
-    
+
     @BeforeEach
     void init() throws Exception {
         if (naming == null) {
             naming = NamingFactory.createNamingService("127.0.0.1" + ":" + port);
         }
     }
-    
+
     @Test
     void serviceList() throws NacosException {
         naming.getServicesOfServer(1, 10);
     }
-    
+
     /**
      * @throws NacosException
      * @description 获取当前订阅的所有服务
      */
     @Test
     void getSubscribeServices() throws NacosException, InterruptedException {
-        
+
         ListView<String> listView = naming.getServicesOfServer(1, 10);
         if (listView != null && listView.getCount() > 0) {
             naming.getAllInstances(listView.getData().get(0));
         }
         List<ServiceInfo> serviceInfoList = naming.getSubscribeServices();
         int count = serviceInfoList.size();
-        
+
         String serviceName = randomDomainName();
         naming.registerInstance(serviceName, "127.0.0.1", TEST_PORT, "c1");
-        
+
         naming.subscribe(serviceName, new EventListener() {
             @Override
             public void onEvent(Event event) {
-                
+
             }
         });
-        
+
         serviceInfoList = naming.getSubscribeServices();
         assertEquals(count + 1, serviceInfoList.size());
     }
-    
+
     /**
      * @throws NacosException
      * @description 删除注册，获取当前订阅的所有服务
@@ -109,21 +109,21 @@ class ServiceListTest_ITCase {
                 listenseCount++;
             }
         };
-        
+
         List<ServiceInfo> serviceInfoList = naming.getSubscribeServices();
         int count = serviceInfoList.size();
-        
+
         String serviceName = randomDomainName();
         naming.registerInstance(serviceName, "127.0.0.1", TEST_PORT, "c1");
-        
+
         naming.subscribe(serviceName, listener);
-        
+
         serviceInfoList = naming.getSubscribeServices();
-        
+
         assertEquals(count + 1, serviceInfoList.size());
-        
+
         naming.deregisterInstance(serviceName, "127.0.0.1", TEST_PORT, "c1");
-        
+
         assertEquals(count + 1, serviceInfoList.size());
     }
 }

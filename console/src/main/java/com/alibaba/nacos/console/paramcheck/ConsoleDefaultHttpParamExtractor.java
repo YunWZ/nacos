@@ -18,7 +18,7 @@ package com.alibaba.nacos.console.paramcheck;
 
 import com.alibaba.nacos.common.paramcheck.ParamInfo;
 import com.alibaba.nacos.common.utils.StringUtils;
-import com.alibaba.nacos.core.paramcheck.AbstractHttpParamExtractor;
+//import com.alibaba.nacos.core.paramcheck.AbstractHttpParamExtractor;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -29,9 +29,15 @@ import java.util.List;
  *
  * @author zhuoguang
  */
-public class ConsoleDefaultHttpParamExtractor extends AbstractHttpParamExtractor {
+public class ConsoleDefaultHttpParamExtractor {
     
-    @Override
+    /**
+     * aa.
+     *
+     * @param request aa
+     * @return bb
+     */
+    //    @Override
     public List<ParamInfo> extractParam(HttpServletRequest request) {
         ParamInfo paramInfo = new ParamInfo();
         paramInfo.setNamespaceId(getAliasNamespaceId(request));

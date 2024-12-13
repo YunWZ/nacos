@@ -56,92 +56,92 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BaseClusterTest extends HttpClient4Test {
-    
+
     protected static final AtomicBoolean[] FINISHED = new AtomicBoolean[] {new AtomicBoolean(false), new AtomicBoolean(false),
             new AtomicBoolean(false)};
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseClusterTest.class);
-    
+
     protected static final NacosRestTemplate NACOS_REST_TEMPLATE = HttpClientBeanHolder.getNacosRestTemplate(LOGGER);
-    
+
     protected static NamingService inaming7;
-    
+
     protected static NamingService inaming8;
-    
+
     protected static NamingService inaming9;
-    
+
     protected static Map<String, ConfigurableApplicationContext> applications = new HashMap<>();
-    
+
     protected static String clusterInfo;
-    
+
     static {
         System.getProperties().setProperty("nacos.core.auth.enabled", "false");
         System.getProperties().setProperty("embeddedStorage", "true");
         String ip = InetUtils.getSelfIP();
         clusterInfo = "nacos.member.list=" + ip + ":8847," + ip + ":8848," + ip + ":8849";
-        
+
         NotifyCenter.registerSubscriber(new Subscriber<RaftDbErrorEvent>() {
             @Override
             public void onEvent(RaftDbErrorEvent event) {
                 System.out.print(event.getEx());
             }
-            
+
             @Override
             public Class<? extends Event> subscribeType() {
                 return RaftDbErrorEvent.class;
             }
         });
     }
-    
+
     @BeforeAll
     static void before() throws Exception {
-        
+
         CountDownLatch latch = new CountDownLatch(3);
-        
+
         Runnable runnable = () -> {
             for (int i = 0; i < 3; i++) {
                 try {
                     URL runnerUrl = new File("../console/target/classes").toURI().toURL();
                     URL[] urls = new URL[] {runnerUrl};
                     URLClassLoader cl = new URLClassLoader(urls);
-                    Class<?> runnerClass = cl.loadClass("com.alibaba.nacos.Nacos");
+                    Class<?> runnerClass = cl.loadClass("com.alibaba.nacos.NacosConsole");
                     run(i, latch, runnerClass);
                 } catch (Exception e) {
                     latch.countDown();
                 }
             }
         };
-        
+
         new Thread(runnable).start();
-        
+
         latch.await();
-        
+
         System.out.println("The cluster node initialization is complete");
-        
+
         Properties setting7 = new Properties();
         String serverIp7 = "127.0.0.1:8847";
         setting7.put(PropertyKeyConst.SERVER_ADDR, serverIp7);
         setting7.put(PropertyKeyConst.USERNAME, "nacos");
         setting7.put(PropertyKeyConst.PASSWORD, "nacos");
         inaming7 = NacosFactory.createNamingService(setting7);
-        
+
         Properties setting8 = new Properties();
         String serverIp8 = "127.0.0.1:8848";
         setting8.put(PropertyKeyConst.SERVER_ADDR, serverIp8);
         setting8.put(PropertyKeyConst.USERNAME, "nacos");
         setting8.put(PropertyKeyConst.PASSWORD, "nacos");
         inaming8 = NacosFactory.createNamingService(setting7);
-        
+
         Properties setting9 = new Properties();
         String serverIp9 = "127.0.0.1:8849";
         setting9.put(PropertyKeyConst.SERVER_ADDR, serverIp9);
         setting9.put(PropertyKeyConst.USERNAME, "nacos");
         setting9.put(PropertyKeyConst.PASSWORD, "nacos");
         inaming9 = NacosFactory.createNamingService(setting7);
-        
+
         TimeUnit.SECONDS.sleep(20L);
     }
-    
+
     @AfterAll
     static void after() throws Exception {
         CountDownLatch latch = new CountDownLatch(applications.size());
@@ -162,18 +162,18 @@ public class BaseClusterTest extends HttpClient4Test {
         }
         latch.await();
     }
-    
+
     private static void run(final int index, final CountDownLatch latch, final Class<?> cls) {
         Runnable runnable = () -> {
             try {
                 EnvUtil.setIsStandalone(false);
-                
+
                 final String path = Paths.get(System.getProperty("user.home"), "/nacos-" + index + "/").toString();
                 DiskUtils.deleteDirectory(path);
-                
+
                 System.setProperty("nacos.home", path);
                 System.out.println("nacos.home is : [" + path + "]");
-                
+
                 Map<String, Object> properties = new HashMap<>();
                 properties.put("server.port", "884" + (7 + index));
                 properties.put("nacos.home", path);
@@ -185,12 +185,12 @@ public class BaseClusterTest extends HttpClient4Test {
                 environment.getPropertySources().addFirst(propertySource);
                 SpringApplication cluster = new SpringApplicationBuilder(cls).web(WebApplicationType.SERVLET).environment(environment)
                         .properties(clusterInfo).properties("embeddedStorage=true").build();
-                
+
                 ConfigurableApplicationContext context = cluster.run();
-                
+
                 DistributedDatabaseOperateImpl operate = context.getBean(DistributedDatabaseOperateImpl.class);
                 CPProtocol protocol = context.getBean(CPProtocol.class);
-                
+
                 protocol.protocolMetaData().subscribe(operate.group(), MetadataKey.LEADER_META_DATA, o -> {
                     ProtocolMetaData.ValueItem item = (ProtocolMetaData.ValueItem) o;
                     System.out.println("node : 884" + (7 + index) + "-> select leader is : " + item.getData());
@@ -198,7 +198,7 @@ public class BaseClusterTest extends HttpClient4Test {
                         latch.countDown();
                     }
                 });
-                
+
                 new Thread(() -> {
                     try {
                         Thread.sleep(5000L);
@@ -210,7 +210,7 @@ public class BaseClusterTest extends HttpClient4Test {
                         }
                     }
                 });
-                
+
                 applications.put(String.valueOf(properties.get("server.port")), context);
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -218,8 +218,8 @@ public class BaseClusterTest extends HttpClient4Test {
                 latch.countDown();
             }
         };
-        
+
         runnable.run();
     }
-    
+
 }

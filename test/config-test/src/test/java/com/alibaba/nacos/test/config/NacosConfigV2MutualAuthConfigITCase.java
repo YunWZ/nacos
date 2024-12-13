@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.test.config;
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.api.config.ConfigChangeEvent;
 import com.alibaba.nacos.api.config.ConfigChangeItem;
 import com.alibaba.nacos.api.config.ConfigService;
@@ -49,26 +49,26 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {Nacos.class}, properties = {"nacos.standalone=true", RpcConstants.NACOS_SERVER_RPC + ".enableTls=true",
+@SpringBootTest(classes = {NacosConsole.class}, properties = {"nacos.standalone=true", RpcConstants.NACOS_SERVER_RPC + ".enableTls=true",
         RpcConstants.NACOS_SERVER_RPC + ".mutualAuthEnable=true", RpcConstants.NACOS_SERVER_RPC + ".compatibility=false",
         RpcConstants.NACOS_SERVER_RPC + ".certChainFile=test-server-cert.pem",
         RpcConstants.NACOS_SERVER_RPC + ".certPrivateKey=test-server-key.pem", RpcConstants.NACOS_SERVER_RPC
         + ".trustCollectionCertFile=test-ca-cert.pem"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class NacosConfigV2MutualAuthConfigITCase {
-    
+
     public static AtomicInteger increment = new AtomicInteger(100);
-    
+
     @BeforeAll
     static void beforeClass() throws IOException {
         ConfigCleanUtils.changeToNewTestNacosHome(NacosConfigV2MutualAuthConfigITCase.class.getSimpleName());
-        
+
     }
-    
+
     @AfterEach
     void cleanClientCache() throws Exception {
         ConfigCleanUtils.cleanClientCache();
     }
-    
+
     @Test
     @Disabled("TODO, Fix cert expired problem")
     void testMutualAuth() throws Exception {
@@ -99,14 +99,14 @@ public class NacosConfigV2MutualAuthConfigITCase {
         latch2.await(5, TimeUnit.SECONDS);
         assertTrue(res);
     }
-    
+
     @Test
     void testMutualAuthButClientNot() throws Exception {
-        
+
         Properties propertiesfalse = new Properties();
         propertiesfalse.put(RpcConstants.RPC_CLIENT_TLS_ENABLE, "true");
         propertiesfalse.put(RpcConstants.RPC_CLIENT_TLS_TRUST_COLLECTION_CHAIN_PATH, "test-client-cert.pem");
-        
+
         propertiesfalse.put("serverAddr", "127.0.0.1");
         ConfigService configServiceFalse = new NacosConfigService(propertiesfalse);
         String dataId = "test-group" + increment.getAndIncrement();

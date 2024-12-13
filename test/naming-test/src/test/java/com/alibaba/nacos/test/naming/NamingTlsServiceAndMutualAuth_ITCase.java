@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.test.naming;
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.api.common.Constants;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingFactory;
@@ -47,18 +47,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @date .
  **/
 @TestMethodOrder(MethodName.class)
-@SpringBootTest(classes = Nacos.class, properties = {"server.servlet.context-path=/nacos",
+@SpringBootTest(classes = NacosConsole.class, properties = {"server.servlet.context-path=/nacos",
         RpcConstants.NACOS_SERVER_RPC + ".enableTls=true", RpcConstants.NACOS_SERVER_RPC + ".mutualAuthEnable=true",
         RpcConstants.NACOS_SERVER_RPC + ".compatibility=false", RpcConstants.NACOS_SERVER_RPC + ".certChainFile=test-server-cert.pem",
         RpcConstants.NACOS_SERVER_RPC + ".certPrivateKey=test-server-key.pem", RpcConstants.NACOS_SERVER_RPC
         + ".trustCollectionCertFile=test-ca-cert.pem"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Disabled("TODO, Fix cert expired problem")
 class NamingTlsServiceAndMutualAuth_ITCase {
-    
-    
+
+
     @LocalServerPort
     private int port;
-    
+
     @Test
     void test_a_MutualAuth() throws NacosException {
         String serviceName = randomDomainName();
@@ -87,10 +87,10 @@ class NamingTlsServiceAndMutualAuth_ITCase {
         assertEquals(1, instances.size());
         assertEquals("2.0", instances.get(0).getMetadata().get("version"));
         namingService.shutDown();
-        
+
     }
-    
-    
+
+
     @Test
     void test_b_MutualAuthClientTrustCa() throws NacosException {
         assertThrows(NacosException.class, () -> {
@@ -112,11 +112,11 @@ class NamingTlsServiceAndMutualAuth_ITCase {
             instance.setMetadata(map);
             namingService.registerInstance(serviceName, instance);
             namingService.shutDown();
-            
+
         });
-        
+
     }
-    
+
     @Test
     void test_c_MutualAuthClientTrustALl() throws NacosException {
         assertThrows(NacosException.class, () -> {
@@ -140,7 +140,7 @@ class NamingTlsServiceAndMutualAuth_ITCase {
             namingService.shutDown();
         });
     }
-    
+
     @AfterEach
     void after() {
         System.setProperty(RpcConstants.RPC_CLIENT_TLS_ENABLE, "");

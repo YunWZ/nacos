@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.test.client;
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.api.config.remote.request.ConfigPublishRequest;
 import com.alibaba.nacos.api.remote.response.Response;
 import com.alibaba.nacos.common.remote.ConnectionType;
@@ -50,28 +50,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 //todo fix this test case
 //ConfigIntegrationV3_CITCase and ConfigIntegrationV2MutualAuth_CITCase will fail when run together
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-@SpringBootTest(classes = {Nacos.class}, properties = {"nacos.standalone=true",
+@SpringBootTest(classes = {NacosConsole.class}, properties = {"nacos.standalone=true",
         RpcConstants.NACOS_SERVER_RPC + ".enableTls=true",
         RpcConstants.NACOS_SERVER_RPC + ".certChainFile=test-server-cert.pem", RpcConstants.NACOS_SERVER_RPC
         + ".certPrivateKey=test-server-key.pem"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class ConfigIntegrationV3CoreITCase {
-    
+
     public static AtomicInteger increment = new AtomicInteger(100);
-    
+
     @LocalServerPort
     private int port;
-    
+
     @BeforeAll
     static void beforeClass() throws IOException {
         ConfigCleanUtils.changeToNewTestNacosHome(ConfigIntegrationV3CoreITCase.class.getSimpleName());
     }
-    
+
     @BeforeAll
     @AfterAll
     static void cleanClientCache() throws Exception {
         ConfigCleanUtils.cleanClientCache();
     }
-    
+
     @Test
     void testTlsServerAndPlainClient() throws Exception {
         RpcClient client = RpcClientFactory.createClient("testTlsServerAndPlainClient", ConnectionType.GRPC,
@@ -81,9 +81,9 @@ public class ConfigIntegrationV3CoreITCase {
         serverInfo.setServerPort(port);
         Connection connection = client.connectToServer(serverInfo);
         ConfigPublishRequest configPublishRequest = new ConfigPublishRequest();
-        
+
         String content = UUID.randomUUID().toString();
-        
+
         configPublishRequest.setContent(content);
         configPublishRequest.setGroup("test-group" + increment.getAndIncrement());
         configPublishRequest.setDataId("test-data" + increment.getAndIncrement());
@@ -92,7 +92,7 @@ public class ConfigIntegrationV3CoreITCase {
         assertTrue(response.isSuccess());
         connection.close();
     }
-    
+
     @Test
     void testServerTlsTrustAll() throws Exception {
         RpcClientTlsConfig tlsConfig = new RpcClientTlsConfig();
@@ -112,16 +112,16 @@ public class ConfigIntegrationV3CoreITCase {
         Response response = connectionTrustAll.request(configPublishRequest, TimeUnit.SECONDS.toMillis(3));
         assertTrue(response.isSuccess());
         connectionTrustAll.close();
-        
+
     }
-    
+
     @Disabled("TODO, Fix cert expired problem")
     @Test
     void testServerTlsTrustCa() throws Exception {
-        
+
         RpcClient.ServerInfo serverInfo = new RpcClient.ServerInfo();
         serverInfo.setServerIp("127.0.0.1");
-        
+
         serverInfo.setServerPort(EnvUtil.getPort());
         RpcClientTlsConfig tlsConfig = new RpcClientTlsConfig();
         tlsConfig.setEnableTls(true);
@@ -131,7 +131,7 @@ public class ConfigIntegrationV3CoreITCase {
         Connection connectionTrustCa = clientTrustCa.connectToServer(serverInfo);
         ConfigPublishRequest configPublishRequestCa = new ConfigPublishRequest();
         String contentCa = UUID.randomUUID().toString();
-        
+
         configPublishRequestCa.setContent(contentCa);
         configPublishRequestCa.setGroup("test-group" + increment.getAndIncrement());
         configPublishRequestCa.setDataId("test-data" + increment.getAndIncrement());

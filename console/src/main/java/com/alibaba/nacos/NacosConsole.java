@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos;
 
-import com.alibaba.nacos.sys.filter.NacosTypeExcludeFilter;
+//import com.alibaba.nacos.sys.filter.NacosTypeExcludeFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.AutoConfigurationExcludeFilter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -36,14 +36,13 @@ import org.springframework.context.annotation.FilterType;
  */
 @SpringBootApplication
 @ComponentScan(basePackages = "com.alibaba.nacos", excludeFilters = {
-        @Filter(type = FilterType.CUSTOM, classes = {NacosTypeExcludeFilter.class}),
         @Filter(type = FilterType.CUSTOM, classes = {TypeExcludeFilter.class}),
         @Filter(type = FilterType.CUSTOM, classes = {AutoConfigurationExcludeFilter.class})})
 @ServletComponentScan
-public class Nacos {
-    
+public class NacosConsole {
+
     public static void main(String[] args) {
-        SpringApplication.run(Nacos.class, args);
+        SpringApplication.run(NacosConsole.class, args);
     }
 }
 

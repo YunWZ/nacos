@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2018 Alibaba Group Holding Ltd.
+ * Copyright 1999-2023 Alibaba Group Holding Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,29 @@
  * limitations under the License.
  */
 
-package com.alibaba.nacos.test.naming;
-
-import com.alibaba.nacos.NacosConsole;
-import org.springframework.boot.test.context.SpringBootTest;
+package com.alibaba.nacos.console.model;
 
 /**
- * Created by wangtong.wt on 2018/6/20.
+ * Readiness result.
  *
- * @author wangtong.wt
- * @date 2018/6/20
+ * @author xiweng.yy
  */
-@SpringBootTest(classes = NacosConsole.class, properties = {
-        "server.servlet.context-path=/nacos"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class InstanceOperate_ITCase extends AbstractInstanceOperate_ITCase {
-
+public class ReadinessResult {
+    
+    private final boolean success;
+    
+    private final String resultMessage;
+    
+    public ReadinessResult(boolean success, String resultMessage) {
+        this.success = success;
+        this.resultMessage = resultMessage;
+    }
+    
+    public boolean isSuccess() {
+        return success;
+    }
+    
+    public String getResultMessage() {
+        return resultMessage;
+    }
 }

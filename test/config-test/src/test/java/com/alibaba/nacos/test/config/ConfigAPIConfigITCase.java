@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.test.config;
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.test.base.ConfigCleanUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,15 +31,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = Nacos.class, properties = {
+@SpringBootTest(classes = NacosConsole.class, properties = {
         "server.servlet.context-path=/nacos"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class ConfigAPIConfigITCase extends AbstractConfigAPIConfigITCase {
-    
+
     @BeforeAll
     static void beforeClass() {
         ConfigCleanUtils.changeToNewTestNacosHome(ConfigAPIConfigITCase.class.getSimpleName());
     }
-    
+
     @BeforeAll
     @AfterAll
     static void cleanClientCache() throws Exception {

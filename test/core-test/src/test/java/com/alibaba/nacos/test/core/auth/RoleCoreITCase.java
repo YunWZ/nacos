@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.test.core.auth;
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.common.utils.JacksonUtils;
 import com.alibaba.nacos.persistence.model.Page;
 import com.alibaba.nacos.plugin.auth.impl.persistence.RoleInfo;
@@ -47,91 +47,91 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 1.2.0
  */
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
-@SpringBootTest(classes = Nacos.class, properties = {
+@SpringBootTest(classes = NacosConsole.class, properties = {
         "server.servlet.context-path=/nacos"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Disabled("todo fix this test case")
 class RoleCoreITCase extends HttpClient4Test {
-    
+
     @LocalServerPort
     private int port;
-    
+
     private String accessToken;
-    
+
     @BeforeEach
     void init() throws Exception {
         TimeUnit.SECONDS.sleep(5L);
         String url = String.format("http://localhost:%d/", port);
         this.base = new URL(url);
     }
-    
+
     @AfterEach
     void destroy() {
-        
+
         // Delete role:
         ResponseEntity<String> response = request("/nacos/v1/auth/roles",
                 Params.newParams().appendParam("role", "role1").appendParam("username", "username2")
                         .appendParam("accessToken", accessToken).done(), String.class, HttpMethod.DELETE);
-        
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
-        
+
         // Delete role:
         response = request("/nacos/v1/auth/roles",
                 Params.newParams().appendParam("role", "role2").appendParam("username", "username2")
                         .appendParam("accessToken", accessToken).done(), String.class, HttpMethod.DELETE);
-        
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
-        
+
         // Delete a user:
         response = request("/nacos/v1/auth/users",
                 Params.newParams().appendParam("username", "username2").appendParam("accessToken", accessToken).done(),
                 String.class, HttpMethod.DELETE);
-        
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
     }
-    
+
     @Test
     void login() {
-        
+
         ResponseEntity<String> response = request("/nacos/v1/auth/users/login",
                 Params.newParams().appendParam("username", "nacos").appendParam("password", "nacos").done(),
                 String.class, HttpMethod.POST);
-        
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
         JsonNode json = JacksonUtils.toObj(response.getBody());
         assertTrue(json.has("accessToken"));
         accessToken = json.get("accessToken").textValue();
     }
-    
+
     @Test
     void createDeleteQueryRole() {
-        
+
         login();
-        
+
         // Create a user:
         ResponseEntity<String> response = request("/nacos/v1/auth/users",
                 Params.newParams().appendParam("username", "username2").appendParam("password", "password1")
                         .appendParam("accessToken", accessToken).done(), String.class, HttpMethod.POST);
-        
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
-        
+
         // Create a role:
         response = request("/nacos/v1/auth/roles",
                 Params.newParams().appendParam("role", "role1").appendParam("username", "username2")
                         .appendParam("accessToken", accessToken).done(), String.class, HttpMethod.POST);
-        
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
-        
+
         // Query role of user:
         response = request("/nacos/v1/auth/roles",
                 Params.newParams().appendParam("username", "username2").appendParam("pageNo", "1")
                         .appendParam("pageSize", "10").appendParam("accessToken", accessToken).done(), String.class,
                 HttpMethod.GET);
-        
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
-        
+
         Page<RoleInfo> roleInfoPage = JacksonUtils.toObj(response.getBody(), new TypeReference<Page<RoleInfo>>() {
         });
-        
+
         assertNotNull(roleInfoPage);
         assertNotNull(roleInfoPage.getPageItems());
         boolean found = false;
@@ -142,25 +142,25 @@ class RoleCoreITCase extends HttpClient4Test {
             }
         }
         assertTrue(found);
-        
+
         // Add second role to user:
         response = request("/nacos/v1/auth/roles",
                 Params.newParams().appendParam("role", "role2").appendParam("username", "username2")
                         .appendParam("accessToken", accessToken).done(), String.class, HttpMethod.POST);
-        
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
-        
+
         // Query roles of user:
         response = request("/nacos/v1/auth/roles",
                 Params.newParams().appendParam("username", "username2").appendParam("pageNo", "1")
                         .appendParam("pageSize", "10").appendParam("accessToken", accessToken).done(), String.class,
                 HttpMethod.GET);
-        
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
-        
+
         roleInfoPage = JacksonUtils.toObj(response.getBody(), new TypeReference<Page<RoleInfo>>() {
         });
-        
+
         assertNotNull(roleInfoPage);
         assertNotNull(roleInfoPage.getPageItems());
         found = false;
@@ -178,25 +178,25 @@ class RoleCoreITCase extends HttpClient4Test {
         }
         assertTrue(found);
         assertTrue(found2);
-        
+
         // Delete role:
         response = request("/nacos/v1/auth/roles",
                 Params.newParams().appendParam("role", "role2").appendParam("username", "username2")
                         .appendParam("accessToken", accessToken).done(), String.class, HttpMethod.DELETE);
-        
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
-        
+
         // Query roles of user:
         response = request("/nacos/v1/auth/roles",
                 Params.newParams().appendParam("username", "username2").appendParam("pageNo", "1")
                         .appendParam("pageSize", "10").appendParam("accessToken", accessToken).done(), String.class,
                 HttpMethod.GET);
-        
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
-        
+
         roleInfoPage = JacksonUtils.toObj(response.getBody(), new TypeReference<Page<RoleInfo>>() {
         });
-        
+
         assertNotNull(roleInfoPage);
         assertNotNull(roleInfoPage.getPageItems());
         found = false;
@@ -211,25 +211,25 @@ class RoleCoreITCase extends HttpClient4Test {
         }
         assertFalse(found2);
         assertTrue(found);
-        
+
         // Delete role:
         response = request("/nacos/v1/auth/roles",
                 Params.newParams().appendParam("role", "role1").appendParam("username", "username2")
                         .appendParam("accessToken", accessToken).done(), String.class, HttpMethod.DELETE);
-        
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
-        
+
         // Query roles of user:
         response = request("/nacos/v1/auth/roles",
                 Params.newParams().appendParam("username", "username2").appendParam("pageNo", "1")
                         .appendParam("pageSize", "10").appendParam("accessToken", accessToken).done(), String.class,
                 HttpMethod.GET);
-        
+
         assertTrue(response.getStatusCode().is2xxSuccessful());
-        
+
         roleInfoPage = JacksonUtils.toObj(response.getBody(), new TypeReference<Page<RoleInfo>>() {
         });
-        
+
         assertNotNull(roleInfoPage);
         assertNotNull(roleInfoPage.getPageItems());
         found = false;

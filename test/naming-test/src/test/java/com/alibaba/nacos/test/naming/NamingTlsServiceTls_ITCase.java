@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.test.naming;
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.api.common.Constants;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingFactory;
@@ -46,21 +46,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @date .
  **/
 @TestMethodOrder(MethodName.class)
-@SpringBootTest(classes = Nacos.class, properties = {"server.servlet.context-path=/nacos",
+@SpringBootTest(classes = NacosConsole.class, properties = {"server.servlet.context-path=/nacos",
         RpcConstants.NACOS_SERVER_RPC + ".enableTls=true", RpcConstants.NACOS_SERVER_RPC + ".compatibility=false",
         RpcConstants.NACOS_SERVER_RPC + ".certChainFile=test-server-cert.pem",
         RpcConstants.NACOS_SERVER_RPC + ".certPrivateKey=test-server-key.pem"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Disabled("TODO, Fix cert expired problem")
 class NamingTlsServiceTls_ITCase {
-    
-    
+
+
     @LocalServerPort
     private int port;
-    
+
     @Test
     void Tls_a_ServerAndPlainClient() throws NacosException {
         assertThrows(NacosException.class, () -> {
-            
+
             Instance instance = new Instance();
             instance.setIp("127.0.0.1");
             instance.setPort(8081);
@@ -72,11 +72,11 @@ class NamingTlsServiceTls_ITCase {
             map.put("version", "2.0");
             namingService.registerInstance(randomDomainName(), instance);
             namingService.shutDown();
-            
+
         });
-        
+
     }
-    
+
     @Test
     void Tls_b_ServerAndTlsClientTrustCa() throws NacosException {
         String serviceName = randomDomainName();
@@ -103,9 +103,9 @@ class NamingTlsServiceTls_ITCase {
         assertEquals(1, instances.size());
         assertEquals("2.0", instances.get(0).getMetadata().get("version"));
         namingService.shutDown();
-        
+
     }
-    
+
     @Test
     void Tls_c_ServerAndTlsClientAll() throws NacosException {
         String serviceName = randomDomainName();

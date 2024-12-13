@@ -16,22 +16,22 @@
 
 package com.alibaba.nacos.console.controller;
 
+import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.common.model.RestResult;
 import com.alibaba.nacos.common.model.RestResultUtils;
-import com.alibaba.nacos.console.paramcheck.ConsoleDefaultHttpParamExtractor;
-import com.alibaba.nacos.core.paramcheck.ExtractorManager;
+import com.alibaba.nacos.console.constant.ConsoleConstants;
+import com.alibaba.nacos.console.service.NacosServerService;
 import com.alibaba.nacos.sys.env.EnvUtil;
-import com.alibaba.nacos.sys.module.ModuleState;
-import com.alibaba.nacos.sys.module.ModuleStateHolder;
 import com.alibaba.nacos.sys.utils.DiskUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.alibaba.nacos.common.utils.StringUtils.FOLDER_SEPARATOR;
@@ -45,12 +45,15 @@ import static com.alibaba.nacos.common.utils.StringUtils.WINDOWS_FOLDER_SEPARATO
  */
 @RestController
 @RequestMapping("/v1/console/server")
-@ExtractorManager.Extractor(httpExtractor = ConsoleDefaultHttpParamExtractor.class)
+//@ExtractorManager.Extractor(httpExtractor = ConsoleDefaultHttpParamExtractor.class)
 public class ServerStateController {
     
     private static final String ANNOUNCEMENT_FILE = "announcement.conf";
     
     private static final String GUIDE_FILE = "console-guide.conf";
+    
+    @Autowired
+    private NacosServerService nacosServerService;
     
     /**
      * Get server state of current server.
@@ -58,12 +61,14 @@ public class ServerStateController {
      * @return state json.
      */
     @GetMapping("/state")
-    public ResponseEntity<Map<String, String>> serverState() {
-        Map<String, String> serverState = new HashMap<>(4);
+    public ResponseEntity<String> serverState(HttpServletRequest request) throws NacosException {
+        /*Map<String, String> serverState = new HashMap<>(4);
         for (ModuleState each : ModuleStateHolder.getInstance().getAllModuleStates()) {
             each.getStates().forEach((s, o) -> serverState.put(s, null == o ? null : o.toString()));
         }
-        return ResponseEntity.ok().body(serverState);
+        return ResponseEntity.ok().body(serverState);*/
+        Map<String, String> serverState = nacosServerService.proxy(request, null, RefType,
+                ConsoleConstants.ApiConstants.SERVER_STATE_API);
     }
     
     @GetMapping("/announcement")

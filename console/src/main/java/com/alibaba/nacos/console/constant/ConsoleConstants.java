@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2018 Alibaba Group Holding Ltd.
+ * Copyright 1999-2023 Alibaba Group Holding Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package com.alibaba.nacos.test.naming;
+package com.alibaba.nacos.console.constant;
 
-import com.alibaba.nacos.NacosConsole;
-import org.springframework.boot.test.context.SpringBootTest;
-
-/**
- * Created by wangtong.wt on 2018/6/20.
- *
- * @author wangtong.wt
- * @date 2018/6/20
- */
-@SpringBootTest(classes = NacosConsole.class, properties = {
-        "server.servlet.context-path=/nacos"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class InstanceOperate_ITCase extends AbstractInstanceOperate_ITCase {
-
+public class ConsoleConstants {
+    
+    public static final String NACOS_CONSOLE = "nacos.console";
+    
+    public static final String LOCAL_IP_PROPERTY_KEY = "nacos.local.ip";
+    public class ApiConstants {
+        public static final String SERVER_STATE_API = "/nacos/v1/console/state";
+    }
 }

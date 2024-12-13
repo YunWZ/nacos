@@ -17,7 +17,7 @@
 
 package com.alibaba.nacos.test.config;
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.common.model.RestResult;
 import com.alibaba.nacos.common.utils.ByteUtils;
 import com.alibaba.nacos.config.server.model.ConfigInfo;
@@ -50,10 +50,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = Nacos.class, properties = {
+@SpringBootTest(classes = NacosConsole.class, properties = {
         "server.servlet.context-path=/nacos"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class ConfigDerbyImportConfigITCase {
-    
+
     private static final String SQL_SCRIPT_CONTEXT =
             "INSERT INTO `config_info` (`id`, `data_id`, `group_id`, `content`, `md5`, `gmt_create`, `gmt_modified`, `src_user`, `src_ip`, `app_name`, `tenant_id`, `c_desc`, `c_use`, `effect`, `type`, `c_schema`) VALUES (1,'boot-test','ALIBABA','dept:123123123\\ngroup:123123123','2ca50d002a7dabf81497f666a7967e15','2020-04-13 13:44:43','2020-04-30 10:45:21',NULL,'127.0.0.1','','',NULL,NULL,NULL,NULL,NULL);\n"
                     + "INSERT INTO `config_info` (`id`, `data_id`, `group_id`, `content`, `md5`, `gmt_create`, `gmt_modified`, `src_user`, `src_ip`, `app_name`, `tenant_id`, `c_desc`, `c_use`, `effect`, `type`, `c_schema`) VALUES (2,'people','DEFAULT_GROUP','people.enable=true','d92cbf8d02080017a805b7efc4481b6c','2020-04-13 13:44:43','2020-04-30 10:45:21',NULL,'127.0.0.1','','',NULL,NULL,NULL,NULL,NULL);\n"
@@ -73,20 +73,20 @@ class ConfigDerbyImportConfigITCase {
                     + "INSERT INTO `config_info` (`id`, `data_id`, `group_id`, `content`, `md5`, `gmt_create`, `gmt_modified`, `src_user`, `src_ip`, `app_name`, `tenant_id`, `c_desc`, `c_use`, `effect`, `type`, `c_schema`) VALUES (17,'develop_test','DEFAULT_GROUP','develop_test=develop_testdevelop_testdevelop_testdevelop_test','cc4ffd21bdd54362b84d629fd243e050','2020-04-13 13:51:48','2020-04-13 13:51:48',NULL,'127.0.0.1','','188c49ac-d06f-4abe-9d05-7bb87185ac34',NULL,NULL,NULL,'properties',NULL);\n"
                     + "INSERT INTO `config_info` (`id`, `data_id`, `group_id`, `content`, `md5`, `gmt_create`, `gmt_modified`, `src_user`, `src_ip`, `app_name`, `tenant_id`, `c_desc`, `c_use`, `effect`, `type`, `c_schema`) VALUES (33,'application.properties','DEFAULT_GROUP','name=liaochuntao is man','17581188a1cdc684721dde500c693c07','2020-04-30 10:45:21','2020-04-30 10:45:21',NULL,'127.0.0.1','','',NULL,NULL,NULL,'properties',NULL);\n"
                     + "\n";
-    
+
     @Autowired
     private ApplicationContext context;
-    
+
     @BeforeAll
     static void beforeClass() {
         ConfigCleanUtils.changeToNewTestNacosHome(ConfigDerbyImportConfigITCase.class.getSimpleName());
     }
-    
+
     @BeforeEach
     void setUp() {
         DynamicDataSource.getInstance().getDataSource().getJdbcTemplate().execute("TRUNCATE TABLE config_info");
     }
-    
+
     @Test
     void testDerbyImport() throws Throwable {
         DatabaseOperate operate = context.getBean(DatabaseOperate.class);
@@ -101,11 +101,11 @@ class ConfigDerbyImportConfigITCase {
             RestResult<String> result = future.join();
             System.out.println(result);
             assertTrue(result.ok());
-            
+
             final String queryDataId = "people";
             final String queryGroup = "DEFAULT_GROUP";
             final String expectContent = "people.enable=true";
-            
+
             ConfigInfoPersistService persistService = context.getBean(ConfigInfoPersistService.class);
             ConfigInfo configInfo = persistService.findConfigInfo(queryDataId, queryGroup, "");
             System.out.println(configInfo);
@@ -118,5 +118,5 @@ class ConfigDerbyImportConfigITCase {
             DiskUtils.deleteQuietly(file);
         }
     }
-    
+
 }

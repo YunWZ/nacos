@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.test.config;
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.sys.env.EnvUtil;
 import com.alibaba.nacos.test.base.ConfigCleanUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -34,18 +34,18 @@ import java.io.IOException;
  */
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = Nacos.class, properties = {"server.servlet.context-path=/",
+@SpringBootTest(classes = NacosConsole.class, properties = {"server.servlet.context-path=/",
         "server.port=7001"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class ConfigAPIWithRootContextPathConfigITCase extends AbstractConfigAPIConfigITCase {
-    
+
     @BeforeAll
     static void beforeClass() throws IOException {
         ConfigCleanUtils.changeToNewTestNacosHome(ConfigAPIWithRootContextPathConfigITCase.class.getSimpleName());
         ConfigCleanUtils.cleanClientCache();
         EnvUtil.setPort(7001);
-        
+
     }
-    
+
     @AfterAll
     static void cleanClientCache() throws Exception {
         ConfigCleanUtils.cleanClientCache();

@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.test.config;
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.common.utils.JacksonUtils;
 import com.alibaba.nacos.config.server.constant.Constants;
 import com.alibaba.nacos.test.base.ConfigCleanUtils;
@@ -50,39 +50,39 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = Nacos.class, properties = {
+@SpringBootTest(classes = NacosConsole.class, properties = {
         "server.servlet.context-path=" + CONTEXT_PATH}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodName.class)
 public class ConfigAPIV2ConfigITCase extends HttpClient4Test {
-    
+
     public static final long TIME_OUT = 5000;
-    
+
     public static final String CONTEXT_PATH = "/nacos";
-    
+
     private static final String CONFIG_V2_CONTROLLER_PATH = CONTEXT_PATH + Constants.CONFIG_CONTROLLER_V2_PATH;
-    
+
     private static final String CONTENT = randomContent();
-    
+
     private static final String DATA_ID = "nacos.example";
-    
+
     private static final String GROUP = "DEFAULT_GROUP";
-    
+
     private static final String NAME_SPACE_ID = "public";
-    
+
     @LocalServerPort
     private int port;
-    
+
     @BeforeAll
     static void beforeClass() {
         ConfigCleanUtils.changeToNewTestNacosHome(ConfigAPIV2ConfigITCase.class.getSimpleName());
     }
-    
+
     @AfterAll
     @BeforeAll
     static void cleanClientCache() throws Exception {
         ConfigCleanUtils.cleanClientCache();
     }
-    
+
     /**
      * Generates random content for testing purposes.
      */
@@ -96,13 +96,13 @@ public class ConfigAPIV2ConfigITCase extends HttpClient4Test {
         }
         return sb.toString();
     }
-    
+
     @BeforeEach
     void setUp() throws Exception {
         String url = String.format("http://127.0.0.1:%d/", port);
         this.base = new URL(url);
     }
-    
+
     @Test
     void test() throws Exception {
         publishConfig();
@@ -120,7 +120,7 @@ public class ConfigAPIV2ConfigITCase extends HttpClient4Test {
         }
         assertTrue(thrown);
     }
-    
+
     /**
      * Publishes a configuration.
      *
@@ -135,7 +135,7 @@ public class ConfigAPIV2ConfigITCase extends HttpClient4Test {
         JsonNode json = JacksonUtils.toObj(response.getBody());
         assertTrue(json.get("data").asBoolean());
     }
-    
+
     public String getConfig(boolean ignoreStatusCode) throws Exception {
         ResponseEntity<String> response = request(CONFIG_V2_CONTROLLER_PATH,
                 Params.newParams().appendParam("dataId", DATA_ID).appendParam("group", GROUP)
@@ -150,7 +150,7 @@ public class ConfigAPIV2ConfigITCase extends HttpClient4Test {
         JsonNode json = JacksonUtils.toObj(response.getBody());
         return json.get("data").asText();
     }
-    
+
     /**
      * Deletes a configuration.
      *

@@ -16,7 +16,7 @@
 
 package com.alibaba.nacos.test.common;
 
-import com.alibaba.nacos.Nacos;
+import com.alibaba.nacos.NacosConsole;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.common.http.Callback;
 import com.alibaba.nacos.common.http.HttpClientBeanHolder;
@@ -56,35 +56,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 @TestMethodOrder(MethodName.class)
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = Nacos.class, properties = {
+@SpringBootTest(classes = NacosConsole.class, properties = {
         "server.servlet.context-path=/nacos"}, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class NacosAsyncRestTemplateCoreITCase {
-    
+
     private static final HttpClientFactory PROCESSOR_ASYNC_HTTP_CLIENT_FACTORY = new ProcessorHttpClientFactory();
-    
+
     private static final String CONFIG_INSTANCE_PATH = "/nacos/v1/ns";
-    
+
     private final NacosAsyncRestTemplate nacosRestTemplate = HttpClientBeanHolder.getNacosAsyncRestTemplate(
             LoggerFactory.getLogger(NacosAsyncRestTemplateCoreITCase.class));
-    
+
     @SuppressWarnings("deprecation")
     @LocalServerPort
     private int port;
-    
+
     private NacosAsyncRestTemplate processorRestTemplate = null;
-    
+
     private String ip = null;
-    
+
     @Autowired
     private Environment environment;
-    
+
     @BeforeEach
     void init() throws NacosException {
         ip = String.format("http://localhost:%d", port);
         EnvUtil.setEnvironment((ConfigurableEnvironment) environment);
         processorRestTemplate = HttpClientBeanHolder.getNacosAsyncRestTemplate(PROCESSOR_ASYNC_HTTP_CLIENT_FACTORY);
     }
-    
+
     @Test
     void testUrlPostForm() throws Exception {
         Map<String, String> param = new HashMap<>();
@@ -100,7 +100,7 @@ class NacosAsyncRestTemplateCoreITCase {
         System.out.println(restResult.getHeader());
         assertTrue(restResult.ok());
     }
-    
+
     @Test
     void testUrlPostFormByProcessor() throws Exception {
         Map<String, String> param = new HashMap<>();
@@ -117,7 +117,7 @@ class NacosAsyncRestTemplateCoreITCase {
         System.out.println(restResult.getHeader());
         assertTrue(restResult.ok());
     }
-    
+
     @Test
     void testUrlPutForm() throws Exception {
         Map<String, String> param = new HashMap<>();
@@ -133,7 +133,7 @@ class NacosAsyncRestTemplateCoreITCase {
         System.out.println(restResult.getHeader());
         assertTrue(restResult.ok());
     }
-    
+
     @Test
     void testUrlGet() throws Exception {
         String url = ip + CONFIG_INSTANCE_PATH + "/instance/list";
@@ -147,7 +147,7 @@ class NacosAsyncRestTemplateCoreITCase {
         assertTrue(restResult.ok());
         assertEquals("DEFAULT_GROUP@@app-test", restResult.getData().get("name"));
     }
-    
+
     @Test
     void testUrlByMap() throws Exception {
         String url = ip + CONFIG_INSTANCE_PATH + "/instance/list";
@@ -162,7 +162,7 @@ class NacosAsyncRestTemplateCoreITCase {
         assertTrue(restResult.ok());
         assertEquals("DEFAULT_GROUP@@app-test", restResult.getData().get("name"));
     }
-    
+
     @Test
     void testUrlDelete() throws Exception {
         String url = ip + CONFIG_INSTANCE_PATH + "/instance";
@@ -176,35 +176,35 @@ class NacosAsyncRestTemplateCoreITCase {
         System.out.println(restResult.getHeader());
         assertTrue(restResult.ok());
     }
-    
+
     private static class CallbackMap<T> implements Callback<T> {
-        
+
         private HttpRestResult<T> restResult;
-        
+
         private Throwable throwable;
-        
+
         @Override
         public void onReceive(RestResult<T> result) {
             restResult = (HttpRestResult<T>) result;
         }
-        
+
         @Override
         public void onError(Throwable throwable) {
             this.throwable = throwable;
         }
-        
+
         @Override
         public void onCancel() {
-        
+
         }
-        
+
         public HttpRestResult<T> getRestResult() {
             return restResult;
         }
-        
+
         public Throwable getThrowable() {
             return throwable;
         }
     }
-    
+
 }
