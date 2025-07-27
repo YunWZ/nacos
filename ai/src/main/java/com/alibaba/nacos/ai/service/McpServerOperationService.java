@@ -174,7 +174,7 @@ public class McpServerOperationService {
         ConfigQueryChainRequest request = buildQueryMcpServerRequest(namespaceId, mcpServerId, version);
         ConfigQueryChainResponse response = configQueryChainService.handle(request);
         if (McpConfigUtils.isConfigNotFound(response.getStatus())) {
-            throw new NacosApiException(NacosApiException.NOT_FOUND, ErrorCode.RESOURCE_NOT_FOUND,
+            throw new NacosApiException(NacosApiException.NOT_FOUND, ErrorCode.MCP_SEVER_VERSION_NOT_FOUND,
                     String.format("mcp server `%s` for version `%s` not found", mcpServerId, version));
         }
         
@@ -214,8 +214,9 @@ public class McpServerOperationService {
         ConfigQueryChainRequest request = buildQueryMcpServerVersionInfoRequest(namespaceId, mcpServerId);
         ConfigQueryChainResponse response = configQueryChainService.handle(request);
         if (McpConfigUtils.isConfigNotFound(response.getStatus())) {
-            throw new NacosApiException(NacosApiException.NOT_FOUND, ErrorCode.RESOURCE_NOT_FOUND,
-                    String.format("mcp server `%s` not found", mcpServerId));
+            throw new NacosApiException(NacosApiException.NOT_FOUND, ErrorCode.MCP_SERVER_NOT_FOUND,
+                     String.format("Mcp server [ID: %s] not found in namespace [%s]. Response: %s",
+                            mcpServerId, namespaceId, response.getMessage()));
         }
         
         return JacksonUtils.toObj(response.getContent(), McpServerVersionInfo.class);
@@ -279,8 +280,24 @@ public class McpServerOperationService {
             throw new NacosApiException(NacosApiException.INVALID_PARAM, ErrorCode.PARAMETER_VALIDATE_ERROR,
                     "Version must be specified in parameter `serverSpecification`");
         }
-        
-        String id = UUID.randomUUID().toString();
+        String id;
+        String customMcpId = serverSpecification.getId();
+
+        if (StringUtils.isEmpty(customMcpId)) {
+            id = UUID.randomUUID().toString();
+        } else {
+            if (!StringUtils.isUuidString(customMcpId)) {
+                throw new NacosApiException(NacosApiException.INVALID_PARAM, ErrorCode.PARAMETER_VALIDATE_ERROR,
+                        "parameter `serverSpecification.id` is not match uuid pattern,  must obey uuid pattern");
+            }
+            if (mcpServerIndex.getMcpServerById(serverSpecification.getId()) != null) {
+                throw new NacosApiException(NacosApiException.INVALID_PARAM, ErrorCode.PARAMETER_VALIDATE_ERROR,
+                        "parameter `serverSpecification.id` conflict with exist mcp server id");
+            }
+
+            id = customMcpId;
+        }
+
         serverSpecification.setId(id);
         ZonedDateTime currentTime = ZonedDateTime.now(ZoneOffset.UTC);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.RELEASE_DATE_FORMAT);

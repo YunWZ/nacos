@@ -16,6 +16,11 @@
 
 package com.alibaba.nacos.ai.index;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+
 import com.alibaba.nacos.ai.constant.Constants;
 import com.alibaba.nacos.ai.model.mcp.McpServerIndexData;
 import com.alibaba.nacos.ai.utils.McpConfigUtils;
@@ -31,12 +36,6 @@ import com.alibaba.nacos.config.server.service.query.ConfigQueryChainService;
 import com.alibaba.nacos.config.server.service.query.model.ConfigQueryChainRequest;
 import com.alibaba.nacos.config.server.service.query.model.ConfigQueryChainResponse;
 import com.alibaba.nacos.core.service.NamespaceOperationService;
-import org.springframework.stereotype.Service;
-
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Plain Mcp server index implementation. This is empty index implementation so the performance is not well. this should
@@ -44,7 +43,6 @@ import java.util.Objects;
  *
  * @author xinluo
  */
-@Service
 public class PlainMcpServerIndex implements McpServerIndex {
     
     private final ConfigDetailService configDetailService;
@@ -78,14 +76,15 @@ public class PlainMcpServerIndex implements McpServerIndex {
     
     private Page<McpServerIndexData> searchMcpServerByName0(String namespaceId, String name, String search, int offset,
             int limit) {
-        Page<ConfigInfo> serverInfos = searchMcpServers(namespaceId, name, search, limit);
-        List<McpServerIndexData> indexDataList = serverInfos.getPageItems().stream().skip(offset)
+        int pageNo = offset / limit + 1;
+        Page<ConfigInfo> serverInfos = searchMcpServers(namespaceId, name, search, pageNo, limit);
+        List<McpServerIndexData> indexDataList = serverInfos.getPageItems().stream()
                 .map(this::mapMcpServerVersionConfigToIndexData).toList();
         Page<McpServerIndexData> result = new Page<>();
         result.setPageItems(indexDataList);
         result.setTotalCount(serverInfos.getTotalCount());
         result.setPagesAvailable((int) Math.ceil((double) serverInfos.getTotalCount() / (double) limit));
-        result.setPageNumber(offset / limit + 1);
+        result.setPageNumber(pageNo);
         return result;
     }
     
@@ -97,7 +96,8 @@ public class PlainMcpServerIndex implements McpServerIndex {
         return data;
     }
     
-    private Page<ConfigInfo> searchMcpServers(String namespace, String serverName, String search, int limit) {
+    private Page<ConfigInfo> searchMcpServers(String namespace, String serverName, String search, int pageNo,
+            int limit) {
         HashMap<String, Object> advanceInfo = new HashMap<>(1);
         if (Objects.isNull(serverName)) {
             serverName = StringUtils.EMPTY;
@@ -114,8 +114,8 @@ public class PlainMcpServerIndex implements McpServerIndex {
             dataId = null;
         }
         
-        return configDetailService.findConfigInfoPage(search, 1, limit, dataId, Constants.MCP_SERVER_VERSIONS_GROUP,
-                namespace, advanceInfo);
+        return configDetailService.findConfigInfoPage(search, pageNo, limit, dataId,
+                Constants.MCP_SERVER_VERSIONS_GROUP, namespace, advanceInfo);
     }
     
     /**
