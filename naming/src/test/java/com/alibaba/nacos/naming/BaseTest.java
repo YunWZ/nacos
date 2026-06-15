@@ -18,7 +18,6 @@ package com.alibaba.nacos.naming;
 
 import com.alibaba.nacos.naming.core.DistroMapper;
 import com.alibaba.nacos.naming.misc.SwitchDomain;
-import com.alibaba.nacos.naming.push.UdpPushService;
 import com.alibaba.nacos.sys.env.EnvUtil;
 import com.alibaba.nacos.sys.utils.ApplicationUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,7 +48,8 @@ public abstract class BaseTest {
     
     protected static final String TEST_METADATA = "{\"label\":\"123\"}";
     
-    protected static final String TEST_INSTANCE_INFO_LIST = "[{\"instanceId\":\"123\",\"ip\":\"1.1.1.1\","
+    protected static final String TEST_INSTANCE_INFO_LIST =
+        "[{\"instanceId\":\"123\",\"ip\":\"1.1.1.1\","
             + "\"port\":9870,\"weight\":2.0,\"healthy\":true,\"enabled\":true,\"ephemeral\":true"
             + ",\"clusterName\":\"clusterName\",\"serviceName\":\"serviceName\",\"metadata\":{}}]";
     
@@ -62,9 +62,6 @@ public abstract class BaseTest {
     @Spy
     protected SwitchDomain switchDomain;
     
-    @Mock
-    protected UdpPushService pushService;
-    
     @Spy
     protected MockEnvironment environment;
     
@@ -74,17 +71,14 @@ public abstract class BaseTest {
         ApplicationUtils.injectContext(context);
     }
     
-    protected MockHttpServletRequestBuilder convert(Object simpleOb, MockHttpServletRequestBuilder builder) throws IllegalAccessException {
+    protected MockHttpServletRequestBuilder convert(Object simpleOb,
+        MockHttpServletRequestBuilder builder) throws IllegalAccessException {
         Field[] declaredFields = simpleOb.getClass().getDeclaredFields();
         for (Field declaredField : declaredFields) {
             declaredField.setAccessible(true);
             builder.param(declaredField.getName(), String.valueOf(declaredField.get(simpleOb)));
         }
         return builder;
-    }
-    
-    protected void mockInjectPushServer() {
-        doReturn(pushService).when(context).getBean(UdpPushService.class);
     }
     
     protected void mockInjectSwitchDomain() {

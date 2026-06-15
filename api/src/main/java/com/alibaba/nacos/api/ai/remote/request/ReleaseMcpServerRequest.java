@@ -16,6 +16,8 @@
 
 package com.alibaba.nacos.api.ai.remote.request;
 
+import com.alibaba.nacos.api.ai.model.mcp.McpEndpointSpec;
+import com.alibaba.nacos.api.ai.model.mcp.McpResourceSpecification;
 import com.alibaba.nacos.api.ai.model.mcp.McpServerBasicInfo;
 import com.alibaba.nacos.api.ai.model.mcp.McpToolSpecification;
 
@@ -36,6 +38,10 @@ public class ReleaseMcpServerRequest extends AbstractMcpRequest {
     
     private McpToolSpecification toolSpecification;
     
+    private McpResourceSpecification resourceSpecification;
+    
+    private McpEndpointSpec endpointSpecification;
+    
     public McpServerBasicInfo getServerSpecification() {
         return serverSpecification;
     }
@@ -50,5 +56,21 @@ public class ReleaseMcpServerRequest extends AbstractMcpRequest {
     
     public void setToolSpecification(McpToolSpecification toolSpecification) {
         this.toolSpecification = toolSpecification;
+    }
+    
+    public McpResourceSpecification getResourceSpecification() {
+        return resourceSpecification;
+    }
+    
+    public void setResourceSpecification(McpResourceSpecification resourceSpecification) {
+        this.resourceSpecification = resourceSpecification;
+    }
+    
+    public McpEndpointSpec getEndpointSpecification() {
+        return endpointSpecification;
+    }
+    
+    public void setEndpointSpecification(McpEndpointSpec endpointSpecification) {
+        this.endpointSpecification = endpointSpecification;
     }
 }

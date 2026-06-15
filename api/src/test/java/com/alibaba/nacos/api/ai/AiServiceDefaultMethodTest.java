@@ -17,13 +17,17 @@
 package com.alibaba.nacos.api.ai;
 
 import com.alibaba.nacos.api.ai.listener.AbstractNacosMcpServerListener;
+import com.alibaba.nacos.api.ai.model.mcp.McpEndpointSpec;
+import com.alibaba.nacos.api.ai.model.mcp.McpResourceSpecification;
 import com.alibaba.nacos.api.ai.model.mcp.McpServerBasicInfo;
 import com.alibaba.nacos.api.ai.model.mcp.McpServerDetailInfo;
 import com.alibaba.nacos.api.ai.model.mcp.McpToolSpecification;
+import com.alibaba.nacos.client.ai.NacosAiService;
 import com.alibaba.nacos.api.exception.NacosException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,44 +39,58 @@ class AiServiceDefaultMethodTest {
     AiService aiService;
     
     @BeforeEach
-    void setUp() {
+    void setUp() throws NacosException {
         invokeMark = new AtomicBoolean(false);
-        aiService = new AiService() {
+        NacosAiService.IS_THROW_EXCEPTION.set(false);
+        aiService = new NacosAiService(new Properties()) {
+            
             @Override
-            public McpServerDetailInfo getMcpServer(String mcpName, String version) throws NacosException {
+            public McpServerDetailInfo getMcpServer(String mcpName, String version)
+                throws NacosException {
                 invokeMark.set(true);
                 return null;
             }
             
             @Override
             public String releaseMcpServer(McpServerBasicInfo serverSpecification,
-                    McpToolSpecification toolSpecification) throws NacosException {
+                McpToolSpecification toolSpecification, McpEndpointSpec endpointSpecification)
+                throws NacosException {
+                invokeMark.set(true);
                 return "";
             }
             
             @Override
-            public void registerMcpServerEndpoint(String mcpName, String address, int port, String version)
-                    throws NacosException {
+            public String releaseMcpServer(McpServerBasicInfo serverSpecification,
+                McpToolSpecification toolSpecification,
+                McpResourceSpecification resourceSpecification,
+                McpEndpointSpec endpointSpecification) throws NacosException {
+                invokeMark.set(true);
+                return "";
+            }
+            
+            @Override
+            public void registerMcpServerEndpoint(String mcpName, String address, int port,
+                String version)
+                throws NacosException {
                 invokeMark.set(true);
             }
             
             @Override
-            public void deregisterMcpServerEndpoint(String mcpName, String address, int port) throws NacosException {
+            public void deregisterMcpServerEndpoint(String mcpName, String address, int port)
+                throws NacosException {
             }
             
             @Override
             public McpServerDetailInfo subscribeMcpServer(String mcpName, String version,
-                    AbstractNacosMcpServerListener mcpServerListener) throws NacosException {
+                AbstractNacosMcpServerListener mcpServerListener) throws NacosException {
+                invokeMark.set(true);
                 return null;
             }
             
             @Override
             public void unsubscribeMcpServer(String mcpName, String version,
-                    AbstractNacosMcpServerListener mcpServerListener) throws NacosException {
-            }
-            
-            @Override
-            public void shutdown() throws NacosException {
+                AbstractNacosMcpServerListener mcpServerListener) throws NacosException {
+                invokeMark.set(true);
             }
         };
     }
@@ -87,5 +105,29 @@ class AiServiceDefaultMethodTest {
     void registerMcpServerEndpoint() throws NacosException {
         aiService.registerMcpServerEndpoint("", "", 0);
         assertTrue(invokeMark.get());
+    }
+    
+    @Test
+    void releaseMcpServer() throws NacosException {
+        McpServerBasicInfo serverSpecification = new McpServerBasicInfo();
+        aiService.releaseMcpServer(serverSpecification, null);
+        assertTrue(invokeMark.get());
+    }
+    
+    @Test
+    void releaseMcpServerWithResourceSpecification() throws NacosException {
+        McpServerBasicInfo serverSpecification = new McpServerBasicInfo();
+        aiService.releaseMcpServer(serverSpecification, null, new McpResourceSpecification());
+        assertTrue(invokeMark.get());
+    }
+    
+    @Test
+    void subscribeMcpServer() throws NacosException {
+        aiService.subscribeMcpServer("", null);
+    }
+    
+    @Test
+    void unsubscribeMcpServer() throws NacosException {
+        aiService.unsubscribeMcpServer("", null);
     }
 }

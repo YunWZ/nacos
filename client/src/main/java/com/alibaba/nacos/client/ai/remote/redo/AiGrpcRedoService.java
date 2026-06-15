@@ -49,8 +49,18 @@ public class AiGrpcRedoService extends AbstractRedoService {
         return new AiRedoScheduledTask(this, aiGrpcClient);
     }
     
-    public void cachedMcpServerEndpointForRedo(String mcpName, String address, int port, String version) {
-        RedoData<McpServerEndpoint> redoData = buildMcpServerEndpointRedoData(mcpName, address, port, version);
+    /**
+     * Cache MCP server endpoint for redo.
+     *
+     * @param mcpName the MCP name
+     * @param address the address
+     * @param port the port
+     * @param version the version
+     */
+    public void cachedMcpServerEndpointForRedo(String mcpName, String address, int port,
+        String version) {
+        RedoData<McpServerEndpoint> redoData =
+            buildMcpServerEndpointRedoData(mcpName, address, port, version);
         super.cachedRedoData(mcpName, redoData, McpServerEndpoint.class);
     }
     
@@ -83,11 +93,47 @@ public class AiGrpcRedoService extends AbstractRedoService {
         return redoData == null ? null : redoData.get();
     }
     
-    private RedoData<McpServerEndpoint> buildMcpServerEndpointRedoData(String mcpName, String address, int port,
-            String version) {
+    private RedoData<McpServerEndpoint> buildMcpServerEndpointRedoData(String mcpName,
+        String address, int port,
+        String version) {
         McpServerEndpoint mcpServerEndpoint = new McpServerEndpoint(address, port, version);
         McpServerEndpointRedoData result = new McpServerEndpointRedoData(mcpName);
         result.set(mcpServerEndpoint);
         return result;
+    }
+    
+    public void cachedAgentEndpointForRedo(String agentName, AgentEndpointWrapper wrapper) {
+        AgentEndpointRedoData redoData = new AgentEndpointRedoData(agentName, wrapper);
+        super.cachedRedoData(agentName, redoData, AgentEndpointWrapper.class);
+    }
+    
+    public void removeAgentEndpointForRedo(String agentName) {
+        super.removeRedoData(agentName, AgentEndpointWrapper.class);
+    }
+    
+    public void agentEndpointRegistered(String agentName) {
+        super.dataRegistered(agentName, AgentEndpointWrapper.class);
+    }
+    
+    public void agentEndpointDeregister(String agentName) {
+        super.dataDeregister(agentName, AgentEndpointWrapper.class);
+    }
+    
+    public void agentEndpointDeregistered(String agentName) {
+        super.dataDeregistered(agentName, AgentEndpointWrapper.class);
+    }
+    
+    public boolean isAgentEndpointRegistered(String agentName) {
+        return super.isDataRegistered(agentName, AgentEndpointWrapper.class);
+    }
+    
+    public Set<RedoData<AgentEndpointWrapper>> findAgentEndpointRedoData() {
+        return super.findRedoData(AgentEndpointWrapper.class);
+    }
+    
+    public AgentEndpointWrapper getAgentEndpoint(String agentName) {
+        RedoData<AgentEndpointWrapper> redoData =
+            super.getRedoData(agentName, AgentEndpointWrapper.class);
+        return redoData == null ? null : redoData.get();
     }
 }

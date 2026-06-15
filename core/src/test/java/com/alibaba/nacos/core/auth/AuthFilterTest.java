@@ -41,12 +41,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -93,7 +99,7 @@ class AuthFilterTest {
     
     @Test
     void testDoFilterDisabledAuth() throws ServletException, IOException {
-        when(authConfig.isAuthEnabled()).thenReturn(false);
+        lenient().when(authConfig.isAuthEnabled()).thenReturn(false);
         authFilter.doFilter(request, response, filterChain);
         verify(filterChain).doFilter(request, response);
         verify(response, never()).sendError(anyInt(), anyString());
@@ -101,22 +107,27 @@ class AuthFilterTest {
     
     @Test
     @Secured
-    void testDoFilterWithoutServerIdentity() throws ServletException, IOException, NoSuchMethodException {
+    void testDoFilterWithoutServerIdentity()
+        throws ServletException, IOException, NoSuchMethodException {
         when(methodsCache.getMethod(request)).thenReturn(
-                this.getClass().getDeclaredMethod("testDoFilterWithoutServerIdentity"));
+            this.getClass().getDeclaredMethod("testDoFilterWithoutServerIdentity"));
         when(authConfig.isAuthEnabled()).thenReturn(true);
+        StringWriter out = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(out));
         authFilter.doFilter(request, response, filterChain);
+        
         verify(filterChain, never()).doFilter(request, response);
-        verify(response).sendError(403,
-                "Invalid server identity key or value, Please make sure set `nacos.core.auth.server.identity.key`"
-                        + " and `nacos.core.auth.server.identity.value`, or open `nacos.core.auth.enable.userAgentAuthWhite`");
+        verify(response).setStatus(eq(403));
+        assertTrue(out.toString().contains("\"code\":10001"));
+        assertTrue(out.toString().contains("Invalid server identity key or value"));
     }
     
     @Test
     @Secured
-    void testDoFilterWithServerIdentity() throws ServletException, IOException, NoSuchMethodException {
+    void testDoFilterWithServerIdentity()
+        throws ServletException, IOException, NoSuchMethodException {
         when(methodsCache.getMethod(request)).thenReturn(
-                this.getClass().getDeclaredMethod("testDoFilterWithServerIdentity"));
+            this.getClass().getDeclaredMethod("testDoFilterWithServerIdentity"));
         when(authConfig.isAuthEnabled()).thenReturn(true);
         when(authConfig.getServerIdentityKey()).thenReturn("1");
         when(authConfig.getServerIdentityValue()).thenReturn("2");
@@ -129,7 +140,7 @@ class AuthFilterTest {
     @Test
     @Secured
     void testDoFilterWithoutMethod() throws ServletException, IOException {
-        when(authConfig.isAuthEnabled()).thenReturn(true);
+        lenient().when(authConfig.isAuthEnabled()).thenReturn(true);
         authFilter.doFilter(request, response, filterChain);
         verify(filterChain).doFilter(request, response);
         verify(response, never()).sendError(anyInt(), anyString());
@@ -137,9 +148,9 @@ class AuthFilterTest {
     
     @Test
     void testDoFilterWithoutSecured() throws ServletException, IOException, NoSuchMethodException {
-        when(authConfig.isAuthEnabled()).thenReturn(true);
+        lenient().when(authConfig.isAuthEnabled()).thenReturn(true);
         when(methodsCache.getMethod(request)).thenReturn(
-                this.getClass().getDeclaredMethod("testDoFilterWithoutSecured"));
+            this.getClass().getDeclaredMethod("testDoFilterWithoutSecured"));
         authFilter.doFilter(request, response, filterChain);
         verify(filterChain).doFilter(request, response);
         verify(response, never()).sendError(anyInt(), anyString());
@@ -147,12 +158,13 @@ class AuthFilterTest {
     
     @Test
     @Secured
-    void testDoFilterWithNoNeedAuthSecured() throws NoSuchMethodException, ServletException, IOException {
+    void testDoFilterWithNoNeedAuthSecured()
+        throws NoSuchMethodException, ServletException, IOException {
         when(authConfig.isAuthEnabled()).thenReturn(true);
         when(authConfig.getServerIdentityKey()).thenReturn("1");
         when(authConfig.getServerIdentityValue()).thenReturn("2");
         when(methodsCache.getMethod(request)).thenReturn(
-                this.getClass().getDeclaredMethod("testDoFilterWithNoNeedAuthSecured"));
+            this.getClass().getDeclaredMethod("testDoFilterWithNoNeedAuthSecured"));
         HttpProtocolAuthService protocolAuthService = injectMockPlugins();
         when(protocolAuthService.enableAuth(any(Secured.class))).thenReturn(false);
         authFilter.doFilter(request, response, filterChain);
@@ -163,19 +175,22 @@ class AuthFilterTest {
     @Test
     @Secured
     void testDoFilterWithNeedAuthSecuredSuccess()
-            throws NoSuchMethodException, ServletException, IOException, AccessException {
+        throws NoSuchMethodException, ServletException, IOException, AccessException {
         when(authConfig.isAuthEnabled()).thenReturn(true);
         when(authConfig.getServerIdentityKey()).thenReturn("1");
         when(authConfig.getServerIdentityValue()).thenReturn("2");
         when(methodsCache.getMethod(request)).thenReturn(
-                this.getClass().getDeclaredMethod("testDoFilterWithNeedAuthSecuredSuccess"));
+            this.getClass().getDeclaredMethod("testDoFilterWithNeedAuthSecuredSuccess"));
         HttpProtocolAuthService protocolAuthService = injectMockPlugins();
         when(protocolAuthService.enableAuth(any(Secured.class))).thenReturn(true);
         doReturn(new IdentityContext()).when(protocolAuthService).parseIdentity(eq(request));
-        doReturn(Resource.EMPTY_RESOURCE).when(protocolAuthService).parseResource(eq(request), any(Secured.class));
-        when(protocolAuthService.validateIdentity(any(IdentityContext.class), any(Resource.class))).thenReturn(
+        doReturn(Resource.EMPTY_RESOURCE).when(protocolAuthService).parseResource(eq(request),
+            any(Secured.class));
+        when(protocolAuthService.validateIdentity(any(IdentityContext.class), any(Resource.class)))
+            .thenReturn(
                 AuthResult.successResult());
-        when(protocolAuthService.validateAuthority(any(IdentityContext.class), any(Permission.class))).thenReturn(
+        when(protocolAuthService.validateAuthority(any(IdentityContext.class),
+            any(Permission.class))).thenReturn(
                 AuthResult.successResult());
         authFilter.doFilter(request, response, filterChain);
         verify(filterChain).doFilter(request, response);
@@ -185,61 +200,95 @@ class AuthFilterTest {
     @Test
     @Secured
     void testDoFilterWithNeedAuthSecuredIdentityFailure()
-            throws NoSuchMethodException, ServletException, IOException, AccessException {
+        throws NoSuchMethodException, ServletException, IOException, AccessException {
         when(authConfig.isAuthEnabled()).thenReturn(true);
         when(authConfig.getServerIdentityKey()).thenReturn("1");
         when(authConfig.getServerIdentityValue()).thenReturn("2");
         when(methodsCache.getMethod(request)).thenReturn(
-                this.getClass().getDeclaredMethod("testDoFilterWithNeedAuthSecuredIdentityFailure"));
+            this.getClass().getDeclaredMethod("testDoFilterWithNeedAuthSecuredIdentityFailure"));
         HttpProtocolAuthService protocolAuthService = injectMockPlugins();
         when(protocolAuthService.enableAuth(any(Secured.class))).thenReturn(true);
         doReturn(new IdentityContext()).when(protocolAuthService).parseIdentity(eq(request));
-        doReturn(Resource.EMPTY_RESOURCE).when(protocolAuthService).parseResource(eq(request), any(Secured.class));
-        when(protocolAuthService.validateIdentity(any(IdentityContext.class), any(Resource.class))).thenReturn(
+        doReturn(Resource.EMPTY_RESOURCE).when(protocolAuthService).parseResource(eq(request),
+            any(Secured.class));
+        when(protocolAuthService.validateIdentity(any(IdentityContext.class), any(Resource.class)))
+            .thenReturn(
                 AuthResult.failureResult(403, "test"));
+        StringWriter out = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(out));
         authFilter.doFilter(request, response, filterChain);
+        
         verify(filterChain, never()).doFilter(request, response);
-        verify(response).sendError(eq(403), anyString());
+        verify(response).setStatus(eq(403));
+        assertTrue(out.toString().contains("\"code\":10001"));
     }
     
     @Test
     @Secured
     void testDoFilterWithNeedAuthSecuredAuthorityFailure()
-            throws NoSuchMethodException, ServletException, IOException, AccessException {
+        throws NoSuchMethodException, ServletException, IOException, AccessException {
         when(authConfig.isAuthEnabled()).thenReturn(true);
         when(authConfig.getServerIdentityKey()).thenReturn("1");
         when(authConfig.getServerIdentityValue()).thenReturn("2");
         when(methodsCache.getMethod(request)).thenReturn(
-                this.getClass().getDeclaredMethod("testDoFilterWithNeedAuthSecuredAuthorityFailure"));
+            this.getClass().getDeclaredMethod("testDoFilterWithNeedAuthSecuredAuthorityFailure"));
         HttpProtocolAuthService protocolAuthService = injectMockPlugins();
         when(protocolAuthService.enableAuth(any(Secured.class))).thenReturn(true);
         doReturn(new IdentityContext()).when(protocolAuthService).parseIdentity(eq(request));
-        doReturn(Resource.EMPTY_RESOURCE).when(protocolAuthService).parseResource(eq(request), any(Secured.class));
-        when(protocolAuthService.validateIdentity(any(IdentityContext.class), any(Resource.class))).thenReturn(
+        doReturn(Resource.EMPTY_RESOURCE).when(protocolAuthService).parseResource(eq(request),
+            any(Secured.class));
+        when(protocolAuthService.validateIdentity(any(IdentityContext.class), any(Resource.class)))
+            .thenReturn(
                 AuthResult.successResult());
-        when(protocolAuthService.validateAuthority(any(IdentityContext.class), any(Permission.class))).thenReturn(
+        when(protocolAuthService.validateAuthority(any(IdentityContext.class),
+            any(Permission.class))).thenReturn(
                 AuthResult.failureResult(403, "test"));
+        StringWriter out = new StringWriter();
+        when(response.getWriter()).thenReturn(new PrintWriter(out));
         authFilter.doFilter(request, response, filterChain);
+        
         verify(filterChain, never()).doFilter(request, response);
-        verify(response).sendError(eq(403), anyString());
+        verify(response).setStatus(eq(403));
+        assertTrue(out.toString().contains("\"code\":10001"));
     }
     
     @Test
     @Secured(tags = Constants.Tag.ONLY_IDENTITY)
     void testDoFilterWithNeedAuthSecuredOnlyIdentity()
-            throws NoSuchMethodException, ServletException, IOException, AccessException {
+        throws NoSuchMethodException, ServletException, IOException, AccessException {
         when(authConfig.isAuthEnabled()).thenReturn(true);
         when(authConfig.getServerIdentityKey()).thenReturn("1");
         when(authConfig.getServerIdentityValue()).thenReturn("2");
         when(methodsCache.getMethod(request)).thenReturn(
-                this.getClass().getDeclaredMethod("testDoFilterWithNeedAuthSecuredOnlyIdentity"));
+            this.getClass().getDeclaredMethod("testDoFilterWithNeedAuthSecuredOnlyIdentity"));
         HttpProtocolAuthService protocolAuthService = injectMockPlugins();
         when(protocolAuthService.enableAuth(any(Secured.class))).thenReturn(true);
         doReturn(new IdentityContext()).when(protocolAuthService).parseIdentity(eq(request));
-        doReturn(Resource.EMPTY_RESOURCE).when(protocolAuthService).parseResource(eq(request), any(Secured.class));
-        when(protocolAuthService.validateIdentity(any(IdentityContext.class), any(Resource.class))).thenReturn(
+        doReturn(Resource.EMPTY_RESOURCE).when(protocolAuthService).parseResource(eq(request),
+            any(Secured.class));
+        when(protocolAuthService.validateIdentity(any(IdentityContext.class), any(Resource.class)))
+            .thenReturn(
                 AuthResult.successResult());
         authFilter.doFilter(request, response, filterChain);
+        verify(filterChain).doFilter(request, response);
+        verify(response, never()).sendError(anyInt(), anyString());
+    }
+    
+    @Test
+    @Secured
+    void testDoFilterWithUnexpectedExceptionShouldRethrow()
+        throws NoSuchMethodException, AccessException, IOException, ServletException {
+        when(authConfig.isAuthEnabled()).thenReturn(true);
+        when(authConfig.getServerIdentityKey()).thenReturn("1");
+        when(authConfig.getServerIdentityValue()).thenReturn("2");
+        when(request.getHeader("1")).thenReturn("2");
+        when(methodsCache.getMethod(request)).thenReturn(
+            this.getClass().getDeclaredMethod("testDoFilterWithUnexpectedExceptionShouldRethrow"));
+        doThrow(new RuntimeException("mock-chain-error")).when(filterChain).doFilter(request,
+            response);
+        
+        assertThrows(RuntimeException.class,
+            () -> authFilter.doFilter(request, response, filterChain));
         verify(filterChain).doFilter(request, response);
         verify(response, never()).sendError(anyInt(), anyString());
     }

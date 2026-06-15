@@ -16,6 +16,7 @@
 
 package com.alibaba.nacos.api.lock.remote.response;
 
+import com.alibaba.nacos.api.lock.model.LockResult;
 import com.alibaba.nacos.api.remote.response.Response;
 import com.alibaba.nacos.api.remote.response.ResponseCode;
 
@@ -31,12 +32,14 @@ public class LockOperationResponse extends Response {
     private Object result;
     
     public LockOperationResponse() {
-    
+        
     }
     
     public LockOperationResponse(Boolean result) {
         this.result = result;
     }
+    
+    private LockResult lockResult;
     
     /**
      * create success response.
@@ -45,6 +48,19 @@ public class LockOperationResponse extends Response {
      */
     public static LockOperationResponse success(Boolean result) {
         LockOperationResponse response = new LockOperationResponse(result);
+        response.setResultCode(ResponseCode.SUCCESS.getCode());
+        return response;
+    }
+    
+    /**
+     * create success response with structured lock result.
+     * @param lockResult structured lock result
+     * @return LockOperationResponse
+     */
+    public static LockOperationResponse success(LockResult lockResult) {
+        LockOperationResponse response = new LockOperationResponse(lockResult.isSuccess());
+        response.setResultCode(ResponseCode.SUCCESS.getCode());
+        response.setLockResult(lockResult);
         return response;
     }
     
@@ -66,5 +82,13 @@ public class LockOperationResponse extends Response {
     
     public void setResult(Object result) {
         this.result = result;
+    }
+    
+    public LockResult getLockResult() {
+        return lockResult;
+    }
+    
+    public void setLockResult(LockResult lockResult) {
+        this.lockResult = lockResult;
     }
 }

@@ -17,7 +17,6 @@
 package com.alibaba.nacos.console.handler.impl.inner.core;
 
 import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.nacos.api.exception.api.NacosApiException;
 import com.alibaba.nacos.api.model.response.Namespace;
 import com.alibaba.nacos.console.handler.core.NamespaceHandler;
 import com.alibaba.nacos.console.handler.impl.inner.EnabledInnerHandler;
@@ -54,14 +53,15 @@ public class NamespaceInnerHandler implements NamespaceHandler {
     
     @Override
     public Boolean createNamespace(String namespaceId, String namespaceName, String namespaceDesc)
-            throws NacosException {
+        throws NacosException {
         return namespaceOperationService.createNamespace(namespaceId, namespaceName, namespaceDesc);
     }
     
     @Override
     public Boolean updateNamespace(NamespaceForm namespaceForm) throws NacosException {
-        return namespaceOperationService.editNamespace(namespaceForm.getNamespaceId(), namespaceForm.getNamespaceName(),
-                namespaceForm.getNamespaceDesc());
+        return namespaceOperationService.editNamespace(namespaceForm.getNamespaceId(),
+            namespaceForm.getNamespaceName(),
+            namespaceForm.getNamespaceDesc());
     }
     
     @Override
@@ -71,11 +71,6 @@ public class NamespaceInnerHandler implements NamespaceHandler {
     
     @Override
     public Boolean checkNamespaceIdExist(String namespaceId) {
-        try {
-            return namespaceOperationService.isNamespaceExist(namespaceId);
-        } catch (NacosApiException e) {
-            return true;
-        }
+        return namespaceOperationService.namespaceExists(namespaceId);
     }
 }
-

@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author xiweng.yy
  */
-@SuppressWarnings("PMD.ClassNamingShouldBeCamelRule")
 public abstract class BaseTopNCounter<T> {
     
     private final Comparator<Pair<String, AtomicInteger>> comparator;
@@ -55,7 +54,8 @@ public abstract class BaseTopNCounter<T> {
         }
         ConcurrentMap<T, AtomicInteger> snapshot = dataCount;
         dataCount = new ConcurrentHashMap<>(1);
-        FixedSizePriorityQueue<Pair<String, AtomicInteger>> queue = new FixedSizePriorityQueue<>(topN, comparator);
+        FixedSizePriorityQueue<Pair<String, AtomicInteger>> queue =
+            new FixedSizePriorityQueue<>(topN, comparator);
         for (T t : snapshot.keySet()) {
             queue.offer(Pair.with(keyToString(t), snapshot.get(t)));
         }

@@ -21,10 +21,10 @@ import com.alibaba.nacos.core.exception.NacosApiExceptionHandler;
 import com.alibaba.nacos.console.filter.NacosConsoleAuthFilter;
 import com.alibaba.nacos.console.filter.XssFilter;
 import com.alibaba.nacos.core.code.ControllerMethodsCache;
-import com.alibaba.nacos.core.controller.compatibility.ApiCompatibilityFilter;
 import com.alibaba.nacos.core.paramcheck.ParamCheckerFilter;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,8 +35,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import javax.annotation.PostConstruct;
-import java.time.ZoneId;
+import java.util.TimeZone;
 
 /**
  * Console config.
@@ -65,11 +64,24 @@ public class ConsoleWebConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.addAllowedHeader("*");
-        config.setMaxAge(18000L);
-        config.addAllowedMethod("*");
-        config.addAllowedOriginPattern("*");
+        ConsoleCorsConfig corsConfig = new ConsoleCorsConfig();
+        config.setAllowCredentials(corsConfig.isAllowCredentials());
+        if (corsConfig.getAllowedHeaders().isEmpty()) {
+            config.addAllowedHeader("*");
+        } else {
+            config.setAllowedHeaders(corsConfig.getAllowedHeaders());
+        }
+        config.setMaxAge(corsConfig.getMaxAge());
+        if (corsConfig.getAllowedMethods().isEmpty()) {
+            config.addAllowedMethod("*");
+        } else {
+            config.setAllowedMethods(corsConfig.getAllowedMethods());
+        }
+        if (corsConfig.getAllowedOrigins().isEmpty()) {
+            config.addAllowedOriginPattern("*");
+        } else {
+            config.setAllowedOrigins(corsConfig.getAllowedOrigins());
+        }
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
@@ -81,8 +93,10 @@ public class ConsoleWebConfig {
     }
     
     @Bean
-    public FilterRegistrationBean<NacosConsoleAuthFilter> authFilterRegistration(NacosConsoleAuthFilter authFilter) {
-        FilterRegistrationBean<NacosConsoleAuthFilter> registration = new FilterRegistrationBean<>();
+    public FilterRegistrationBean<NacosConsoleAuthFilter> authFilterRegistration(
+        NacosConsoleAuthFilter authFilter) {
+        FilterRegistrationBean<NacosConsoleAuthFilter> registration =
+            new FilterRegistrationBean<>();
         registration.setFilter(authFilter);
         registration.addUrlPatterns("/*");
         registration.setName("consoleAuthFilter");
@@ -93,12 +107,13 @@ public class ConsoleWebConfig {
     @Bean
     public NacosConsoleAuthFilter consoleAuthFilter(ControllerMethodsCache methodsCache) {
         return new NacosConsoleAuthFilter(NacosAuthConfigHolder.getInstance()
-                .getNacosAuthConfigByScope(NacosConsoleAuthConfig.NACOS_CONSOLE_AUTH_SCOPE), methodsCache);
+            .getNacosAuthConfigByScope(NacosConsoleAuthConfig.NACOS_CONSOLE_AUTH_SCOPE),
+            methodsCache);
     }
     
     @Bean
     public FilterRegistrationBean<ParamCheckerFilter> consoleParamCheckerFilterRegistration(
-            ParamCheckerFilter consoleParamCheckerFilter) {
+        ParamCheckerFilter consoleParamCheckerFilter) {
         FilterRegistrationBean<ParamCheckerFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(consoleParamCheckerFilter);
         registration.addUrlPatterns("/*");
@@ -113,30 +128,15 @@ public class ConsoleWebConfig {
     }
     
     @Bean
-    public ApiCompatibilityFilter consoleApiCompatibilityFilter(ControllerMethodsCache methodsCache) {
-        return new ApiCompatibilityFilter(methodsCache, null);
-    }
-    
-    @Bean
-    public FilterRegistrationBean<ApiCompatibilityFilter> consoleApiCompatibilityFilterRegistration(
-            ApiCompatibilityFilter consoleApiCompatibilityFilter) {
-        FilterRegistrationBean<ApiCompatibilityFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(consoleApiCompatibilityFilter);
-        registration.addUrlPatterns("/v1/*", "/v2/*");
-        registration.setName("consoleApiCompatibilityFilter");
-        registration.setOrder(5);
-        return registration;
-    }
-    
-    @Bean
-    public Jackson2ObjectMapperBuilderCustomizer jacksonObjectMapperCustomization() {
-        return jacksonObjectMapperBuilder -> jacksonObjectMapperBuilder.timeZone(ZoneId.systemDefault().toString());
+    public JsonMapperBuilderCustomizer jacksonJsonMapperCustomization() {
+        return jsonMapperBuilder -> jsonMapperBuilder.defaultTimeZone(TimeZone.getDefault());
     }
     
     @Bean
     @ConditionalOnMissingBean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests.requestMatchers("/**").permitAll());
+        http.authorizeHttpRequests(
+            (authorizeHttpRequests) -> authorizeHttpRequests.requestMatchers("/**").permitAll());
         http.csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }

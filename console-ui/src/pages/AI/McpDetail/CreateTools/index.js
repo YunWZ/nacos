@@ -1,107 +1,64 @@
-import React, { Children, useEffect, useImperativeHandle, useRef, useState } from 'react';
+
+import React, { useImperativeHandle, useState } from 'react';
+import PropTypes from 'prop-types';
 import {
   Dialog,
   Field,
   Form,
-  Input,
-  Grid,
-  Table,
-  Button,
   Message,
-  Select,
-  Tree,
-  Switch,
-  Tag,
+  Tab,
+  Button,
 } from '@alifd/next';
-import { formitemLayout, GetTitle, tableOperation } from './components';
+import { formitemLayout } from './components';
 import { request } from '../../../../globalLib';
-import { object } from 'prop-types';
-
-const { Row, Col } = Grid;
+import BasicInfo from './BasicInfo';
+import InputSchema from './InputSchema';
+import OutputSchema from './OutputSchema';
+import AdvancedConfig from './AdvancedConfig';
+import MetaEditor from './MetaEditor';
+import AnnotationsEditor from './AnnotationsEditor';
+import { convertPropertiesToTreeData } from './utils';
+import './CreateTools.css';
 
 const CreateTools = React.forwardRef((props, ref) => {
-  // eslint-disable-next-line react/prop-types
   const { locale, showTemplates = false, onlyEditRuntimeInfo = false } = props;
   const field = Field.useField({
     parseName: true,
     values: {
       toolParams: [],
+      outputToolParams: [],
+      outputRequired: [],
       invokeContext: [],
       templates: '',
+      transparentAuth: false,
+      securitySchemeId: '',
+      clientSecuritySchemeId: '',
     },
   });
-  const { init } = field;
+
   const [visible, setVisible] = useState(false);
-  const [invokeIdx, setInvokeIdx] = useState(0);
-  const [templateIdx, setTemplateIdx] = useState(0);
   const [type, setType] = useState('');
   const [okLoading, setOkLoading] = useState(false);
-  const [rawData, setRawData] = useState([]);
-  const [data, setData] = useState([]);
-  const [args, setArgs] = useState({});
-  const [currentNode, setCurrentNode] = useState({
-    description: '',
-    type: 'object',
-    // eslint-disable-next-line react/prop-types
-    label: locale.ArgumentsList,
-    key: 'args',
-    children: [],
-  });
-  // useEffect(() => {
-  //   if (visible) {
-  //     if (field.getValue('invokeContext') && !field.getValue('invokeContext')?.length) {
-  //       addNewToolMetadata();
-  //     } else {
-  //       field.setValues({ invokeContext: [] });
-  //     }
-  //     if (field.getValue('templates') && !field.getValue('templates')?.length) {
-  //       // addNewTemplates();
-  //     } else {
-  //       field.setValues({ templates: 'aaa' });
-  //     }
-  //   }
-  // }, [visible]);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const convertPropertiesToTreeData = (properties, prefix) => {
-    if (properties == null) {
-      return [];
-    }
-    const keys = Object.keys(properties);
-    let result = [];
-    for (let index = 0; index < keys.length; index++) {
-      const element = keys[index];
-      const arg = properties[element];
-      let children = [];
-      if (arg.type === 'object') {
-        children = convertPropertiesToTreeData(arg.properties, `${prefix}@@${element}`);
-      } else if (arg.type === 'array') {
-        children = convertPropertiesToTreeData(
-          {
-            items: arg.items,
-          },
-          `${prefix}@@${element}`
-        );
-      }
-      const node = {
-        label: element,
-        type: arg.type,
-        arg: arg,
-        description: arg.description ? arg.description : '',
-        children,
-        key: `${prefix}@@${element}`,
-      };
-      result.push(node);
-      args[`${prefix}@@${element}`] = node;
-    }
-    return result;
-  };
+  // States to pass to children for initialization
+  const [initialInputData, setInitialInputData] = useState({ rawData: [], args: {} });
+  const [initialOutputData, setInitialOutputData] = useState({ rawData: [], args: {} });
+  const [initialTemplate, setInitialTemplate] = useState('');
 
   const openVisible = ({ record, type, toolsMeta }) => {
-    const { name, description, inputSchema } = record;
+    const { name, description, inputSchema, outputSchema, _meta, annotations } = record;
     setType(type);
 
+    // --- Input Schema Initialization ---
+    const nextArgs = {};
     const _toolParams = inputSchema?.properties
-      ? convertPropertiesToTreeData(inputSchema?.properties, 'args')
+      ? convertPropertiesToTreeData(
+        inputSchema?.properties,
+        'args',
+        nextArgs,
+        Array.isArray(inputSchema?.required) ? inputSchema?.required : []
+      )
       : [];
 
     let rootNode = {
@@ -109,50 +66,149 @@ const CreateTools = React.forwardRef((props, ref) => {
       label: locale.ArgumentsList,
       key: 'args',
       description: '',
-      children: [],
+      children: _toolParams,
     };
+    nextArgs.args = rootNode;
 
-    args.args = rootNode;
-    rootNode.children = _toolParams;
     if (rootNode.children.length === 0) {
       const defaultNewArg = {
         type: 'string',
         label: 'NewArg1',
         key: 'args@@NewArg1',
         description: '',
+        defaultValue: '',
+        required: false,
         children: [],
+        arg: {
+          type: 'string',
+          description: '',
+        },
       };
       rootNode.children = [defaultNewArg];
-      args['args@@NewArg1'] = defaultNewArg;
+      nextArgs['args@@NewArg1'] = defaultNewArg;
     }
 
-    rawData.push(rootNode);
-    setRawData(rawData);
-    setData(JSON.parse(JSON.stringify(rawData)));
-    setArgs(args);
+    setInitialInputData({
+      rawData: [rootNode],
+      args: nextArgs
+    });
 
+
+    // --- Output Schema Initialization ---
+    const nextOutputArgs = {};
+    const _outputParams = outputSchema?.properties
+      ? convertPropertiesToTreeData(
+        outputSchema?.properties,
+        'out',
+        nextOutputArgs,
+        Array.isArray(outputSchema?.required) ? outputSchema?.required : []
+      )
+      : [];
+
+    let outputRootNode = {
+      type: 'object',
+      label: locale.OutputArgumentsList || locale.ArgumentsList,
+      key: 'out',
+      description: '',
+      children: _outputParams,
+    };
+    nextOutputArgs.out = outputRootNode;
+
+    if (outputRootNode.children.length === 0) {
+      const defaultNewOut = {
+        type: 'string',
+        label: 'result',
+        key: 'out@@result',
+        description: '',
+        defaultValue: '',
+        required: false,
+        children: [],
+        arg: {
+          type: 'string',
+          description: '',
+        },
+      };
+      outputRootNode.children = [defaultNewOut];
+      nextOutputArgs['out@@result'] = defaultNewOut;
+    }
+
+    setInitialOutputData({
+      rawData: [outputRootNode],
+      args: nextOutputArgs
+    });
+
+    // --- Templates & Security Initialization ---
     const _invokeContext = toolsMeta?.invokeContext
       ? Object.keys(toolsMeta?.invokeContext).map(key => ({
-          key,
-          value: toolsMeta?.invokeContext[key],
-        }))
+        key,
+        value: toolsMeta?.invokeContext[key],
+      }))
       : [];
-    setInvokeIdx(_invokeContext.length + 1);
 
     let templatesStr = '';
+    let extractedSecuritySchemeId = '';
+    let extractedClientSecuritySchemeId = '';
+    let extractedTransparentAuth = false;
+
     if (toolsMeta?.templates !== undefined && 'json-go-template' in toolsMeta?.templates) {
-      templatesStr = JSON.stringify(toolsMeta?.templates['json-go-template']);
+      templatesStr = JSON.stringify(toolsMeta?.templates['json-go-template'], null, 2);
+
+      try {
+        const templateObj = toolsMeta?.templates['json-go-template'];
+
+        if (templateObj?.requestTemplate?.security) {
+          extractedSecuritySchemeId = templateObj?.requestTemplate?.security.id;
+        }
+
+        if (templateObj?.security) {
+          if (templateObj.security.id) {
+            extractedClientSecuritySchemeId = templateObj.security.id;
+          }
+          if (templateObj.security.passthrough === true) {
+            extractedTransparentAuth = true;
+          }
+        }
+      } catch (error) {
+        // ignore error
+      }
+    }
+
+    setInitialTemplate(templatesStr);
+
+    // Initialize meta field
+    let metaStr = '';
+    if (_meta && typeof _meta === 'object' && Object.keys(_meta).length > 0) {
+      try {
+        metaStr = JSON.stringify(_meta, null, 2);
+      } catch (e) {
+        metaStr = '';
+      }
     }
 
     field.setValues({
       name,
       description,
-      toolParams: inputSchema?.properties ? inputSchema?.properties : {},
+      toolParams: inputSchema?.properties || {},
       required: inputSchema?.required,
+      outputToolParams: outputSchema?.properties || {},
+      outputRequired: outputSchema?.required,
       invokeContext: _invokeContext,
       templates: templatesStr,
       enabled: toolsMeta?.enabled,
+      transparentAuth: extractedTransparentAuth || toolsMeta?.transparentAuth || false,
+      securitySchemeId: extractedSecuritySchemeId || toolsMeta?.securitySchemeId || '',
+      clientSecuritySchemeId:
+        extractedClientSecuritySchemeId || toolsMeta?.clientSecuritySchemeId || '',
+      meta: metaStr,
+      // Initialize annotations fields
+      annotationsTitle: annotations?.title || '',
+      readOnlyHint: annotations?.readOnlyHint ?? false,
+      destructiveHint: annotations?.destructiveHint ?? true,
+      idempotentHint: annotations?.idempotentHint ?? false,
+      openWorldHint: annotations?.openWorldHint ?? true,
     });
+
+    setRefreshKey(prev => prev + 1);
     setOkLoading(false);
     setVisible(true);
   };
@@ -161,32 +217,12 @@ const CreateTools = React.forwardRef((props, ref) => {
     openVisible,
   }));
 
-  const openDialog = () => {
-    openVisible({
-      record: {
-        name: '',
-        description: '',
-      },
-      type: '',
-      toolsMeta: {
-        enabled: true,
-      },
-    });
-  };
-
   const closeDialog = () => {
     setVisible(false);
     setType('');
-    setCurrentNode({
-      description: '',
-      type: 'object',
-      label: '',
-      key: '',
-      children: [],
-    });
-    setData([]);
-    setRawData([]);
-    setArgs([]);
+    setInitialTemplate('');
+    setInitialInputData({ rawData: [], args: {} });
+    setInitialOutputData({ rawData: [], args: {} });
   };
 
   const createItems = () => {
@@ -198,8 +234,9 @@ const CreateTools = React.forwardRef((props, ref) => {
 
       const invokeContext = {};
       if (values?.invokeContext?.length) {
-        // eslint-disable-next-line no-unused-expressions
-        values?.invokeContext?.forEach(item => (invokeContext[item.key] = item.value));
+        values.invokeContext.forEach(item => {
+          invokeContext[item.key] = item.value;
+        });
       }
 
       const templates = {};
@@ -208,26 +245,24 @@ const CreateTools = React.forwardRef((props, ref) => {
         (records.protocol === 'http' || records.protocol === 'https') &&
         values?.templates?.length > 0
       ) {
-        const jsonGoTemplate = JSON.parse(values?.templates);
-        if (Object.keys(jsonGoTemplate).length > 0) {
-          templates['json-go-template'] = jsonGoTemplate;
+        try {
+          // values.templates should already contain the security injection
+          // if AdvancedConfig works correctly
+          let parsedTemplate = JSON.parse(values.templates);
+
+          if (parsedTemplate && Object.keys(parsedTemplate).length > 0) {
+            templates['json-go-template'] = parsedTemplate;
+          }
+        } catch (error) {
+          Message.error(locale.templateParseError || '模板格式错误，请检查 JSON 格式');
+          return;
         }
       }
-
-      const serverSpecification = JSON.stringify({
-        protocol: records?.protocol,
-        name: records?.name,
-        description: records?.description,
-        version: records?.version,
-        enbled: true,
-        remoteServerConfig: {
-          exportPath: records?.remoteServerConfig?.exportPath,
-        },
-      });
 
       // 根据 item.name  去除 重复的 name 值
       let _tool = JSON.parse(JSON.stringify(records?.toolSpec?.tools || []));
       let _toolsMeta = JSON.parse(JSON.stringify(records?.toolSpec?.toolsMeta || {}));
+
       const properties = values?.toolParams;
       const _toolitem = {
         name: values?.name,
@@ -238,14 +273,71 @@ const CreateTools = React.forwardRef((props, ref) => {
           required: values?.required,
         },
       };
+
+      // Handle meta field (_meta in JSON)
+      if (values?.meta && values.meta.trim()) {
+        try {
+          const parsedMeta = JSON.parse(values.meta);
+          if (parsedMeta && typeof parsedMeta === 'object' && Object.keys(parsedMeta).length > 0) {
+            _toolitem._meta = parsedMeta;
+          }
+        } catch (e) {
+          Message.error(locale.metaJsonError || 'Meta field JSON format error');
+          return;
+        }
+      }
+
+      // Handle annotations field
+      const hasAnnotations = values?.annotationsTitle ||
+        values?.readOnlyHint !== undefined ||
+        values?.destructiveHint !== undefined ||
+        values?.idempotentHint !== undefined ||
+        values?.openWorldHint !== undefined;
+
+      if (hasAnnotations) {
+        const annotations = {};
+        if (values?.annotationsTitle) {
+          annotations.title = values.annotationsTitle;
+        }
+        if (values?.readOnlyHint !== undefined) {
+          annotations.readOnlyHint = values.readOnlyHint;
+        }
+        if (values?.destructiveHint !== undefined) {
+          annotations.destructiveHint = values.destructiveHint;
+        }
+        if (values?.idempotentHint !== undefined) {
+          annotations.idempotentHint = values.idempotentHint;
+        }
+        if (values?.openWorldHint !== undefined) {
+          annotations.openWorldHint = values.openWorldHint;
+        }
+        if (Object.keys(annotations).length > 0) {
+          _toolitem.annotations = annotations;
+        }
+      }
+
+      const outputProperties = values?.outputToolParams;
+      const hasOutputProperties =
+        outputProperties && typeof outputProperties === 'object' && Object.keys(outputProperties).length > 0;
+      if (hasOutputProperties) {
+        _toolitem.outputSchema = {
+          type: 'object',
+          properties: outputProperties,
+          required: values?.outputRequired,
+        };
+      }
       const _toolsMetaitem = {
         [values?.name]: {
           enabled: values?.enabled,
           invokeContext,
           templates,
+          transparentAuth: values?.transparentAuth || false,
+          securitySchemeId: values?.securitySchemeId || '',
+          clientSecuritySchemeId: values?.clientSecuritySchemeId || '',
         },
       };
-      if (type == 'edit') {
+
+      if (type === 'edit') {
         _tool
           .map(i => i.name)
           .forEach((name, index) => {
@@ -277,7 +369,16 @@ const CreateTools = React.forwardRef((props, ref) => {
 
       const params = {
         mcpName: records?.name,
-        serverSpecification,
+        serverSpecification: JSON.stringify({
+          protocol: records?.protocol,
+          name: records?.name,
+          description: records?.description,
+          version: records?.version,
+          enbled: true,
+          remoteServerConfig: {
+            exportPath: records?.remoteServerConfig?.exportPath,
+          },
+        }),
         toolSpecification,
       };
 
@@ -286,437 +387,150 @@ const CreateTools = React.forwardRef((props, ref) => {
       }
 
       if (props?.onChange) {
-        // eslint-disable-next-line no-unused-expressions
-        props?.onChange(JSON.parse(toolSpecification));
+        props.onChange(JSON.parse(toolSpecification));
         closeDialog();
       }
     });
   };
 
-  const putMcp = async params => {
-    setOkLoading(true);
-    const result = await request({
-      url: 'v3/console/ai/mcp',
-      method: 'put',
-      data: params,
-      error: err => setOkLoading(false),
-    });
-    setOkLoading(false);
-
-    if (result?.code === 0 && result?.data === 'ok') {
-      if (type == 'edit') {
-        Message.success(locale.editToolSuccess);
-      } else {
-        Message.success(locale.createToolSuccess);
-      }
-      await new Promise(resolve => setTimeout(resolve, 300));
-      closeDialog();
-      // eslint-disable-next-line no-unused-expressions
-      props?.getServerDetail();
-    } else if (type == 'edit') {
-      Message.error(result?.message || locale.editToolFailed);
-    } else {
-      Message.error(result?.message || locale.createToolFailed);
-    }
-  };
-
-  // 添加Tool 元数据
-  const addNewToolMetadata = () => {
-    setInvokeIdx(invokeIdx + 1);
-    field.addArrayValue('invokeContext', invokeIdx, {
-      id: invokeIdx + 1,
-      key: '',
-      value: '',
-    });
-  };
-  // 删除Tool 元数据
-  const deleteToolMetadata = index => {
-    field.deleteArrayValue('invokeContext', index);
-  };
-
-  const validateTemplateJsonFormat = (rule, value, callback) => {
-    try {
-      if (value?.length > 0) {
-        JSON.parse(value);
-      }
-      callback();
-    } catch (e) {
-      callback(locale.templateShouldBeJson);
-    }
-  };
-
-  // 渲染表格
-  const renderTableCell = params => {
-    const {
-      component = 'input',
-      key = '',
-      rulesMessage = locale.placeInput,
-      minWidth = 200,
-    } = params;
-
-    const rules = [{ required: true, message: rulesMessage }];
-    if (component === 'textArea') {
-      if (key.startsWith('templates')) {
-        rules.push({
-          validator: validateTemplateJsonFormat,
-        });
-      }
-
-      return (
-        <Form.Item style={{ margin: 0 }}>
-          <Input.TextArea
-            aria-label="auto height"
-            style={{ minHeight: 32 }}
-            autoHeight={{ minRows: 1, maxRows: 8 }}
-            {...field.init(key, { rules })}
-          />
-        </Form.Item>
-      );
-    }
-
-    if (component === 'select') {
-      return (
-        <Form.Item style={{ margin: 0 }}>
-          <Select
-            style={{ width: '100%', maxWidth: minWidth }}
-            dataSource={[
-              { label: '字符串类型 string', value: 'string' },
-              { label: '数字类型 number', value: 'number' },
-              { label: '整数类型 integer', value: 'integer' },
-              { label: '布尔类型 boolean', value: 'boolean' },
-              { label: '数组类型 array', value: 'array' },
-              // { label:'对象类型，使用 properties 字段定义对象属性的模式', value:'object' },
-            ]}
-            {...field.init(key, { initValue: 'string', rules })}
-          />
-        </Form.Item>
-      );
-    }
-
-    return (
-      <Form.Item style={{ margin: 0, minWidth }}>
-        <Input {...field.init(key, { rules })} />
-      </Form.Item>
-    );
-  };
-
-  const rawDataToFiledValue = rawData => {
-    const result = {};
-    if (!rawData) {
-      return result;
-    }
-    for (let index = 0; index < rawData.length; index++) {
-      const element = rawData[index];
-      let arg = {
-        ...element.arg,
-        type: element.type,
-      };
-
-      arg.description = element.description;
-      arg.type = element.type;
-      if (element.type === 'object' && element.children.length > 0) {
-        arg.properties = rawDataToFiledValue(element.children);
-      } else if (element.type === 'array') {
-        arg.items = rawDataToFiledValue(element.children).items;
-      }
-      result[element.label] = arg;
-    }
-    return result;
-  };
-
-  const AddPropertiesToArgs = () => {
-    const parentNode = args[currentNode.key];
-    if (!parentNode.children) {
-      parentNode.children = [];
-    }
-    const childLen = parentNode.children.length + 1;
-    const newArgsName = `newArg${childLen}`;
-    const newNode = {
-      label: newArgsName,
-      key: `${currentNode.key}@@${newArgsName}`,
-      type: 'string',
-      description: '',
-      children: [],
-    };
-
-    args[`${currentNode.key}@@${newArgsName}`] = newNode;
-    if (!parentNode.children) {
-      parentNode.children = [];
-    }
-    parentNode.children.push(newNode);
-    setRawData(rawData);
-    setArgs(args);
-    setData(JSON.parse(JSON.stringify(rawData)));
-    saveParamToFiled();
-  };
-
-  const changeNodeInfo = () => {
-    setData(JSON.parse(JSON.stringify(rawData)));
-    saveParamToFiled();
-  };
-
-  const saveParamToFiled = () => {
-    field.setValue('toolParams', rawDataToFiledValue(rawData[0].children));
-  };
-
   const isPreview = type === 'preview';
+
   return (
     <div>
       {visible ? (
         <Dialog
           v2
-          title={'Tools'}
-          footer={
-            onlyEditRuntimeInfo ? (
-              <p style={{ color: 'red' }}>{locale.editExistVersionMessage}</p>
-            ) : (
-              ''
-            )
+          title={
+            <div style={{ fontSize: '18px', fontWeight: '600', color: '#262626', display: 'flex', alignItems: 'center' }}>
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: '4px',
+                  height: '18px',
+                  backgroundColor: '#1890ff',
+                  marginRight: '12px',
+                  borderRadius: '2px',
+                }}
+              />
+              {(() => {
+                if (type === 'edit') return locale.editTool || '编辑工具';
+                if (type === 'preview') return locale.previewTool || '预览工具';
+                return locale.createTool || '创建工具';
+              })()}
+            </div>
           }
-          visible
           footer={
             isPreview ? (
-              <Button type="primary" onClick={closeDialog}>
+              <Button
+                type="primary"
+                size="large"
+                onClick={closeDialog}
+                style={{ borderRadius: '6px', height: '40px', fontSize: '16px', fontWeight: '500' }}
+              >
                 {locale.close}
               </Button>
             ) : (
               true
             )
           }
+          visible
           footerActions={isPreview ? [] : ['ok', 'cancel']}
           onOk={createItems}
-          okProps={{ loading: okLoading }}
+          okProps={{
+            loading: okLoading,
+            size: 'large',
+            style: { borderRadius: '6px', height: '40px', fontSize: '16px', fontWeight: '500' },
+          }}
+          cancelProps={{
+            size: 'large',
+            style: { borderRadius: '6px', height: '40px', fontSize: '16px' },
+          }}
           onClose={closeDialog}
-          style={{ width: '70%' }}
+          className="create-tools-modal"
+          style={{ width: '80%', maxWidth: '1200px', minWidth: '800px' }}
+          bodyStyle={{ padding: 0 }}
         >
-          <Form field={field} {...formitemLayout}>
-            {/* 名称 */}
-            <Form.Item label={locale.toolName} required isPreview={!!type}>
-              <Input
-                placeholder={locale.toolName}
-                {...init('name', {
-                  rules: [
-                    { required: true, message: locale.toolNameRequired },
-                    {
-                      validator: (rule, value, callback) => {
-                        const _tools = props?.serverConfig?.toolSpec?.tools || [];
-                        if (_tools?.length && !type) {
-                          const names = _tools.map(item => item.name);
-                          if (names.includes(value)) {
-                            callback(locale.toolNameRepeat);
-                          }
-                        }
-                        callback();
-                      },
-                    },
-                  ],
-                })}
-              />
-            </Form.Item>
-
-            {/* 描述 */}
-            <Form.Item label={locale.toolDescription} required>
-              <Input.TextArea
-                placeholder={locale.toolDescription}
-                {...init('description', {
-                  rules: [{ required: true, message: locale.toolDescriptionRequired }],
-                })}
-              />
-            </Form.Item>
-
-            {/* 是否上线 */}
-            <Form.Item label={locale.toolOnline} required>
-              <Switch
-                {...init('enabled', {
-                  valueName: 'checked',
-                  initValue: true,
-                  props: isPreview
-                    ? {
-                        checkedChildren: locale.online,
-                        unCheckedChildren: locale.offline,
-                      }
-                    : {},
-                })}
-              />
-            </Form.Item>
-
-            {/* 入参描述 */}
-            <Form.Item label={locale.toolInputSchema} required style={{ margin: '16px 0 0' }} />
-            <Form.Item label={locale.ArgumentTree} style={{ margin: '16px 0 0' }}>
-              {!isPreview && !onlyEditRuntimeInfo && (
-                <Row>
-                  <Col style={{ marginTop: 5 }}>
-                    <Button
-                      type="primary"
-                      size={'small'}
-                      onClick={AddPropertiesToArgs}
-                      disabled={currentNode.type !== 'object'}
-                    >
-                      {currentNode.key === 'args' ? locale.AddNewArg : locale.AddNewProperties}
-                    </Button>
-                    &nbsp;&nbsp;
-                    {currentNode.type !== 'object' ? locale.OnlyObjectSupportAddProperties : ''}
-                  </Col>
-                </Row>
-              )}
-              <Row style={{ marginTop: 5 }}>
-                <Col>
-                  <Tree
-                    defaultExpandAll
-                    autoExpandParent
-                    showLine
-                    isLabelBlock
-                    dataSource={data}
-                    defaultSelectedKeys={['args']}
-                    aria-label={'test'}
-                    labelRender={node => {
-                      return (
-                        <Row style={{ fontSize: 'medium' }}>
-                          <Col>
-                            <a>{node.label}</a>&nbsp;&nbsp;({args[node.key].type})
-                          </Col>
-                          <Col style={{ textOverflow: 'ellipsis' }}>
-                            {args[node.key].description?.length <= 25
-                              ? args[node.key].description
-                              : `${args[node.key].description?.substring(0, 20)}...`}
-                          </Col>
-                        </Row>
-                      );
-                    }}
-                    onSelect={data => {
-                      if (data.length === 1) {
-                        const currentNode = args[data];
-                        setCurrentNode(currentNode);
-                      } else if (data.length === 0) {
-                        setCurrentNode({
-                          key: '',
-                          label: '',
-                          type: 'string',
-                          description: '',
-                        });
-                      }
-                    }}
+          <div className="create-tools-dialog-body">
+            <Form
+              field={field}
+              {...formitemLayout}
+              className="create-tools-form-container"
+            >
+              <Tab shape="wrapped" size="medium" style={{ marginTop: 0 }} contentStyle={{ padding: '20px 0' }}>
+                <Tab.Item title={locale.basicInfo || '基础信息'} key="basic">
+                  <BasicInfo
+                    locale={locale}
+                    field={field}
+                    type={type}
+                    serverConfig={props?.serverConfig}
+                    isPreview={isPreview}
                   />
-                </Col>
-              </Row>
-            </Form.Item>
-            {currentNode.key !== '' && currentNode.key !== 'args' && (
-              <Form.Item label={locale.ArgumentInfo}>
-                <Row>
-                  <Col>
-                    <Form.Item
-                      name="args.name"
-                      label={locale.toolParamName}
-                      required
-                      requiredTrigger="onBlur"
-                      asterisk={false}
-                    >
-                      <Input
-                        isPreview={onlyEditRuntimeInfo}
-                        disabled={currentNode.key === 'args'}
-                        value={currentNode.label}
-                        onChange={data => {
-                          if (currentNode.key !== '') {
-                            currentNode.label = data;
-                            changeNodeInfo(currentNode);
-                          }
-                        }}
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col offset={1}>
-                    <Form.Item name="args.type" label={locale.toolParamType}>
-                      <Select
-                        isPreview={onlyEditRuntimeInfo}
-                        disabled={currentNode.key === 'args'}
-                        value={currentNode.type}
-                        dataSource={[
-                          { label: '字符串类型 string', value: 'string' },
-                          { label: '数字类型 number', value: 'number' },
-                          { label: '整数类型 integer', value: 'integer' },
-                          { label: '布尔类型 boolean', value: 'boolean' },
-                          { label: '数组类型 array', value: 'array' },
-                          { label: '对象类型 object', value: 'object' },
-                          // { label:'对象类型，使用 properties 字段定义对象属性的模式', value:'object' },
-                        ]}
-                        style={{ width: '60%' }}
-                        onChange={data => {
-                          if (currentNode.key !== '') {
-                            if (!(data === 'array' || data === 'object')) {
-                              currentNode.children = [];
-                            }
-                            if (data === 'array') {
-                              const itemNode = {
-                                label: 'items',
-                                type: 'string',
-                                description: '',
-                                key: `${currentNode.key}@@items`,
-                              };
-                              currentNode.type = data;
-                              currentNode.children = [itemNode];
-                              args[`${currentNode.key}@@items`] = itemNode;
-                              changeNodeInfo(currentNode);
-                            } else if (data === 'object') {
-                              currentNode.children = [];
-                              currentNode.type = data;
-                              changeNodeInfo(currentNode);
-                            } else {
-                              currentNode.type = data;
-                              changeNodeInfo(currentNode);
-                            }
-                          }
-                        }}
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col>
-                    <Form.Item
-                      label={locale.toolParamDescription}
-                      name="args.description"
-                      asterisk={false}
-                    >
-                      <Input.TextArea
-                        disabled={currentNode.key === 'args'}
-                        value={currentNode.description}
-                        onChange={data => {
-                          if (currentNode.key !== '') {
-                            currentNode.description = data;
-                            changeNodeInfo(currentNode);
-                          }
-                        }}
-                      />
-                    </Form.Item>
-                  </Col>
-                </Row>
-              </Form.Item>
-            )}
-            {showTemplates ? (
-              <>
-                <Form.Item
-                  label={locale.invokeTemplates}
-                  extra={locale.httpToMcpDoc}
-                  style={{ marginTop: '10px' }}
-                >
-                  <Input.TextArea
-                    isPreview={onlyEditRuntimeInfo}
-                    aria-label="auto height"
-                    style={{ minHeight: 32 }}
-                    multiline
-                    autoHeight={{ minRows: 5, maxRows: 8 }}
-                    {...field.init('templates', {
-                      rules: [{ validator: validateTemplateJsonFormat }],
-                    })}
+                </Tab.Item>
+                <Tab.Item title={locale.toolInputSchema || '入参配置'} key="input">
+                  <InputSchema
+                    locale={locale}
+                    field={field}
+                    isPreview={isPreview}
+                    onlyEditRuntimeInfo={onlyEditRuntimeInfo}
+                    initialRawData={initialInputData.rawData}
+                    initialArgs={initialInputData.args}
+                    refreshKey={refreshKey}
                   />
-                </Form.Item>
-              </>
-            ) : null}
-          </Form>
+                </Tab.Item>
+                <Tab.Item title={locale.toolOutputSchema || '出参配置'} key="output">
+                  <OutputSchema
+                    locale={locale}
+                    field={field}
+                    isPreview={isPreview}
+                    onlyEditRuntimeInfo={onlyEditRuntimeInfo}
+                    initialRawData={initialOutputData.rawData}
+                    initialArgs={initialOutputData.args}
+                    refreshKey={refreshKey}
+                  />
+                </Tab.Item>
+                <Tab.Item title={locale.metaConfig || 'Meta'} key="meta">
+                  <MetaEditor
+                    locale={locale}
+                    field={field}
+                    isPreview={isPreview}
+                    refreshKey={refreshKey}
+                  />
+                </Tab.Item>
+                <Tab.Item title={locale.annotationsConfig || 'Annotations'} key="annotations">
+                  <AnnotationsEditor
+                    locale={locale}
+                    field={field}
+                    isPreview={isPreview}
+                    refreshKey={refreshKey}
+                  />
+                </Tab.Item>
+                {showTemplates && (
+                  <Tab.Item title={locale.advancedConfig || '高级配置'} key="template">
+                    <AdvancedConfig
+                      locale={locale}
+                      field={field}
+                      serverConfig={props?.serverConfig}
+                      onlyEditRuntimeInfo={onlyEditRuntimeInfo}
+                      initialOriginalTemplate={initialTemplate}
+                      refreshKey={refreshKey}
+                    />
+                  </Tab.Item>
+                )}
+              </Tab>
+            </Form>
+          </div>
         </Dialog>
       ) : null}
     </div>
   );
 });
+
+CreateTools.propTypes = {
+  locale: PropTypes.object,
+  showTemplates: PropTypes.bool,
+  onlyEditRuntimeInfo: PropTypes.bool,
+  serverConfig: PropTypes.object,
+  onChange: PropTypes.func,
+};
 
 export default CreateTools;

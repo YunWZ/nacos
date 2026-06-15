@@ -40,6 +40,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
@@ -72,11 +73,12 @@ class RequestHandlerRegistryTest {
     void setUp() {
         controlManagerCenterMockedStatic = Mockito.mockStatic(ControlManagerCenter.class);
         controlManagerCenterMockedStatic.when(() -> ControlManagerCenter.getInstance())
-                .thenReturn(controlManagerCenter);
+            .thenReturn(controlManagerCenter);
         when(controlManagerCenter.getTpsControlManager()).thenReturn(tpsControlManager);
         
         Map<String, Object> handlerMap = new HashMap<>();
-        handlerMap.put(HealthCheckRequestHandler.class.getSimpleName(), new HealthCheckRequestHandler());
+        handlerMap.put(HealthCheckRequestHandler.class.getSimpleName(),
+            new HealthCheckRequestHandler());
         Mockito.when(applicationContext.getBeansOfType(Mockito.any())).thenReturn(handlerMap);
         
         registry.onApplicationEvent(contextRefreshedEvent);
@@ -96,15 +98,23 @@ class RequestHandlerRegistryTest {
     @Test
     public void testSourceInvokeAllowed() {
         Map<String, Object> handlerMap = new HashMap<>();
-        handlerMap.put(ServerReloadRequest.class.getSimpleName(), new ServerReloaderRequestHandler());
+        handlerMap.put(ServerReloadRequest.class.getSimpleName(),
+            new ServerReloaderRequestHandler());
         Mockito.when(applicationContext.getBeansOfType(Mockito.any())).thenReturn(handlerMap);
         
         registry.onApplicationEvent(contextRefreshedEvent);
         assertNotNull(registry.sourceRegistry.get(ServerReloadRequest.class.getSimpleName())
-                .contains(RemoteConstants.LABEL_SOURCE_CLUSTER));
+            .contains(RemoteConstants.LABEL_SOURCE_CLUSTER));
         
         assertFalse(registry.checkSourceInvokeAllowed(ServerReloadRequest.class.getSimpleName(),
-                RemoteConstants.LABEL_SOURCE_SDK));
+            RemoteConstants.LABEL_SOURCE_SDK));
         
+        assertTrue(registry.checkSourceInvokeAllowed(ServerReloadRequest.class.getSimpleName(),
+            RemoteConstants.LABEL_SOURCE_CLUSTER));
+    }
+    
+    @Test
+    void testCheckSourceInvokeAllowedWhenTypeNotInRegistry() {
+        assertTrue(registry.checkSourceInvokeAllowed("UnknownType", "anySource"));
     }
 }

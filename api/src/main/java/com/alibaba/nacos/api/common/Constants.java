@@ -46,15 +46,17 @@ public class Constants {
     public static final String NULL = "";
     
     public static final String DATA_ID = "dataId";
-
+    
     public static final String TENANT = "tenant";
-
+    
     public static final String GROUP = "group";
     
     public static final String GROUP_NAME = "groupName";
-
+    
     public static final String NAMESPACE_ID = "namespaceId";
-
+    
+    public static final String TARGET_NAMESPACE_ID = "targetNamespaceId";
+    
     public static final String LAST_MODIFIED = "Last-Modified";
     
     public static final String ACCEPT_ENCODING = "Accept-Encoding";
@@ -226,6 +228,10 @@ public class Constants {
     
     public static final String CLUSTER_NAME_PATTERN_STRING = "^[0-9a-zA-Z-]+$";
     
+    public static final String TAG_V2 = "tagv2";
+    
+    public static final String TAG_V2_PREFIX = "tagv2_";
+    
     /**
      * millisecond.
      */
@@ -320,7 +326,7 @@ public class Constants {
         public static final String DELETE_CONFIG = "DELETE_CONFIG";
         
         public static final String CONFIG_CHANGED = "CONFIG_CHANGED";
-    
+        
     }
     
     /**
@@ -372,7 +378,6 @@ public class Constants {
     /**
      * The constants in AI directory.
      */
-    @SuppressWarnings("PMD.ClassNamingShouldBeCamelRule")
     public static class AI {
         
         public static final String AI_MODULE = "ai";

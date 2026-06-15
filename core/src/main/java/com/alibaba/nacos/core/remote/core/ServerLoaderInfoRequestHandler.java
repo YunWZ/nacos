@@ -16,6 +16,8 @@
 
 package com.alibaba.nacos.core.remote.core;
 
+import com.alibaba.nacos.api.annotation.Since;
+import com.alibaba.nacos.api.common.ApiType;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.remote.RemoteConstants;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
@@ -25,7 +27,6 @@ import com.alibaba.nacos.auth.annotation.Secured;
 import com.alibaba.nacos.core.remote.ConnectionManager;
 import com.alibaba.nacos.core.remote.RequestHandler;
 import com.alibaba.nacos.core.remote.grpc.InvokeSource;
-import com.alibaba.nacos.plugin.auth.constant.ApiType;
 import com.alibaba.nacos.plugin.auth.constant.SignType;
 import com.alibaba.nacos.sys.env.EnvUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,20 +43,24 @@ import java.util.Map;
  */
 @Component
 @InvokeSource(source = {RemoteConstants.LABEL_SOURCE_CLUSTER})
-public class ServerLoaderInfoRequestHandler extends RequestHandler<ServerLoaderInfoRequest, ServerLoaderInfoResponse> {
+@Since("2.0.0")
+public class ServerLoaderInfoRequestHandler
+    extends RequestHandler<ServerLoaderInfoRequest, ServerLoaderInfoResponse> {
     
     @Autowired
     private ConnectionManager connectionManager;
     
     @Override
     @Secured(resource = "serverLoader", signType = SignType.SPECIFIED, apiType = ApiType.INNER_API)
-    public ServerLoaderInfoResponse handle(ServerLoaderInfoRequest request, RequestMeta meta) throws NacosException {
+    public ServerLoaderInfoResponse handle(ServerLoaderInfoRequest request, RequestMeta meta)
+        throws NacosException {
         ServerLoaderInfoResponse serverLoaderInfoResponse = new ServerLoaderInfoResponse();
-        serverLoaderInfoResponse.putMetricsValue("conCount", String.valueOf(connectionManager.currentClientsCount()));
+        serverLoaderInfoResponse.putMetricsValue("conCount",
+            String.valueOf(connectionManager.currentClientsCount()));
         Map<String, String> filter = new HashMap<>(2);
         filter.put(RemoteConstants.LABEL_SOURCE, RemoteConstants.LABEL_SOURCE_SDK);
-        serverLoaderInfoResponse
-                .putMetricsValue("sdkConCount", String.valueOf(connectionManager.currentClientsCount(filter)));
+        serverLoaderInfoResponse.putMetricsValue("sdkConCount",
+            String.valueOf(connectionManager.currentClientsCount(filter)));
         serverLoaderInfoResponse.putMetricsValue("load", String.valueOf(EnvUtil.getLoad()));
         serverLoaderInfoResponse.putMetricsValue("cpu", String.valueOf(EnvUtil.getCpu()));
         

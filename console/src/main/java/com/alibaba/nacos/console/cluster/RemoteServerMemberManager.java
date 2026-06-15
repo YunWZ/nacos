@@ -26,9 +26,9 @@ import com.alibaba.nacos.core.cluster.MembersChangeEvent;
 import com.alibaba.nacos.core.cluster.NacosMemberManager;
 import com.alibaba.nacos.core.cluster.lookup.LookupFactory;
 import com.alibaba.nacos.core.utils.Loggers;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -73,7 +73,8 @@ public class RemoteServerMemberManager implements NacosMemberManager {
         for (Member each : members) {
             newServerList.put(each.getAddress(), each);
         }
-        Loggers.CLUSTER.info("[serverlist] nacos remote server members changed to : {}", newServerList);
+        Loggers.CLUSTER.info("[serverlist] nacos remote server members changed to : {}",
+            newServerList);
         this.serverList = newServerList;
         Event event = MembersChangeEvent.builder().members(members).build();
         NotifyCenter.publishEvent(event);

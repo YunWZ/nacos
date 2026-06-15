@@ -48,11 +48,71 @@ class ParamRequestConditionTest {
     @Test
     void testGetMatchingCondition() {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        ParamRequestCondition paramRequestCondition1 = paramRequestCondition.getMatchingCondition(request);
+        ParamRequestCondition paramRequestCondition1 =
+            paramRequestCondition.getMatchingCondition(request);
         assertNull(paramRequestCondition1);
         
         request.setParameter("test", "1244");
-        ParamRequestCondition paramRequestCondition2 = paramRequestCondition.getMatchingCondition(request);
+        ParamRequestCondition paramRequestCondition2 =
+            paramRequestCondition.getMatchingCondition(request);
         assertNotNull(paramRequestCondition2);
+    }
+    
+    @Test
+    void testGetMatchingConditionWithMultipleExpressions() {
+        ParamRequestCondition condition = new ParamRequestCondition("a=1", "b=2");
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        assertNull(condition.getMatchingCondition(request));
+        
+        request.setParameter("a", "1");
+        assertNull(condition.getMatchingCondition(request));
+        
+        request.setParameter("b", "2");
+        assertNotNull(condition.getMatchingCondition(request));
+    }
+    
+    @Test
+    void testEmptyExpressions() {
+        ParamRequestCondition condition = new ParamRequestCondition();
+        assertEquals(0, condition.getExpressions().size());
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        assertNotNull(condition.getMatchingCondition(request));
+    }
+    
+    @Test
+    void testParamWithoutValueMatchName() {
+        ParamRequestCondition condition = new ParamRequestCondition("present");
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        assertNull(condition.getMatchingCondition(request));
+        request.setParameter("present", "any");
+        assertNotNull(condition.getMatchingCondition(request));
+    }
+    
+    @Test
+    void testNegatedParamPresent() {
+        ParamRequestCondition condition = new ParamRequestCondition("!absent");
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        assertNotNull(condition.getMatchingCondition(request));
+        request.setParameter("absent", "v");
+        assertNull(condition.getMatchingCondition(request));
+    }
+    
+    @Test
+    void testNegatedParamWithValue() {
+        ParamRequestCondition condition = new ParamRequestCondition("x!=v");
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        assertNotNull(condition.getMatchingCondition(request));
+        request.setParameter("x", "other");
+        assertNotNull(condition.getMatchingCondition(request));
+        request.setParameter("x", "v");
+        assertNull(condition.getMatchingCondition(request));
+    }
+    
+    @Test
+    void testToString() {
+        ParamRequestCondition condition = new ParamRequestCondition("k=v");
+        String s = condition.toString();
+        assertNotNull(s);
+        assertEquals("ParamRequestCondition{expressions=" + condition.getExpressions() + "}", s);
     }
 }

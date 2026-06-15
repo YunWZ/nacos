@@ -16,28 +16,8 @@
 
 package com.alibaba.nacos.maintainer.client.ai;
 
-import com.alibaba.nacos.api.ai.constant.AiConstants;
-import com.alibaba.nacos.api.ai.model.mcp.McpEndpointSpec;
-import com.alibaba.nacos.api.ai.model.mcp.McpServerBasicInfo;
-import com.alibaba.nacos.api.ai.model.mcp.McpServerDetailInfo;
-import com.alibaba.nacos.api.ai.model.mcp.McpToolSpecification;
 import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.nacos.api.model.Page;
-import com.alibaba.nacos.api.model.v2.ErrorCode;
-import com.alibaba.nacos.api.model.v2.Result;
-import com.alibaba.nacos.common.http.HttpRestResult;
-import com.alibaba.nacos.common.utils.HttpMethod;
-import com.alibaba.nacos.common.utils.JacksonUtils;
-import com.alibaba.nacos.common.utils.StringUtils;
-import com.alibaba.nacos.maintainer.client.constants.Constants;
-import com.alibaba.nacos.maintainer.client.model.HttpRequest;
-import com.alibaba.nacos.maintainer.client.remote.ClientHttpProxy;
-import com.alibaba.nacos.maintainer.client.utils.ParamUtil;
-import com.alibaba.nacos.plugin.auth.api.RequestResource;
-import com.fasterxml.jackson.core.type.TypeReference;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -47,154 +27,57 @@ import java.util.Properties;
  */
 public class NacosAiMaintainerServiceImpl implements AiMaintainerService {
     
-    private final ClientHttpProxy clientHttpProxy;
+    private final SkillMaintainerService skillMaintainerService;
+    
+    private final AgentSpecMaintainerService agentSpecMaintainerService;
+    
+    private final McpMaintainerService mcpMaintainerService;
+    
+    private final A2aMaintainerService a2aMaintainerService;
+    
+    private final PromptMaintainerService promptMaintainerService;
+    
+    private final PipelineMaintainerService pipelineMaintainerService;
     
     public NacosAiMaintainerServiceImpl(Properties properties) throws NacosException {
-        this.clientHttpProxy = new ClientHttpProxy(properties);
-        ParamUtil.initSerialization();
+        AiMaintainerHttpContext context = new AiMaintainerHttpContext(properties);
+        SkillMaintainerService skillDelegate = new SkillMaintainerServiceImpl(context);
+        AgentSpecMaintainerService agentSpecDelegate = new AgentSpecMaintainerServiceImpl(context);
+        this.mcpMaintainerService = new McpMaintainerServiceImpl(context);
+        this.a2aMaintainerService = new A2aMaintainerServiceImpl(context);
+        this.promptMaintainerService = new PromptMaintainerServiceImpl(context);
+        this.pipelineMaintainerService = new PipelineMaintainerServiceImpl(context);
+        this.skillMaintainerService = skillDelegate;
+        this.agentSpecMaintainerService = agentSpecDelegate;
     }
     
     @Override
-    public Page<McpServerBasicInfo> listMcpServer(String namespaceId, String mcpName, int pageNo, int pageSize)
-            throws NacosException {
-        if (StringUtils.isBlank(namespaceId)) {
-            namespaceId = AiConstants.Mcp.MCP_DEFAULT_NAMESPACE;
-        }
-        Map<String, String> params = new HashMap<>(8);
-        params.put("pageNo", String.valueOf(pageNo));
-        params.put("pageSize", String.valueOf(pageSize));
-        params.put("search", "accurate");
-        params.put("mcpName", mcpName);
-        params.put("namespaceId", namespaceId);
-        RequestResource resource = buildRequestResource(namespaceId, mcpName);
-        return getMcpServerBasicInfoPage(params, resource);
+    public SkillMaintainerService skill() {
+        return skillMaintainerService;
     }
     
     @Override
-    public Page<McpServerBasicInfo> searchMcpServer(String namespaceId, String mcpName, int pageNo, int pageSize)
-            throws NacosException {
-        if (StringUtils.isBlank(namespaceId)) {
-            namespaceId = AiConstants.Mcp.MCP_DEFAULT_NAMESPACE;
-        }
-        Map<String, String> params = new HashMap<>(8);
-        params.put("pageNo", String.valueOf(pageNo));
-        params.put("pageSize", String.valueOf(pageSize));
-        params.put("search", "blur");
-        params.put("mcpName", mcpName);
-        params.put("namespaceId", namespaceId);
-        RequestResource resource = buildRequestResource(namespaceId, mcpName);
-        return getMcpServerBasicInfoPage(params, resource);
-    }
-    
-    private Page<McpServerBasicInfo> getMcpServerBasicInfoPage(Map<String, String> params, RequestResource resource)
-            throws NacosException {
-        HttpRequest httpRequest = buildHttpRequestBuilder(resource).setHttpMethod(HttpMethod.GET)
-                .setPath(Constants.AdminApiPath.AI_MCP_ADMIN_PATH + "/list").setParamValue(params).build();
-        HttpRestResult<String> restResult = clientHttpProxy.executeSyncHttpRequest(httpRequest);
-        Result<Page<McpServerBasicInfo>> result = JacksonUtils.toObj(restResult.getData(),
-                new TypeReference<Result<Page<McpServerBasicInfo>>>() {
-                });
-        return result.getData();
+    public AgentSpecMaintainerService agentSpec() {
+        return agentSpecMaintainerService;
     }
     
     @Override
-    public McpServerDetailInfo getMcpServerDetail(String namespaceId, String mcpName, String mcpId, String version)
-            throws NacosException {
-        if (StringUtils.isBlank(namespaceId)) {
-            namespaceId = AiConstants.Mcp.MCP_DEFAULT_NAMESPACE;
-        }
-        Map<String, String> params = new HashMap<>(4);
-        params.put("mcpName", mcpName);
-        params.put("mcpId", mcpId);
-        params.put("version", version);
-        params.put("namespaceId", namespaceId);
-        RequestResource resource = buildRequestResource(namespaceId, mcpName);
-        HttpRequest httpRequest = buildHttpRequestBuilder(resource).setHttpMethod(HttpMethod.GET)
-                .setPath(Constants.AdminApiPath.AI_MCP_ADMIN_PATH).setParamValue(params).build();
-        HttpRestResult<String> restResult = clientHttpProxy.executeSyncHttpRequest(httpRequest);
-        Result<McpServerDetailInfo> result = JacksonUtils.toObj(restResult.getData(),
-                new TypeReference<Result<McpServerDetailInfo>>() {
-                });
-        return result.getData();
+    public McpMaintainerService mcp() {
+        return mcpMaintainerService;
     }
     
     @Override
-    public String createMcpServer(String namespaceId, String mcpName, McpServerBasicInfo serverSpec,
-            McpToolSpecification toolSpec, McpEndpointSpec endpointSpec) throws NacosException {
-        if (StringUtils.isBlank(namespaceId)) {
-            namespaceId = AiConstants.Mcp.MCP_DEFAULT_NAMESPACE;
-        }
-        Map<String, String> params = buildFullParameters(serverSpec, toolSpec, endpointSpec);
-        params.put("namespaceId", namespaceId);
-        RequestResource resource = buildRequestResource(namespaceId, mcpName);
-        HttpRequest httpRequest = buildHttpRequestBuilder(resource).setHttpMethod(HttpMethod.POST)
-                .setPath(Constants.AdminApiPath.AI_MCP_ADMIN_PATH).setParamValue(params).build();
-        HttpRestResult<String> restResult = clientHttpProxy.executeSyncHttpRequest(httpRequest);
-        Result<String> result = JacksonUtils.toObj(restResult.getData(), new TypeReference<Result<String>>() {
-        });
-        return result.getData();
+    public A2aMaintainerService a2a() {
+        return a2aMaintainerService;
     }
     
     @Override
-    public boolean updateMcpServer(String namespaceId, String mcpName, boolean isLatest, McpServerBasicInfo serverSpec,
-            McpToolSpecification toolSpec, McpEndpointSpec endpointSpec) throws NacosException {
-        if (StringUtils.isBlank(namespaceId)) {
-            namespaceId = AiConstants.Mcp.MCP_DEFAULT_NAMESPACE;
-        }
-        Map<String, String> params = buildFullParameters(serverSpec, toolSpec, endpointSpec);
-        params.put("latest", String.valueOf(isLatest));
-        params.put("namespaceId", namespaceId);
-        RequestResource resource = buildRequestResource(namespaceId, mcpName);
-        HttpRequest httpRequest = buildHttpRequestBuilder(resource).setHttpMethod(HttpMethod.PUT)
-                .setPath(Constants.AdminApiPath.AI_MCP_ADMIN_PATH).setParamValue(params).build();
-        HttpRestResult<String> restResult = clientHttpProxy.executeSyncHttpRequest(httpRequest);
-        Result<String> result = JacksonUtils.toObj(restResult.getData(), new TypeReference<Result<String>>() {
-        });
-        return ErrorCode.SUCCESS.getCode().equals(result.getCode());
-    }
-    
-    private Map<String, String> buildFullParameters(McpServerBasicInfo serverSpec, McpToolSpecification toolSpec,
-            McpEndpointSpec endpointSpec) {
-        Map<String, String> params = new HashMap<>(4);
-        params.put("mcpName", serverSpec.getName());
-        params.put("serverSpecification", JacksonUtils.toJson(serverSpec));
-        if (null != toolSpec) {
-            params.put("toolSpecification", JacksonUtils.toJson(toolSpec));
-        }
-        if (null != endpointSpec) {
-            params.put("endpointSpecification", JacksonUtils.toJson(endpointSpec));
-        }
-        return params;
+    public PromptMaintainerService prompt() {
+        return promptMaintainerService;
     }
     
     @Override
-    public boolean deleteMcpServer(String namespaceId, String mcpName, String mcpId, String version) throws NacosException {
-        if (StringUtils.isBlank(namespaceId)) {
-            namespaceId = AiConstants.Mcp.MCP_DEFAULT_NAMESPACE;
-        }
-        Map<String, String> params = new HashMap<>(4);
-        params.put("mcpName", mcpName);
-        params.put("mcpId", mcpId);
-        params.put("version", version);
-        params.put("namespaceId", namespaceId);
-        RequestResource resource = buildRequestResource(namespaceId, mcpName);
-        HttpRequest httpRequest = buildHttpRequestBuilder(resource).setHttpMethod(HttpMethod.DELETE)
-                .setPath(Constants.AdminApiPath.AI_MCP_ADMIN_PATH).setParamValue(params).build();
-        HttpRestResult<String> restResult = clientHttpProxy.executeSyncHttpRequest(httpRequest);
-        Result<String> result = JacksonUtils.toObj(restResult.getData(), new TypeReference<Result<String>>() {
-        });
-        return ErrorCode.SUCCESS.getCode().equals(result.getCode());
-    }
-    
-    private RequestResource buildRequestResource(String namespaceId, String mcpName) {
-        RequestResource.Builder builder = RequestResource.aiBuilder();
-        builder.setNamespace(namespaceId);
-        builder.setGroup(com.alibaba.nacos.api.common.Constants.DEFAULT_GROUP);
-        builder.setResource(null == mcpName ? StringUtils.EMPTY : mcpName);
-        return builder.build();
-    }
-    
-    private HttpRequest.Builder buildHttpRequestBuilder(RequestResource resource) {
-        return new HttpRequest.Builder().setResource(resource);
+    public PipelineMaintainerService pipeline() {
+        return pipelineMaintainerService;
     }
 }

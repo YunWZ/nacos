@@ -17,7 +17,9 @@
 
 package com.alibaba.nacos.console.controller.v3.core;
 
+import com.alibaba.nacos.api.annotation.Since;
 import com.alibaba.nacos.api.annotation.NacosApi;
+import com.alibaba.nacos.api.common.ApiType;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.model.response.Namespace;
 import com.alibaba.nacos.api.model.v2.Result;
@@ -29,10 +31,8 @@ import com.alibaba.nacos.core.namespace.model.form.CreateNamespaceForm;
 import com.alibaba.nacos.core.namespace.model.form.NamespaceForm;
 import com.alibaba.nacos.core.paramcheck.ExtractorManager;
 import com.alibaba.nacos.plugin.auth.constant.ActionTypes;
-import com.alibaba.nacos.plugin.auth.constant.ApiType;
 import com.alibaba.nacos.plugin.auth.constant.Constants;
 import com.alibaba.nacos.plugin.auth.constant.SignType;
-import com.alibaba.nacos.plugin.auth.impl.constant.AuthConstants;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,9 +65,11 @@ public class ConsoleNamespaceController {
      *
      * @return namespace list
      */
+    @Since("3.0.0")
     @GetMapping("/list")
-    @Secured(resource = AuthConstants.CONSOLE_RESOURCE_NAME_PREFIX + "namespaces",
-            action = ActionTypes.READ, signType = SignType.CONSOLE, apiType = ApiType.CONSOLE_API, tags = Constants.Tag.ONLY_IDENTITY)
+    @Secured(resource = Constants.Resource.CONSOLE_RESOURCE_NAME_PREFIX
+        + "namespaces", action = ActionTypes.READ, signType = SignType.CONSOLE,
+        apiType = ApiType.CONSOLE_API, tags = Constants.Tag.ONLY_IDENTITY)
     public Result<List<Namespace>> getNamespaceList() throws NacosException {
         return Result.success(namespaceProxy.getNamespaceList());
     }
@@ -78,10 +80,13 @@ public class ConsoleNamespaceController {
      * @param namespaceId namespaceId
      * @return namespace all info
      */
+    @Since("3.0.0")
     @GetMapping()
-    @Secured(resource = AuthConstants.CONSOLE_RESOURCE_NAME_PREFIX
-            + "namespaces", action = ActionTypes.READ, signType = SignType.CONSOLE, apiType = ApiType.CONSOLE_API)
-    public Result<Namespace> getNamespaceDetail(@RequestParam("namespaceId") String namespaceId) throws NacosException {
+    @Secured(resource = Constants.Resource.CONSOLE_RESOURCE_NAME_PREFIX
+        + "namespaces", action = ActionTypes.READ, signType = SignType.CONSOLE,
+        apiType = ApiType.CONSOLE_API)
+    public Result<Namespace> getNamespaceDetail(@RequestParam("namespaceId") String namespaceId)
+        throws NacosException {
         return Result.success(namespaceProxy.getNamespaceDetail(namespaceId));
     }
     
@@ -91,15 +96,19 @@ public class ConsoleNamespaceController {
      * @param namespaceForm create namespace form.
      * @return whether create ok
      */
+    @Since("3.0.0")
     @PostMapping
-    @Secured(resource = AuthConstants.CONSOLE_RESOURCE_NAME_PREFIX
-            + "namespaces", action = ActionTypes.WRITE, signType = SignType.CONSOLE, apiType = ApiType.CONSOLE_API)
-    public Result<Boolean> createNamespace(CreateNamespaceForm namespaceForm) throws NacosException {
+    @Secured(resource = Constants.Resource.CONSOLE_RESOURCE_NAME_PREFIX
+        + "namespaces", action = ActionTypes.WRITE, signType = SignType.CONSOLE,
+        apiType = ApiType.CONSOLE_API)
+    public Result<Boolean> createNamespace(CreateNamespaceForm namespaceForm)
+        throws NacosException {
         namespaceForm.validate();
         String namespaceId = namespaceForm.getCustomNamespaceId();
         String namespaceName = namespaceForm.getNamespaceName();
         String namespaceDesc = namespaceForm.getNamespaceDesc();
-        return Result.success(namespaceProxy.createNamespace(namespaceId, namespaceName, namespaceDesc));
+        return Result
+            .success(namespaceProxy.createNamespace(namespaceId, namespaceName, namespaceDesc));
     }
     
     /**
@@ -108,9 +117,11 @@ public class ConsoleNamespaceController {
      * @param namespaceForm namespace form
      * @return whether edit ok
      */
+    @Since("3.0.0")
     @PutMapping
-    @Secured(resource = AuthConstants.CONSOLE_RESOURCE_NAME_PREFIX
-            + "namespaces", action = ActionTypes.WRITE, signType = SignType.CONSOLE, apiType = ApiType.CONSOLE_API)
+    @Secured(resource = Constants.Resource.CONSOLE_RESOURCE_NAME_PREFIX
+        + "namespaces", action = ActionTypes.WRITE, signType = SignType.CONSOLE,
+        apiType = ApiType.CONSOLE_API)
     public Result<Boolean> updateNamespace(NamespaceForm namespaceForm) throws NacosException {
         namespaceForm.validate();
         return Result.success(namespaceProxy.updateNamespace(namespaceForm));
@@ -122,10 +133,13 @@ public class ConsoleNamespaceController {
      * @param namespaceId namespace ID
      * @return whether delete ok
      */
+    @Since("3.0.0")
     @DeleteMapping
-    @Secured(resource = AuthConstants.CONSOLE_RESOURCE_NAME_PREFIX
-            + "namespaces", action = ActionTypes.WRITE, signType = SignType.CONSOLE, apiType = ApiType.CONSOLE_API)
-    public Result<Boolean> deleteNamespace(@RequestParam("namespaceId") String namespaceId) throws NacosException {
+    @Secured(resource = Constants.Resource.CONSOLE_RESOURCE_NAME_PREFIX
+        + "namespaces", action = ActionTypes.WRITE, signType = SignType.CONSOLE,
+        apiType = ApiType.CONSOLE_API)
+    public Result<Boolean> deleteNamespace(@RequestParam("namespaceId") String namespaceId)
+        throws NacosException {
         return Result.success(namespaceProxy.deleteNamespace(namespaceId));
     }
     
@@ -135,11 +149,14 @@ public class ConsoleNamespaceController {
      * @param namespaceId namespace id
      * @return true if exist, otherwise false
      */
+    @Since("3.0.0")
     @GetMapping("/exist")
-    @Secured(resource = AuthConstants.CONSOLE_RESOURCE_NAME_PREFIX + "namespaces",
-            action = ActionTypes.READ, signType = SignType.CONSOLE, apiType = ApiType.CONSOLE_API, tags = Constants.Tag.ONLY_IDENTITY)
-    public Result<Boolean> checkNamespaceIdExist(@RequestParam("customNamespaceId") String namespaceId)
-            throws NacosException {
+    @Secured(resource = Constants.Resource.CONSOLE_RESOURCE_NAME_PREFIX
+        + "namespaces", action = ActionTypes.READ, signType = SignType.CONSOLE,
+        apiType = ApiType.CONSOLE_API, tags = Constants.Tag.ONLY_IDENTITY)
+    public Result<Boolean> checkNamespaceIdExist(
+        @RequestParam("customNamespaceId") String namespaceId)
+        throws NacosException {
         // customNamespaceId if blank means create new namespace with uuid.
         if (StringUtils.isBlank(namespaceId)) {
             return Result.success(false);

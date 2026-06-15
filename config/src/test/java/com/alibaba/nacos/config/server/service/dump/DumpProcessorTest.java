@@ -20,7 +20,6 @@ import com.alibaba.nacos.common.utils.MD5Utils;
 import com.alibaba.nacos.config.server.model.CacheItem;
 import com.alibaba.nacos.config.server.model.ConfigInfoWrapper;
 import com.alibaba.nacos.config.server.service.ConfigCacheService;
-import com.alibaba.nacos.config.server.service.ConfigMigrateService;
 import com.alibaba.nacos.config.server.service.dump.disk.ConfigDiskService;
 import com.alibaba.nacos.config.server.service.dump.disk.ConfigDiskServiceFactory;
 import com.alibaba.nacos.config.server.service.dump.disk.ConfigRocksDbDiskService;
@@ -66,9 +65,6 @@ class DumpProcessorTest {
     @Mock
     ConfigInfoGrayPersistService configInfoGrayPersistService;
     
-    @Mock
-    ConfigMigrateService configMigrateService;
-    
     ExternalDumpService dumpService;
     
     DumpProcessor dumpProcessor;
@@ -83,17 +79,18 @@ class DumpProcessorTest {
         envUtilMockedStatic = Mockito.mockStatic(EnvUtil.class);
         when(EnvUtil.getNacosHome()).thenReturn(System.getProperty("user.home"));
         when(EnvUtil.getProperty(eq(CommonConstant.NACOS_PLUGIN_DATASOURCE_LOG), eq(Boolean.class),
-                eq(false))).thenReturn(false);
+            eq(false))).thenReturn(false);
         when(EnvUtil.getProperty(eq("memory_limit_file_path"),
-                eq("/sys/fs/cgroup/memory/memory.limit_in_bytes"))).thenReturn(
+            eq("/sys/fs/cgroup/memory/memory.limit_in_bytes"))).thenReturn(
                 "/sys/fs/cgroup/memory/memory.limit_in_bytes");
         
-        dynamicDataSourceMockedStatic.when(DynamicDataSource::getInstance).thenReturn(dynamicDataSource);
+        dynamicDataSourceMockedStatic.when(DynamicDataSource::getInstance)
+            .thenReturn(dynamicDataSource);
         
         when(dynamicDataSource.getDataSource()).thenReturn(dataSourceService);
         
         dumpService = new ExternalDumpService(configInfoPersistService, null, null,
-                configInfoGrayPersistService, null, configMigrateService);
+            configInfoGrayPersistService, null);
         dumpProcessor = new DumpProcessor(configInfoPersistService, configInfoGrayPersistService);
         Field[] declaredFields = ConfigDiskServiceFactory.class.getDeclaredFields();
         for (Field filed : declaredFields) {
@@ -115,7 +112,7 @@ class DumpProcessorTest {
         envUtilMockedStatic.close();
         ConfigDiskServiceFactory.getInstance().clearAll();
         ConfigDiskServiceFactory.getInstance().clearAllGray();
-    
+        
         Field[] declaredFields = ConfigDiskServiceFactory.class.getDeclaredFields();
         for (Field filed : declaredFields) {
             if (filed.getName().equals("configDiskService")) {
@@ -140,33 +137,39 @@ class DumpProcessorTest {
         configInfoWrapper.setLastModified(time);
         
         Mockito.when(configInfoPersistService.findConfigInfo(eq(dataId), eq(group), eq(tenant)))
-                .thenReturn(configInfoWrapper);
+            .thenReturn(configInfoWrapper);
         
         String handlerIp = "127.0.0.1";
         long lastModified = System.currentTimeMillis();
-        DumpTask dumpTask = new DumpTask(GroupKey2.getKey(dataId, group, tenant), null, lastModified, handlerIp);
+        DumpTask dumpTask =
+            new DumpTask(GroupKey2.getKey(dataId, group, tenant), null, lastModified, handlerIp);
         boolean process = dumpProcessor.process(dumpTask);
         assertTrue(process);
         
         //Check cache
-        CacheItem contentCache = ConfigCacheService.getContentCache(GroupKey2.getKey(dataId, group, tenant));
+        CacheItem contentCache =
+            ConfigCacheService.getContentCache(GroupKey2.getKey(dataId, group, tenant));
         assertEquals(MD5Utils.md5Hex(content, "UTF-8"), contentCache.getConfigCache().getMd5());
         assertEquals(time, contentCache.getConfigCache().getLastModifiedTs());
         //check disk
-        String contentFromDisk = ConfigDiskServiceFactory.getInstance().getContent(dataId, group, tenant);
+        String contentFromDisk =
+            ConfigDiskServiceFactory.getInstance().getContent(dataId, group, tenant);
         assertEquals(content, contentFromDisk);
         
         // remove
-        Mockito.when(configInfoPersistService.findConfigInfo(eq(dataId), eq(group), eq(tenant))).thenReturn(null);
+        Mockito.when(configInfoPersistService.findConfigInfo(eq(dataId), eq(group), eq(tenant)))
+            .thenReturn(null);
         
         boolean processRemove = dumpProcessor.process(dumpTask);
         assertTrue(processRemove);
         
         //Check cache
-        CacheItem contentCacheAfterRemove = ConfigCacheService.getContentCache(GroupKey2.getKey(dataId, group, tenant));
+        CacheItem contentCacheAfterRemove =
+            ConfigCacheService.getContentCache(GroupKey2.getKey(dataId, group, tenant));
         assertTrue(contentCacheAfterRemove == null);
         //check disk
-        String contentFromDiskAfterRemove = ConfigDiskServiceFactory.getInstance().getContent(dataId, group, tenant);
+        String contentFromDiskAfterRemove =
+            ConfigDiskServiceFactory.getInstance().getContent(dataId, group, tenant);
         assertNull(contentFromDiskAfterRemove);
         
     }

@@ -16,6 +16,7 @@
 
 package com.alibaba.nacos.plugin.auth.impl.constant;
 
+import com.alibaba.nacos.plugin.auth.constant.Constants;
 import com.alibaba.nacos.plugin.auth.impl.utils.PasswordEncoderUtil;
 
 /**
@@ -41,9 +42,17 @@ public class AuthConstants {
     
     public static final String PARAM_PASSWORD = "password";
     
-    public static final String CONSOLE_RESOURCE_NAME_PREFIX = "console/";
+    /**
+     * Console resource name prefix.
+     *
+     * @deprecated Use {@link Constants.Resource#CONSOLE_RESOURCE_NAME_PREFIX} instead.
+     */
+    @Deprecated
+    public static final String CONSOLE_RESOURCE_NAME_PREFIX =
+        Constants.Resource.CONSOLE_RESOURCE_NAME_PREFIX;
     
-    public static final String UPDATE_PASSWORD_ENTRY_POINT = CONSOLE_RESOURCE_NAME_PREFIX + "user/password";
+    public static final String UPDATE_PASSWORD_ENTRY_POINT =
+        CONSOLE_RESOURCE_NAME_PREFIX + "user/password";
     
     public static final String LOCK_OPERATOR_POINT = "grpc/lock";
     
@@ -53,7 +62,8 @@ public class AuthConstants {
     
     public static final String DEFAULT_TOKEN_SECRET_KEY = "";
     
-    public static final String TOKEN_EXPIRE_SECONDS = "nacos.core.auth.plugin.nacos.token.expire.seconds";
+    public static final String TOKEN_EXPIRE_SECONDS =
+        "nacos.core.auth.plugin.nacos.token.expire.seconds";
     
     public static final Long DEFAULT_TOKEN_EXPIRE_SECONDS = 18_000L;
     
@@ -67,16 +77,20 @@ public class AuthConstants {
     
     public static final String NACOS_CORE_AUTH_LDAP_PASSWORD = "nacos.core.auth.ldap.password";
     
-    public static final String NACOS_CORE_AUTH_LDAP_FILTER_PREFIX = "nacos.core.auth.ldap.filter.prefix";
+    public static final String NACOS_CORE_AUTH_LDAP_FILTER_PREFIX =
+        "nacos.core.auth.ldap.filter.prefix";
     
-    public static final String NACOS_CORE_AUTH_CASE_SENSITIVE = "nacos.core.auth.ldap.case.sensitive";
+    public static final String NACOS_CORE_AUTH_CASE_SENSITIVE =
+        "nacos.core.auth.ldap.case.sensitive";
     
     /**
      * LDAP Ignore partial result exception.
      */
-    public static final String NACOS_CORE_AUTH_IGNORE_PARTIAL_RESULT_EXCEPTION = "nacos.core.auth.ldap.ignore.partial.result.exception";
-
-    public static final String LDAP_DEFAULT_ENCODED_PASSWORD = PasswordEncoderUtil.encode(System.getProperty("ldap.default.password", "nacos"));
+    public static final String NACOS_CORE_AUTH_IGNORE_PARTIAL_RESULT_EXCEPTION =
+        "nacos.core.auth.ldap.ignore.partial.result.exception";
+    
+    public static final String LDAP_DEFAULT_ENCODED_PASSWORD =
+        PasswordEncoderUtil.encode(System.getProperty("ldap.default.password", "nacos"));
     
     public static final String LDAP_PREFIX = "LDAP_";
     
@@ -93,4 +107,27 @@ public class AuthConstants {
     public static final String ROLE_PATH = "/v3/auth/role";
     
     public static final String PERMISSION_PATH = "/v3/auth/permission";
+    
+    /**
+     * System-reserved anonymous user name. Used for unauthenticated access to PUBLIC AI resources.
+     */
+    public static final String ANONYMOUS_USER = "__nacos_anonymous__";
+    
+    /**
+     * System-reserved anonymous role name bound to {@link #ANONYMOUS_USER}.
+     */
+    public static final String ANONYMOUS_ROLE = "__nacos_anonymous_role__";
+    
+    /**
+     * Tag value that marks a {@link com.alibaba.nacos.auth.annotation.Secured} API as allowing anonymous access.
+     *
+     * @see Constants.Tag#ALLOW_ANONYMOUS
+     */
+    public static final String TAG_ALLOW_ANONYMOUS = Constants.Tag.ALLOW_ANONYMOUS;
+    
+    /**
+     * Configuration key controlling whether anonymous access to AI resources is enabled.
+     */
+    public static final String NACOS_CORE_AUTH_NACOS_ANONYMOUS_AI_ENABLED =
+        "nacos.core.auth.nacos.anonymous.ai.enabled";
 }

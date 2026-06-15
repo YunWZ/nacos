@@ -26,7 +26,6 @@ import java.util.concurrent.TimeUnit;
  *
  * @author xiweng.yy
  */
-@SuppressWarnings("PMD.ClassNamingShouldBeCamelRule")
 public class TopNConfig extends AbstractDynamicConfig {
     
     private static final String TOP_N = "topN";
@@ -72,7 +71,8 @@ public class TopNConfig extends AbstractDynamicConfig {
     
     @Override
     public String toString() {
-        return "TopNConfig{" + "enabled=" + enabled + ", topNCount=" + countOfTopN + ", internalMs=" + internalMs + '}';
+        return "TopNConfig{" + "enabled=" + enabled + ", topNCount=" + countOfTopN + ", internalMs="
+            + internalMs + '}';
     }
     
     public static TopNConfig getInstance() {

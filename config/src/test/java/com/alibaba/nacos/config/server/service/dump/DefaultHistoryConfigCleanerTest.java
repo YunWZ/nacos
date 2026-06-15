@@ -25,9 +25,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.lang.reflect.Method;
@@ -40,9 +40,10 @@ import static org.mockito.ArgumentMatchers.anyInt;
 @ExtendWith(SpringExtension.class)
 public class DefaultHistoryConfigCleanerTest {
     
-    private DefaultHistoryConfigCleaner defaultHistoryConfigCleaner = new DefaultHistoryConfigCleaner();
+    private DefaultHistoryConfigCleaner defaultHistoryConfigCleaner =
+        new DefaultHistoryConfigCleaner();
     
-    @Mock
+    @MockitoBean
     private HistoryConfigInfoPersistService historyConfigInfoPersistService;
     
     MockedStatic<ApplicationUtils> applicationUtilsMockedStatic;
@@ -57,8 +58,9 @@ public class DefaultHistoryConfigCleanerTest {
     @BeforeEach
     public void setUp() {
         applicationUtilsMockedStatic = Mockito.mockStatic(ApplicationUtils.class);
-        applicationUtilsMockedStatic.when(() -> ApplicationUtils.getBean(HistoryConfigInfoPersistService.class))
-                .thenReturn(historyConfigInfoPersistService);
+        applicationUtilsMockedStatic
+            .when(() -> ApplicationUtils.getBean(HistoryConfigInfoPersistService.class))
+            .thenReturn(historyConfigInfoPersistService);
         
         configExecutorMocked = Mockito.mockStatic(ConfigExecutor.class);
         envUtilMockedStatic = Mockito.mockStatic(EnvUtil.class);
@@ -76,7 +78,8 @@ public class DefaultHistoryConfigCleanerTest {
     
     @Test
     public void test() {
-        HistoryConfigCleaner configCleaner = HistoryConfigCleanerManager.getHistoryConfigCleaner("nacos");
+        HistoryConfigCleaner configCleaner =
+            HistoryConfigCleanerManager.getHistoryConfigCleaner("nacos");
         assertEquals(configCleaner.getName(), "nacos");
     }
     
@@ -84,26 +87,30 @@ public class DefaultHistoryConfigCleanerTest {
     public void testCleanHistoryConfig() throws Exception {
         defaultHistoryConfigCleaner.cleanHistoryConfig();
         Mockito.verify(historyConfigInfoPersistService, Mockito.times(1))
-                .removeConfigHistory(any(Timestamp.class), anyInt());
+            .removeConfigHistory(any(Timestamp.class), anyInt());
     }
     
     @Test
     public void testGetRetentionDays() throws Exception {
         Method method = DefaultHistoryConfigCleaner.class.getDeclaredMethod("getRetentionDays");
         method.setAccessible(true);
-
-        Method setRetentionDaysMethod = PropertyUtil.class.getDeclaredMethod("setConfigRententionDays");
+        
+        Method setRetentionDaysMethod =
+            PropertyUtil.class.getDeclaredMethod("setConfigRententionDays");
         setRetentionDaysMethod.setAccessible(true);
-
-        envUtilMockedStatic.when(() -> EnvUtil.getProperty("nacos.config.retention.days")).thenReturn("-1");
+        
+        envUtilMockedStatic.when(() -> EnvUtil.getProperty("nacos.config.retention.days"))
+            .thenReturn("-1");
         setRetentionDaysMethod.invoke(new PropertyUtil());
         assertEquals((int) method.invoke(defaultHistoryConfigCleaner), 30);
         
-        envUtilMockedStatic.when(() -> EnvUtil.getProperty("nacos.config.retention.days")).thenReturn("30");
+        envUtilMockedStatic.when(() -> EnvUtil.getProperty("nacos.config.retention.days"))
+            .thenReturn("30");
         setRetentionDaysMethod.invoke(new PropertyUtil());
         assertEquals((int) method.invoke(defaultHistoryConfigCleaner), 30);
         
-        envUtilMockedStatic.when(() -> EnvUtil.getProperty("nacos.config.retention.days")).thenReturn("1");
+        envUtilMockedStatic.when(() -> EnvUtil.getProperty("nacos.config.retention.days"))
+            .thenReturn("1");
         setRetentionDaysMethod.invoke(new PropertyUtil());
         assertEquals((int) method.invoke(defaultHistoryConfigCleaner), 1);
     }

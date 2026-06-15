@@ -30,11 +30,21 @@ public class McpUpdateForm extends McpDetailForm {
     
     private boolean latest = true;
     
+    private boolean overrideExisting = false;
+    
     public Boolean getLatest() {
         return latest;
     }
     
     public void setLatest(Boolean publish) {
         this.latest = publish;
+    }
+    
+    public boolean isOverrideExisting() {
+        return overrideExisting;
+    }
+    
+    public void setOverrideExisting(boolean overrideExisting) {
+        this.overrideExisting = overrideExisting;
     }
 }

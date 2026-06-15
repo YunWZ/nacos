@@ -24,6 +24,7 @@ import java.util.Map;
  * @author zhuoguang
  */
 public class ParamInfo {
+    
     private String namespaceShowName;
     
     private String namespaceId;
@@ -47,6 +48,12 @@ public class ParamInfo {
     private String mcpName;
     
     private String mcpId;
+    
+    private String agentName;
+    
+    private String skillName;
+    
+    private String skillSearchName;
     
     public String getNamespaceShowName() {
         return namespaceShowName;
@@ -131,16 +138,40 @@ public class ParamInfo {
     public String getMcpName() {
         return mcpName;
     }
-
+    
     public String getMcpId() {
         return mcpId;
     }
-
+    
     public void setMcpId(String mcpId) {
         this.mcpId = mcpId;
     }
-
+    
     public void setMcpName(String mcpName) {
         this.mcpName = mcpName;
+    }
+    
+    public String getAgentName() {
+        return agentName;
+    }
+    
+    public void setAgentName(String agentName) {
+        this.agentName = agentName;
+    }
+    
+    public String getSkillName() {
+        return skillName;
+    }
+    
+    public void setSkillName(String skillName) {
+        this.skillName = skillName;
+    }
+    
+    public String getSkillSearchName() {
+        return skillSearchName;
+    }
+    
+    public void setSkillSearchName(String skillSearchName) {
+        this.skillSearchName = skillSearchName;
     }
 }

@@ -1,6 +1,7 @@
 import { Dialog, Message } from '@alifd/next';
 import { request } from '../../../../globalLib';
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const DeleteTool = props => {
   const { record, locale, getServerDetail, serverConfig } = props;
@@ -51,7 +52,9 @@ const DeleteTool = props => {
 
   return (
     <>
-      <a onClick={deleteTool}>{locale.operationToolDelete}</a>
+      <a onClick={deleteTool} style={{ fontSize: '12px' }}>
+        {locale.operationToolDelete}
+      </a>
       <Dialog
         visible={visible}
         title={locale.deleteToolTitle}
@@ -82,3 +85,11 @@ const DeleteTool = props => {
 };
 
 export default DeleteTool;
+
+DeleteTool.propTypes = {
+  record: PropTypes.object,
+  locale: PropTypes.object,
+  getServerDetail: PropTypes.func,
+  serverConfig: PropTypes.object,
+  onChange: PropTypes.func,
+};

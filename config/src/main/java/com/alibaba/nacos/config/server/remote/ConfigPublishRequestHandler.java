@@ -16,6 +16,7 @@
 
 package com.alibaba.nacos.config.server.remote;
 
+import com.alibaba.nacos.api.annotation.Since;
 import com.alibaba.nacos.api.common.Constants;
 import com.alibaba.nacos.api.config.ConfigType;
 import com.alibaba.nacos.api.config.remote.request.ConfigPublishRequest;
@@ -34,6 +35,7 @@ import com.alibaba.nacos.config.server.model.form.ConfigForm;
 import com.alibaba.nacos.config.server.service.ConfigOperationService;
 import com.alibaba.nacos.config.server.utils.ParamUtils;
 import com.alibaba.nacos.core.control.TpsControl;
+import com.alibaba.nacos.core.namespace.filter.NamespaceValidation;
 import com.alibaba.nacos.core.paramcheck.ExtractorManager;
 import com.alibaba.nacos.core.paramcheck.impl.ConfigRequestParamExtractor;
 import com.alibaba.nacos.core.remote.RequestHandler;
@@ -51,8 +53,10 @@ import static com.alibaba.nacos.config.server.constant.Constants.RPC;
  * @author liuzunfei
  * @version $Id: ConfigPublishRequestHandler.java, v 0.1 2020年07月16日 4:41 PM liuzunfei Exp $
  */
+@Since("2.0.0")
 @Component
-public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishRequest, ConfigPublishResponse> {
+public class ConfigPublishRequestHandler
+    extends RequestHandler<ConfigPublishRequest, ConfigPublishResponse> {
     
     private ConfigOperationService configOperationService;
     
@@ -61,16 +65,17 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
     }
     
     @Override
+    @NamespaceValidation
     @TpsControl(pointName = "ConfigPublish")
     @Secured(action = ActionTypes.WRITE, signType = SignType.CONFIG)
     @ExtractorManager.Extractor(rpcExtractor = ConfigRequestParamExtractor.class)
-    public ConfigPublishResponse handle(ConfigPublishRequest request, RequestMeta meta) throws NacosException {
+    public ConfigPublishResponse handle(ConfigPublishRequest request, RequestMeta meta)
+        throws NacosException {
         
         try {
             String dataId = request.getDataId();
             String group = request.getGroup();
             String content = request.getContent();
-            final boolean namespaceTransferred = NamespaceUtil.isNeedTransferNamespace(request.getTenant());
             final String tenant = NamespaceUtil.processNamespaceParameter(request.getTenant());
             
             final String srcIp = meta.getClientIp();
@@ -109,7 +114,6 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
             configRequestInfo.setRequestIpApp(meta.getLabels().get(Constants.APPNAME));
             configRequestInfo.setBetaIps(request.getAdditionParam("betaIps"));
             configRequestInfo.setCasMd5(request.getCasMd5());
-            configRequestInfo.setNamespaceTransferred(namespaceTransferred);
             
             String encryptedDataKeyFinal = null;
             if (StringUtils.isNotBlank(encryptedDataKey)) {
@@ -121,18 +125,21 @@ public class ConfigPublishRequestHandler extends RequestHandler<ConfigPublishReq
                 configForm.setContent(content);
             }
             try {
-                configOperationService.publishConfig(configForm, configRequestInfo, encryptedDataKeyFinal);
+                configOperationService.publishConfig(configForm, configRequestInfo,
+                    encryptedDataKeyFinal);
                 return ConfigPublishResponse.buildSuccessResponse();
             } catch (NacosApiException | ConfigAlreadyExistsException ex) {
                 return ConfigPublishResponse.buildFailResponse(ResponseCode.FAIL.getCode(),
-                        ex.getErrMsg());
+                    ex.getErrMsg());
             }
             
         } catch (Exception e) {
-            Loggers.REMOTE_DIGEST.error("[ConfigPublishRequestHandler] publish config error ,request ={}", request, e);
+            Loggers.REMOTE_DIGEST.error(
+                "[ConfigPublishRequestHandler] publish config error ,request ={}", request, e);
             return ConfigPublishResponse.buildFailResponse(
-                    (e instanceof NacosException) ? ((NacosException) e).getErrCode() : ResponseCode.FAIL.getCode(),
-                    e.getMessage());
+                (e instanceof NacosException) ? ((NacosException) e).getErrCode()
+                    : ResponseCode.FAIL.getCode(),
+                e.getMessage());
         }
     }
     

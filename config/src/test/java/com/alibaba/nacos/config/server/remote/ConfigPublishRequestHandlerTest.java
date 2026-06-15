@@ -30,7 +30,6 @@ import com.alibaba.nacos.config.server.model.ConfigInfoStateWrapper;
 import com.alibaba.nacos.config.server.model.ConfigOperateResult;
 import com.alibaba.nacos.config.server.model.event.ConfigDataChangeEvent;
 import com.alibaba.nacos.config.server.model.gray.BetaGrayRule;
-import com.alibaba.nacos.config.server.service.ConfigMigrateService;
 import com.alibaba.nacos.config.server.service.ConfigOperationService;
 import com.alibaba.nacos.config.server.service.repository.ConfigInfoGrayPersistService;
 import com.alibaba.nacos.config.server.service.repository.ConfigInfoPersistService;
@@ -65,9 +64,6 @@ class ConfigPublishRequestHandlerTest {
     @Mock
     ConfigInfoGrayPersistService configInfoGrayPersistService;
     
-    @Mock
-    ConfigMigrateService configMigrateService;
-    
     MockedStatic<EnvUtil> envUtilMockedStatic;
     
     private ConfigPublishRequestHandler configPublishRequestHandler;
@@ -75,8 +71,9 @@ class ConfigPublishRequestHandlerTest {
     @BeforeEach
     void setUp() {
         envUtilMockedStatic = Mockito.mockStatic(EnvUtil.class);
-        ConfigOperationService configOperationService = new ConfigOperationService(configInfoPersistService,
-                configInfoGrayPersistService, configMigrateService);
+        ConfigOperationService configOperationService =
+            new ConfigOperationService(configInfoPersistService,
+                configInfoGrayPersistService);
         configPublishRequestHandler = new ConfigPublishRequestHandler(configOperationService);
         DatasourceConfiguration.setEmbeddedStorage(false);
     }
@@ -134,12 +131,14 @@ class ConfigPublishRequestHandlerTest {
         long id = timestamp / 1000;
         configOperateResult.setId(id);
         configOperateResult.setLastModified(timestamp);
-        when(configInfoPersistService.insertOrUpdate(eq(requestMeta.getClientIp()), eq(srcUser), any(ConfigInfo.class),
-                any(Map.class))).thenReturn(configOperateResult);
-        ConfigPublishResponse response = configPublishRequestHandler.handle(configPublishRequest, requestMeta);
+        when(configInfoPersistService.insertOrUpdate(eq(requestMeta.getClientIp()), eq(srcUser),
+            any(ConfigInfo.class),
+            any(Map.class))).thenReturn(configOperateResult);
+        ConfigPublishResponse response =
+            configPublishRequestHandler.handle(configPublishRequest, requestMeta);
         
         assertEquals(ResponseCode.SUCCESS.getCode(), response.getResultCode());
-        Thread.sleep(500L);
+        waitForEvent(reference);
         assertTrue(reference.get() != null);
         assertEquals(dataId, reference.get().dataId);
         assertEquals(group, reference.get().group);
@@ -198,11 +197,12 @@ class ConfigPublishRequestHandlerTest {
         configOperateResult.setId(id);
         configOperateResult.setLastModified(timestamp);
         when(configInfoPersistService.insertOrUpdateCas(eq(requestMeta.getClientIp()), eq(srcUser),
-                any(ConfigInfo.class), any(Map.class))).thenReturn(configOperateResult);
-        ConfigPublishResponse response = configPublishRequestHandler.handle(configPublishRequest, requestMeta);
+            any(ConfigInfo.class), any(Map.class))).thenReturn(configOperateResult);
+        ConfigPublishResponse response =
+            configPublishRequestHandler.handle(configPublishRequest, requestMeta);
         
         assertEquals(ResponseCode.SUCCESS.getCode(), response.getResultCode());
-        Thread.sleep(500L);
+        waitForEvent(reference);
         assertTrue(reference.get() != null);
         assertEquals(dataId, reference.get().dataId);
         assertEquals(group, reference.get().group);
@@ -265,14 +265,46 @@ class ConfigPublishRequestHandlerTest {
         configOperateResult.setId(id);
         configOperateResult.setLastModified(timestamp);
         when(configInfoPersistService.insertOrUpdateCas(eq(requestMeta.getClientIp()), eq(srcUser),
-                any(ConfigInfo.class), any(Map.class))).thenThrow(new NacosRuntimeException(502, "mock error"));
-        ConfigPublishResponse response = configPublishRequestHandler.handle(configPublishRequest, requestMeta);
+            any(ConfigInfo.class), any(Map.class)))
+            .thenThrow(new NacosRuntimeException(502, "mock error"));
+        ConfigPublishResponse response =
+            configPublishRequestHandler.handle(configPublishRequest, requestMeta);
         
         assertEquals(ResponseCode.FAIL.getCode(), response.getResultCode());
         assertTrue(response.getMessage().contains("mock error"));
         Thread.sleep(500L);
         assertTrue(reference.get() == null);
         
+    }
+    
+    @Test
+    void testPublishConfigAlreadyExistsWithEncryptedDataKey() throws Exception {
+        String dataId = "testPublishConfigWithEncryptedDataKey";
+        String group = "group";
+        String tenant = "tenant";
+        
+        ConfigPublishRequest configPublishRequest = new ConfigPublishRequest();
+        configPublishRequest.setDataId(dataId);
+        configPublishRequest.setGroup(group);
+        configPublishRequest.setTenant(tenant);
+        configPublishRequest.setContent("content");
+        Map<String, String> keyMap = new HashMap<>();
+        String srcUser = "src_user111";
+        keyMap.put("src_user", srcUser);
+        keyMap.put("encryptedDataKey", "cipherKey");
+        configPublishRequest.setAdditionMap(keyMap);
+        
+        RequestMeta requestMeta = new RequestMeta();
+        requestMeta.setClientIp("127.0.0.1");
+        
+        when(configInfoPersistService.insertOrUpdate(eq(requestMeta.getClientIp()), eq(srcUser),
+            any(ConfigInfo.class), any(Map.class))).thenReturn(new ConfigOperateResult(false));
+        
+        ConfigPublishResponse response =
+            configPublishRequestHandler.handle(configPublishRequest, requestMeta);
+        
+        assertEquals(ResponseCode.FAIL.getCode(), response.getResultCode());
+        assertTrue(response.getMessage().contains("already exist"));
     }
     
     @Test
@@ -320,12 +352,15 @@ class ConfigPublishRequestHandlerTest {
         long id = timestamp / 1000;
         configOperateResult.setId(id);
         configOperateResult.setLastModified(timestamp);
-        when(configInfoGrayPersistService.insertOrUpdateGray(any(ConfigInfo.class), eq(BetaGrayRule.TYPE_BETA),
-                anyString(), eq(requestMeta.getClientIp()), eq(srcUser))).thenReturn(configOperateResult);
-        ConfigPublishResponse response = configPublishRequestHandler.handle(configPublishRequest, requestMeta);
+        when(configInfoGrayPersistService.insertOrUpdateGray(any(ConfigInfo.class),
+            eq(BetaGrayRule.TYPE_BETA),
+            anyString(), eq(requestMeta.getClientIp()), eq(srcUser)))
+            .thenReturn(configOperateResult);
+        ConfigPublishResponse response =
+            configPublishRequestHandler.handle(configPublishRequest, requestMeta);
         
         assertEquals(ResponseCode.SUCCESS.getCode(), response.getResultCode());
-        Thread.sleep(500L);
+        waitForEvent(reference);
         assertTrue(reference.get() != null);
         assertEquals(dataId, reference.get().dataId);
         assertEquals(group, reference.get().group);
@@ -382,12 +417,15 @@ class ConfigPublishRequestHandlerTest {
         configOperateResult.setId(id);
         configOperateResult.setLastModified(timestamp);
         
-        when(configInfoGrayPersistService.insertOrUpdateGrayCas(any(ConfigInfo.class), eq(BetaGrayRule.TYPE_BETA),
-                anyString(), eq(requestMeta.getClientIp()), eq(srcUser))).thenReturn(configOperateResult);
-        ConfigPublishResponse response = configPublishRequestHandler.handle(configPublishRequest, requestMeta);
+        when(configInfoGrayPersistService.insertOrUpdateGrayCas(any(ConfigInfo.class),
+            eq(BetaGrayRule.TYPE_BETA),
+            anyString(), eq(requestMeta.getClientIp()), eq(srcUser)))
+            .thenReturn(configOperateResult);
+        ConfigPublishResponse response =
+            configPublishRequestHandler.handle(configPublishRequest, requestMeta);
         
         assertEquals(ResponseCode.SUCCESS.getCode(), response.getResultCode());
-        Thread.sleep(500L);
+        waitForEvent(reference);
         assertTrue(reference.get() != null);
         assertEquals(dataId, reference.get().dataId);
         assertEquals(group, reference.get().group);
@@ -446,12 +484,14 @@ class ConfigPublishRequestHandlerTest {
         configOperateResult.setId(id);
         configOperateResult.setLastModified(timestamp);
         
-        when(configInfoGrayPersistService.insertOrUpdateGray(any(ConfigInfo.class), eq("tag_" + tag), anyString(),
-                eq(requestMeta.getClientIp()), eq(srcUser))).thenReturn(configOperateResult);
-        ConfigPublishResponse response = configPublishRequestHandler.handle(configPublishRequest, requestMeta);
+        when(configInfoGrayPersistService.insertOrUpdateGray(any(ConfigInfo.class),
+            eq("tag_" + tag), anyString(),
+            eq(requestMeta.getClientIp()), eq(srcUser))).thenReturn(configOperateResult);
+        ConfigPublishResponse response =
+            configPublishRequestHandler.handle(configPublishRequest, requestMeta);
         
         assertEquals(ResponseCode.SUCCESS.getCode(), response.getResultCode());
-        Thread.sleep(500L);
+        waitForEvent(reference);
         assertTrue(reference.get() != null);
         assertEquals(dataId, reference.get().dataId);
         assertEquals(group, reference.get().group);
@@ -504,18 +544,27 @@ class ConfigPublishRequestHandlerTest {
         configOperateResult.setId(id);
         configOperateResult.setLastModified(timestamp);
         
-        when(configInfoGrayPersistService.insertOrUpdateGrayCas(any(ConfigInfo.class), eq("tag_" + tag), anyString(),
-                eq(requestMeta.getClientIp()), eq(srcUser))).thenReturn(configOperateResult);
-        ConfigPublishResponse response = configPublishRequestHandler.handle(configPublishRequest, requestMeta);
+        when(configInfoGrayPersistService.insertOrUpdateGrayCas(any(ConfigInfo.class),
+            eq("tag_" + tag), anyString(),
+            eq(requestMeta.getClientIp()), eq(srcUser))).thenReturn(configOperateResult);
+        ConfigPublishResponse response =
+            configPublishRequestHandler.handle(configPublishRequest, requestMeta);
         
         assertEquals(ResponseCode.SUCCESS.getCode(), response.getResultCode());
-        Thread.sleep(500L);
+        waitForEvent(reference);
         assertTrue(reference.get() != null);
         assertEquals(dataId, reference.get().dataId);
         assertEquals(group, reference.get().group);
         assertEquals(tenant, reference.get().tenant);
         assertEquals(timestamp, reference.get().lastModifiedTs);
         assertEquals("tag_" + tag, reference.get().grayName);
+    }
+    
+    private void waitForEvent(AtomicReference<ConfigDataChangeEvent> reference)
+        throws InterruptedException {
+        for (int i = 0; i < 30 && reference.get() == null; i++) {
+            Thread.sleep(100L);
+        }
     }
     
 }

@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -60,9 +60,10 @@ public class PrometheusApiExceptionHandlerTest {
     @Test
     public void testNacosRunTimeExceptionHandler() throws Exception {
         // 设置PrometheusController的行为，使其抛出NacosRuntimeException并被PrometheusApiExceptionHandler捕获处理
-        when(prometheusController.metric()).thenThrow(new NacosRuntimeException(NacosException.INVALID_PARAM))
-                .thenThrow(new NacosRuntimeException(NacosException.SERVER_ERROR))
-                .thenThrow(new NacosRuntimeException(503));
+        when(prometheusController.metric())
+            .thenThrow(new NacosRuntimeException(NacosException.INVALID_PARAM))
+            .thenThrow(new NacosRuntimeException(NacosException.SERVER_ERROR))
+            .thenThrow(new NacosRuntimeException(503));
         
         // 执行请求并验证响应码
         ResultActions resultActions = mockMvc.perform(get("/prometheus"));

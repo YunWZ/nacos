@@ -1,5 +1,5 @@
 /*
- * Copyright 1999-2018 Alibaba Group Holding Ltd.
+ * Copyright 1999-2026 Alibaba Group Holding Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,66 +18,61 @@ package com.alibaba.nacos.naming.exception;
 
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.exception.runtime.NacosRuntimeException;
-import com.alibaba.nacos.naming.controllers.v2.InstanceControllerV2;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(SpringExtension.class)
-@WebAppConfiguration
-@ContextConfiguration(classes = {ResponseExceptionHandler.class})
 class ResponseExceptionHandlerTest {
     
-    private MockMvc mockMvc;
+    private final ResponseExceptionHandler handler = new ResponseExceptionHandler();
     
-    @Autowired
-    private WebApplicationContext context;
-    
-    @MockBean
-    private InstanceControllerV2 instanceControllerV2;
-    
-    @BeforeEach
-    void before() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+    @Test
+    void testHandleNacosException() {
+        ResponseEntity<String> response =
+            handler.handleNacosException(new NacosException(403, "no permission"));
+        
+        assertEquals(403, response.getStatusCode().value());
+        assertEquals("no permission", response.getBody());
     }
     
     @Test
-    void testNacosRunTimeExceptionHandler() throws Exception {
-        // 设置InstanceControllerV2的行为，使其抛出NacosRuntimeException并被ResponseExceptionHandler捕获处理
-        when(instanceControllerV2.register(any())).thenThrow(new NacosRuntimeException(NacosException.INVALID_PARAM))
-                .thenThrow(new NacosRuntimeException(NacosException.SERVER_ERROR)).thenThrow(new NacosRuntimeException(503));
+    void testHandleNacosRuntimeException() {
+        ResponseEntity<String> response =
+            handler.handleNacosRuntimeException(new NacosRuntimeException(500, "failed"));
         
-        // 执行请求并验证响应码
-        ResultActions resultActions = mockMvc.perform(
-                MockMvcRequestBuilders.post("/v2/ns/instance").param("namespaceId", "public").param("groupName", "G")
-                        .param("serviceName", "s").param("ip", "192.168.0.1").param("port", "8080").param("ephemeral", "true"));
-        resultActions.andExpect(MockMvcResultMatchers.status().is(NacosException.INVALID_PARAM));
+        assertEquals(500, response.getStatusCode().value());
+        assertTrue(response.getBody().contains("failed"));
+    }
+    
+    @Test
+    void testHandleParameterError() {
+        ResponseEntity<String> response =
+            handler.handleParameterError(new IllegalArgumentException("bad argument"));
         
-        // 执行请求并验证响应码
-        ResultActions resultActions1 = mockMvc.perform(
-                post("/v2/ns/instance").param("namespaceId", "public").param("groupName", "G").param("serviceName", "s")
-                        .param("ip", "192.168.0.1").param("port", "8080").param("ephemeral", "true"));
-        resultActions1.andExpect(MockMvcResultMatchers.status().is(NacosException.SERVER_ERROR));
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("bad argument", response.getBody());
+    }
+    
+    @Test
+    void testHandleMissingParams() {
+        MissingServletRequestParameterException exception =
+            new MissingServletRequestParameterException("namespaceId", "String");
         
-        // 执行请求并验证响应码
-        ResultActions resultActions2 = mockMvc.perform(
-                post("/v2/ns/instance").param("namespaceId", "public").param("groupName", "G").param("serviceName", "s")
-                        .param("ip", "192.168.0.1").param("port", "8080").param("ephemeral", "true"));
-        resultActions2.andExpect(MockMvcResultMatchers.status().is(503));
+        ResponseEntity<String> response = handler.handleMissingParams(exception);
+        
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Parameter 'namespaceId' is missing", response.getBody());
+    }
+    
+    @Test
+    void testHandleException() {
+        ResponseEntity<String> response = handler.handleException(new Exception("unexpected"));
+        
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertTrue(response.getBody().contains("unexpected"));
     }
 }

@@ -17,7 +17,9 @@
 
 package com.alibaba.nacos.console.controller.v3.naming;
 
+import com.alibaba.nacos.api.annotation.Since;
 import com.alibaba.nacos.api.annotation.NacosApi;
+import com.alibaba.nacos.api.common.ApiType;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.exception.api.NacosApiException;
 import com.alibaba.nacos.api.model.Page;
@@ -46,9 +48,7 @@ import com.alibaba.nacos.naming.paramcheck.NamingDefaultHttpParamExtractor;
 import com.alibaba.nacos.naming.selector.NoneSelector;
 import com.alibaba.nacos.naming.selector.SelectorManager;
 import com.alibaba.nacos.plugin.auth.constant.ActionTypes;
-import com.alibaba.nacos.plugin.auth.constant.ApiType;
 import com.alibaba.nacos.plugin.auth.constant.Constants;
-import com.alibaba.nacos.plugin.auth.impl.constant.AuthConstants;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -86,6 +86,7 @@ public class ConsoleServiceController {
     /**
      * Create a new service. This API will create a persistence service.
      */
+    @Since("3.0.0")
     @PostMapping()
     @TpsControl(pointName = "NamingServiceRegister", name = "HttpNamingServiceRegister")
     @Secured(action = ActionTypes.WRITE, apiType = ApiType.CONSOLE_API)
@@ -104,19 +105,21 @@ public class ConsoleServiceController {
     /**
      * Remove service.
      */
+    @Since("3.0.0")
     @DeleteMapping()
     @TpsControl(pointName = "NamingServiceDeregister", name = "HttpNamingServiceDeregister")
     @Secured(action = ActionTypes.WRITE, apiType = ApiType.CONSOLE_API)
     public Result<String> deleteService(ServiceForm serviceForm) throws Exception {
         serviceForm.validate();
         serviceProxy.deleteService(serviceForm.getNamespaceId(), serviceForm.getServiceName(),
-                serviceForm.getGroupName());
+            serviceForm.getGroupName());
         return Result.success("ok");
     }
     
     /**
      * Update service.
      */
+    @Since("3.0.0")
     @PutMapping()
     @TpsControl(pointName = "NamingServiceUpdate", name = "HttpNamingServiceUpdate")
     @Secured(action = ActionTypes.WRITE, apiType = ApiType.CONSOLE_API)
@@ -136,9 +139,11 @@ public class ConsoleServiceController {
      *
      * @return {@link Selector} types.
      */
+    @Since("3.0.0")
     @GetMapping("/selector/types")
-    @Secured(resource = AuthConstants.CONSOLE_RESOURCE_NAME_PREFIX
-            + "naming", action = ActionTypes.READ, apiType = ApiType.CONSOLE_API, tags = Constants.Tag.ONLY_IDENTITY)
+    @Secured(resource = Constants.Resource.CONSOLE_RESOURCE_NAME_PREFIX
+        + "naming", action = ActionTypes.READ, apiType = ApiType.CONSOLE_API,
+        tags = Constants.Tag.ONLY_IDENTITY)
     public Result<List<String>> getSelectorTypeList() throws NacosException {
         return Result.success(serviceProxy.getSelectorTypeList());
     }
@@ -152,10 +157,11 @@ public class ConsoleServiceController {
      * @return subscribes result data.
      * @throws Exception any exception during get subscriber list.
      */
+    @Since("3.0.0")
     @GetMapping("/subscribers")
     @Secured(action = ActionTypes.READ, apiType = ApiType.CONSOLE_API)
     public Result<Page<SubscriberInfo>> subscribers(ServiceForm serviceForm, PageForm pageForm,
-            AggregationForm aggregationForm) throws Exception {
+        AggregationForm aggregationForm) throws Exception {
         serviceForm.validate();
         pageForm.validate();
         int pageNo = pageForm.getPageNo();
@@ -164,7 +170,8 @@ public class ConsoleServiceController {
         String serviceName = serviceForm.getServiceName();
         String groupName = serviceForm.getGroupName();
         boolean aggregation = aggregationForm.isAggregation();
-        Page<SubscriberInfo> subscribers = serviceProxy.getSubscribers(pageNo, pageSize, namespaceId, serviceName,
+        Page<SubscriberInfo> subscribers =
+            serviceProxy.getSubscribers(pageNo, pageSize, namespaceId, serviceName,
                 groupName, aggregation);
         return Result.success(subscribers);
     }
@@ -176,9 +183,11 @@ public class ConsoleServiceController {
      * @param pageForm        page form
      * @return list service detail, depend on withInstances parameters, return ServiceDetailInfo or ServiceView.
      */
+    @Since("3.0.0")
     @Secured(action = ActionTypes.READ, apiType = ApiType.CONSOLE_API)
     @GetMapping("/list")
-    public Result<Object> getServiceList(ServiceListForm serviceListForm, PageForm pageForm) throws NacosException {
+    public Result<Object> getServiceList(ServiceListForm serviceListForm, PageForm pageForm)
+        throws NacosException {
         serviceListForm.validate();
         pageForm.validate();
         String namespaceId = serviceListForm.getNamespaceId();
@@ -187,8 +196,9 @@ public class ConsoleServiceController {
         boolean hasIpCount = serviceListForm.isIgnoreEmptyService();
         boolean withInstances = serviceListForm.isWithInstances();
         return Result.success(
-                serviceProxy.getServiceList(withInstances, namespaceId, pageForm.getPageNo(), pageForm.getPageSize(),
-                        serviceName, groupName, hasIpCount));
+            serviceProxy.getServiceList(withInstances, namespaceId, pageForm.getPageNo(),
+                pageForm.getPageSize(),
+                serviceName, groupName, hasIpCount));
     }
     
     /**
@@ -198,12 +208,14 @@ public class ConsoleServiceController {
      * @return service detail information
      * @throws NacosException nacos exception
      */
+    @Since("3.0.0")
     @Secured(action = ActionTypes.READ, apiType = ApiType.CONSOLE_API)
     @GetMapping()
-    public Result<ServiceDetailInfo> getServiceDetail(ServiceForm serviceForm) throws NacosException {
+    public Result<ServiceDetailInfo> getServiceDetail(ServiceForm serviceForm)
+        throws NacosException {
         serviceForm.validate();
         ServiceDetailInfo result = serviceProxy.getServiceDetail(serviceForm.getNamespaceId(),
-                serviceForm.getServiceName(), serviceForm.getGroupName());
+            serviceForm.getServiceName(), serviceForm.getGroupName());
         return Result.success(result);
     }
     
@@ -214,6 +226,7 @@ public class ConsoleServiceController {
      * @return 'ok' if success
      * @throws Exception if failed
      */
+    @Since("3.0.0")
     @PutMapping("/cluster")
     @Secured(action = ActionTypes.WRITE, apiType = ApiType.CONSOLE_API)
     public Result<String> updateCluster(UpdateClusterForm updateClusterForm) throws Exception {
@@ -225,11 +238,14 @@ public class ConsoleServiceController {
         ClusterMetadata clusterMetadata = new ClusterMetadata();
         clusterMetadata.setHealthyCheckPort(updateClusterForm.getCheckPort());
         clusterMetadata.setUseInstancePortForCheck(updateClusterForm.isUseInstancePort4Check());
-        AbstractHealthChecker healthChecker = HealthCheckerFactory.deserialize(updateClusterForm.getHealthChecker());
+        AbstractHealthChecker healthChecker =
+            HealthCheckerFactory.deserialize(updateClusterForm.getHealthChecker());
         clusterMetadata.setHealthChecker(healthChecker);
         clusterMetadata.setHealthyCheckType(healthChecker.getType());
-        clusterMetadata.setExtendData(UtilsAndCommons.parseMetadata(updateClusterForm.getMetadata()));
-        serviceProxy.updateClusterMetadata(namespaceId, groupName, serviceName, clusterName, clusterMetadata);
+        clusterMetadata
+            .setExtendData(UtilsAndCommons.parseMetadata(updateClusterForm.getMetadata()));
+        serviceProxy.updateClusterMetadata(namespaceId, groupName, serviceName, clusterName,
+            clusterMetadata);
         return Result.success("ok");
     }
     
@@ -240,13 +256,15 @@ public class ConsoleServiceController {
         
         JsonNode selectorJson = JacksonUtils.toObj(URLDecoder.decode(selectorJsonString, "UTF-8"));
         String type = Optional.ofNullable(selectorJson.get("type")).orElseThrow(
-                () -> new NacosApiException(NacosException.INVALID_PARAM, ErrorCode.SELECTOR_ERROR,
-                        "not match any type of selector!")).asText();
-        String expression = Optional.ofNullable(selectorJson.get("expression")).map(JsonNode::asText).orElse(null);
+            () -> new NacosApiException(NacosException.INVALID_PARAM, ErrorCode.SELECTOR_ERROR,
+                "not match any type of selector!"))
+            .asText();
+        String expression =
+            Optional.ofNullable(selectorJson.get("expression")).map(JsonNode::asText).orElse(null);
         Selector selector = selectorManager.parseSelector(type, expression);
         if (Objects.isNull(selector)) {
             throw new NacosApiException(NacosException.INVALID_PARAM, ErrorCode.SELECTOR_ERROR,
-                    "not match any type of selector!");
+                "not match any type of selector!");
         }
         return selector;
     }

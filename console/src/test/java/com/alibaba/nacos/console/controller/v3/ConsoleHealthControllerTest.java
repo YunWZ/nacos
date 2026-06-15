@@ -59,13 +59,15 @@ public class ConsoleHealthControllerTest {
     
     @Test
     void testLiveness() throws Exception {
-        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/v3/console/health/liveness");
+        MockHttpServletRequestBuilder builder =
+            MockMvcRequestBuilders.get("/v3/console/health/liveness");
         
         MockHttpServletResponse response = mockMvc.perform(builder).andReturn().getResponse();
         String actualValue = response.getContentAsString();
         
-        Result<String> result = new ObjectMapper().readValue(actualValue, new TypeReference<Result<String>>() {
-        });
+        Result<String> result =
+            new ObjectMapper().readValue(actualValue, new TypeReference<Result<String>>() {
+            });
         
         assertEquals("ok", result.getData());
     }
@@ -74,15 +76,36 @@ public class ConsoleHealthControllerTest {
     void testReadiness() throws Exception {
         when(healthProxy.checkReadiness()).thenReturn(Result.success("ready"));
         
-        MockHttpServletRequestBuilder builder = MockMvcRequestBuilders.get("/v3/console/health/readiness");
+        MockHttpServletRequestBuilder builder =
+            MockMvcRequestBuilders.get("/v3/console/health/readiness");
         
         MockHttpServletResponse response = mockMvc.perform(builder).andReturn().getResponse();
         String actualValue = response.getContentAsString();
         
-        Result<String> result = new ObjectMapper().readValue(actualValue, new TypeReference<Result<String>>() {
-        });
+        Result<String> result =
+            new ObjectMapper().readValue(actualValue, new TypeReference<Result<String>>() {
+            });
         
         assertEquals("ready", result.getData());
+        assertEquals(200, response.getStatus());
+    }
+    
+    @Test
+    void testReadinessFail() throws Exception {
+        when(healthProxy.checkReadiness()).thenReturn(Result.failure("fail"));
+        
+        MockHttpServletRequestBuilder builder =
+            MockMvcRequestBuilders.get("/v3/console/health/readiness");
+        
+        MockHttpServletResponse response = mockMvc.perform(builder).andReturn().getResponse();
+        String actualValue = response.getContentAsString();
+        
+        Result<String> result =
+            new ObjectMapper().readValue(actualValue, new TypeReference<Result<String>>() {
+            });
+        
+        assertEquals("fail", result.getMessage());
+        assertEquals(500, response.getStatus());
+        
     }
 }
-

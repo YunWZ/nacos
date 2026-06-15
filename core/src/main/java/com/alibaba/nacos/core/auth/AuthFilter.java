@@ -16,11 +16,11 @@
 
 package com.alibaba.nacos.core.auth;
 
+import com.alibaba.nacos.api.common.ApiType;
 import com.alibaba.nacos.auth.annotation.Secured;
 import com.alibaba.nacos.auth.config.NacosAuthConfig;
 import com.alibaba.nacos.auth.serveridentity.ServerIdentityResult;
 import com.alibaba.nacos.core.code.ControllerMethodsCache;
-import com.alibaba.nacos.plugin.auth.constant.ApiType;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -36,7 +36,7 @@ public class AuthFilter extends AbstractWebAuthFilter {
     private final InnerApiAuthEnabled innerApiAuthEnabled;
     
     public AuthFilter(NacosAuthConfig authConfig, ControllerMethodsCache methodsCache,
-            InnerApiAuthEnabled innerApiAuthEnabled) {
+        InnerApiAuthEnabled innerApiAuthEnabled) {
         super(authConfig, methodsCache);
         this.authConfig = authConfig;
         this.innerApiAuthEnabled = innerApiAuthEnabled;
@@ -54,7 +54,8 @@ public class AuthFilter extends AbstractWebAuthFilter {
     }
     
     @Override
-    protected ServerIdentityResult checkServerIdentity(HttpServletRequest request, Secured secured) {
+    protected ServerIdentityResult checkServerIdentity(HttpServletRequest request,
+        Secured secured) {
         // During Upgrading, Old Nacos server might not with server identity for some Inner API, follow old version logic.
         if (ApiType.INNER_API.equals(secured.apiType()) && !innerApiAuthEnabled.isEnabled()) {
             return ServerIdentityResult.success();

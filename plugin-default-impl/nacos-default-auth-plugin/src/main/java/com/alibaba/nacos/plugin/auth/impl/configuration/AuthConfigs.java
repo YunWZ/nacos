@@ -26,14 +26,15 @@ import com.alibaba.nacos.common.notify.listener.Subscriber;
 import com.alibaba.nacos.common.utils.ConvertUtils;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.plugin.auth.constant.Constants;
+import com.alibaba.nacos.plugin.auth.impl.constant.AuthConstants;
 import com.alibaba.nacos.sys.env.EnvUtil;
 import com.alibaba.nacos.sys.utils.PropertiesUtil;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -80,9 +81,15 @@ public class AuthConfigs extends Subscriber<ServerConfigChangeEvent> {
     @Value("${" + Constants.Auth.NACOS_CORE_AUTH_SERVER_IDENTITY_VALUE + ":}")
     private String serverIdentityValue;
     
+    /**
+     * Whether AI resource anonymous access is enabled.
+     */
+    @Value("${" + AuthConstants.NACOS_CORE_AUTH_NACOS_ANONYMOUS_AI_ENABLED + ":false}")
+    private boolean aiAnonymousEnabled;
+    
     private boolean hasGlobalAdminRole;
     
-    private Map<String, Properties> authPluginProperties = new HashMap<>();
+    private volatile Map<String, Properties> authPluginProperties = new HashMap<>();
     
     public AuthConfigs() {
         NotifyCenter.registerSubscriber(this);
@@ -100,27 +107,30 @@ public class AuthConfigs extends Subscriber<ServerConfigChangeEvent> {
             return;
         }
         if (StringUtils.isEmpty(nacosAuthSystemType)) {
-            throw new NacosException(AuthErrorCode.INVALID_TYPE.getCode(), AuthErrorCode.INVALID_TYPE.getMsg());
+            throw new NacosException(AuthErrorCode.INVALID_TYPE.getCode(),
+                AuthErrorCode.INVALID_TYPE.getMsg());
         }
         if (EnvUtil.getStandaloneMode()) {
             return;
         }
         if (StringUtils.isEmpty(serverIdentityKey) || StringUtils.isEmpty(serverIdentityValue)) {
-            throw new NacosException(AuthErrorCode.EMPTY_IDENTITY.getCode(), AuthErrorCode.EMPTY_IDENTITY.getMsg());
+            throw new NacosException(AuthErrorCode.EMPTY_IDENTITY.getCode(),
+                AuthErrorCode.EMPTY_IDENTITY.getMsg());
         }
     }
     
     private void refreshPluginProperties() {
         try {
             Map<String, Properties> newProperties = new HashMap<>(1);
-            Properties properties = PropertiesUtil.getPropertiesWithPrefix(EnvUtil.getEnvironment(), PREFIX);
+            Properties properties =
+                PropertiesUtil.getPropertiesWithPrefix(EnvUtil.getEnvironment(), PREFIX);
             if (properties != null) {
                 for (String each : properties.stringPropertyNames()) {
                     int typeIndex = each.indexOf('.');
                     String type = each.substring(0, typeIndex);
                     String subKey = each.substring(typeIndex + 1);
                     newProperties.computeIfAbsent(type, key -> new Properties())
-                            .setProperty(subKey, properties.getProperty(each));
+                        .setProperty(subKey, properties.getProperty(each));
                 }
             }
             authPluginProperties = newProperties;
@@ -166,7 +176,16 @@ public class AuthConfigs extends Subscriber<ServerConfigChangeEvent> {
     public boolean isAuthEnabled() {
         return authEnabled;
     }
-
+    
+    /**
+     * AI anonymous access is open.
+     *
+     * @return AI anonymous access is open
+     */
+    public boolean isAiAnonymousEnabled() {
+        return aiAnonymousEnabled;
+    }
+    
     /**
      * Whether permission information can be cached.
      *
@@ -176,15 +195,17 @@ public class AuthConfigs extends Subscriber<ServerConfigChangeEvent> {
         if (Objects.nonNull(AuthConfigs.cachingEnabled)) {
             return cachingEnabled;
         }
-        return ConvertUtils.toBoolean(EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_CACHING_ENABLED, "true"));
+        return ConvertUtils
+            .toBoolean(EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_CACHING_ENABLED, "true"));
     }
     
     public Properties getAuthPluginProperties(String authType) {
-        if (!authPluginProperties.containsKey(authType)) {
+        Properties properties = authPluginProperties.get(authType);
+        if (properties == null) {
             LOGGER.warn("Can't find properties for type {}, will use empty properties", authType);
             return new Properties();
         }
-        return authPluginProperties.get(authType);
+        return properties;
     }
     
     @JustForTest
@@ -195,12 +216,21 @@ public class AuthConfigs extends Subscriber<ServerConfigChangeEvent> {
     @Override
     public void onEvent(ServerConfigChangeEvent event) {
         try {
-            authEnabled = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_ENABLED, Boolean.class, false);
-            consoleAuthEnabled = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_CONSOLE_ENABLED, Boolean.class, true);
-            cachingEnabled = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_CACHING_ENABLED, Boolean.class, true);
-            serverIdentityKey = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SERVER_IDENTITY_KEY, "");
-            serverIdentityValue = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SERVER_IDENTITY_VALUE, "");
-            nacosAuthSystemType = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SYSTEM_TYPE, "");
+            authEnabled =
+                EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_ENABLED, Boolean.class, false);
+            consoleAuthEnabled = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_CONSOLE_ENABLED,
+                Boolean.class, true);
+            cachingEnabled = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_CACHING_ENABLED,
+                Boolean.class, true);
+            serverIdentityKey =
+                EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SERVER_IDENTITY_KEY, "");
+            serverIdentityValue =
+                EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SERVER_IDENTITY_VALUE, "");
+            nacosAuthSystemType =
+                EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SYSTEM_TYPE, "");
+            aiAnonymousEnabled =
+                EnvUtil.getProperty(AuthConstants.NACOS_CORE_AUTH_NACOS_ANONYMOUS_AI_ENABLED,
+                    Boolean.class, false);
             refreshPluginProperties();
         } catch (Exception e) {
             LOGGER.warn("Upgrade auth config from env failed, use old value", e);

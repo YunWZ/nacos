@@ -17,7 +17,9 @@
 
 package com.alibaba.nacos.console.controller.v3.naming;
 
+import com.alibaba.nacos.api.annotation.Since;
 import com.alibaba.nacos.api.annotation.NacosApi;
+import com.alibaba.nacos.api.common.ApiType;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.exception.api.NacosApiException;
 import com.alibaba.nacos.api.model.Page;
@@ -37,8 +39,8 @@ import com.alibaba.nacos.naming.model.form.InstanceListForm;
 import com.alibaba.nacos.naming.paramcheck.NamingDefaultHttpParamExtractor;
 import com.alibaba.nacos.naming.web.CanDistro;
 import com.alibaba.nacos.plugin.auth.constant.ActionTypes;
-import com.alibaba.nacos.plugin.auth.constant.ApiType;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -69,16 +71,21 @@ public class ConsoleInstanceController {
      * List instances of special service.
      *
      * @param instanceForm instance list form
-     * @param pageForm Page form
+     * @param pageForm     Page form
      * @return instances information
      */
+    @Since("3.0.0")
     @Secured(action = ActionTypes.READ, apiType = ApiType.CONSOLE_API)
     @RequestMapping("/list")
-    public Result<Page<? extends Instance>> getInstanceList(InstanceListForm instanceForm, PageForm pageForm)
-            throws NacosException {
+    public Result<Page<? extends Instance>> getInstanceList(InstanceListForm instanceForm,
+        PageForm pageForm)
+        throws NacosException {
         instanceForm.validate();
-        Page<? extends Instance> instancePage = instanceProxy.listInstances(instanceForm.getNamespaceId(),
-                instanceForm.getServiceName(), instanceForm.getGroupName(), instanceForm.getClusterName(),
+        pageForm.validate();
+        Page<? extends Instance> instancePage =
+            instanceProxy.listInstances(instanceForm.getNamespaceId(),
+                instanceForm.getServiceName(), instanceForm.getGroupName(),
+                instanceForm.getClusterName(),
                 pageForm.getPageNo(), pageForm.getPageSize());
         return Result.success(instancePage);
     }
@@ -86,6 +93,7 @@ public class ConsoleInstanceController {
     /**
      * Update instance.
      */
+    @Since("3.0.0")
     @CanDistro
     @PutMapping
     @TpsControl(pointName = "NamingInstanceUpdate", name = "HttpNamingInstanceUpdate")
@@ -100,18 +108,45 @@ public class ConsoleInstanceController {
         return Result.success("ok");
     }
     
+    /**
+     * Remove instance.
+     */
+    @Since("3.2.2")
+    @CanDistro
+    @DeleteMapping
+    @TpsControl(pointName = "NamingInstanceDeregister", name = "HttpNamingInstanceDeregister")
+    @Secured(action = ActionTypes.WRITE, apiType = ApiType.CONSOLE_API)
+    public Result<String> removeInstance(InstanceForm instanceForm) throws NacosException {
+        // check param
+        instanceForm.validate();
+        checkDeleteInstanceEphemeral(instanceForm.getEphemeral());
+        // build instance
+        Instance instance = buildInstance(instanceForm);
+        instanceProxy.removeInstance(instanceForm, instance);
+        return Result.success("ok");
+    }
+    
     private void checkWeight(Double weight) throws NacosException {
         if (weight > com.alibaba.nacos.naming.constants.Constants.MAX_WEIGHT_VALUE
-                || weight < com.alibaba.nacos.naming.constants.Constants.MIN_WEIGHT_VALUE) {
+            || weight < com.alibaba.nacos.naming.constants.Constants.MIN_WEIGHT_VALUE) {
             throw new NacosApiException(HttpStatus.BAD_REQUEST.value(), ErrorCode.WEIGHT_ERROR,
-                    "instance format invalid: The weights range from "
-                            + com.alibaba.nacos.naming.constants.Constants.MIN_WEIGHT_VALUE + " to "
-                            + com.alibaba.nacos.naming.constants.Constants.MAX_WEIGHT_VALUE);
+                "instance format invalid: The weights range from "
+                    + com.alibaba.nacos.naming.constants.Constants.MIN_WEIGHT_VALUE + " to "
+                    + com.alibaba.nacos.naming.constants.Constants.MAX_WEIGHT_VALUE);
+        }
+    }
+    
+    private void checkDeleteInstanceEphemeral(Boolean ephemeral) throws NacosApiException {
+        if (Boolean.TRUE.equals(ephemeral)) {
+            throw new NacosApiException(HttpStatus.BAD_REQUEST.value(),
+                ErrorCode.PARAMETER_VALIDATE_ERROR,
+                "Console only supports deregistering persistent instances");
         }
     }
     
     private Instance buildInstance(InstanceForm instanceForm) throws NacosException {
-        Instance instance = InstanceBuilder.newBuilder().setServiceName(buildCompositeServiceName(instanceForm))
+        Instance instance =
+            InstanceBuilder.newBuilder().setServiceName(buildCompositeServiceName(instanceForm))
                 .setIp(instanceForm.getIp()).setClusterName(instanceForm.getClusterName())
                 .setPort(instanceForm.getPort()).setHealthy(instanceForm.getHealthy())
                 .setWeight(instanceForm.getWeight()).setEnabled(instanceForm.getEnabled())
@@ -125,7 +160,8 @@ public class ConsoleInstanceController {
     }
     
     private String buildCompositeServiceName(InstanceForm instanceForm) {
-        return NamingUtils.getGroupedName(instanceForm.getServiceName(), instanceForm.getGroupName());
+        return NamingUtils.getGroupedName(instanceForm.getServiceName(),
+            instanceForm.getGroupName());
     }
     
 }

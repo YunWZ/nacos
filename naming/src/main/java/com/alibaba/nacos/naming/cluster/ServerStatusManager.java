@@ -22,9 +22,9 @@ import com.alibaba.nacos.core.distributed.distro.DistroProtocol;
 import com.alibaba.nacos.naming.misc.GlobalConfig;
 import com.alibaba.nacos.naming.misc.GlobalExecutor;
 import com.alibaba.nacos.naming.misc.SwitchDomain;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.Optional;
 
 /**
@@ -47,7 +47,7 @@ public class ServerStatusManager {
     private ServerStatus serverStatus = ServerStatus.STARTING;
     
     public ServerStatusManager(GlobalConfig globalConfig, DistroProtocol distroProtocol,
-            ProtocolManager protocolManager, SwitchDomain switchDomain) {
+        ProtocolManager protocolManager, SwitchDomain switchDomain) {
         this.globalConfig = globalConfig;
         this.distroProtocol = distroProtocol;
         this.protocolManager = protocolManager;
@@ -92,10 +92,10 @@ public class ServerStatusManager {
         }
         if (!distroProtocol.isInitialized()) {
             return Optional.of(
-                    "Distro snapshot load failed, please see logs `protocol-distro.log` or `naming-distro.log` to see details.");
+                "Distro snapshot load failed, please see logs `protocol-distro.log` or `naming-distro.log` to see details.");
         }
         return Optional.of(
-                "No leader for raft, please see logs `alipay-jraft.log` or `naming-raft.log` to see details.");
+            "No leader for raft, please see logs `alipay-jraft.log` or `naming-raft.log` to see details.");
     }
     
     public class ServerStatusUpdater implements Runnable {

@@ -81,9 +81,9 @@ public class ResponseUtil {
     }
     
     /**
-     * Transfer from {@link ConfigInfo} to {@link ConfigBasicInfo} for APIs.
+     * Transfer from {@link ConfigInfoWrapper} to {@link ConfigBasicInfo} for APIs.
      *
-     * @param configInfo {@link ConfigInfo} config basic information from storage.
+     * @param configInfo {@link ConfigInfoWrapper} config basic information from storage.
      * @return {@link ConfigBasicInfo} for APIs response.
      */
     public static ConfigBasicInfo transferToConfigBasicInfo(ConfigInfoWrapper configInfo) {
@@ -114,7 +114,8 @@ public class ResponseUtil {
      * @param historyInfo {@link ConfigHistoryInfo} config history information from storage.
      * @return {@link ConfigHistoryBasicInfo} for APIs response.
      */
-    public static ConfigHistoryBasicInfo transferToConfigHistoryBasicInfo(ConfigHistoryInfo historyInfo) {
+    public static ConfigHistoryBasicInfo transferToConfigHistoryBasicInfo(
+        ConfigHistoryInfo historyInfo) {
         ConfigHistoryBasicInfo result = new ConfigHistoryBasicInfo();
         BeanUtils.copyProperties(historyInfo, result);
         injectHistoryBasicInfo(result, historyInfo);
@@ -127,14 +128,16 @@ public class ResponseUtil {
      * @param historyInfo {@link ConfigHistoryInfo} config history information from storage.
      * @return {@link ConfigHistoryDetailInfo} for APIs response.
      */
-    public static ConfigHistoryDetailInfo transferToConfigHistoryDetailInfo(ConfigHistoryInfo historyInfo) {
+    public static ConfigHistoryDetailInfo transferToConfigHistoryDetailInfo(
+        ConfigHistoryInfo historyInfo) {
         ConfigHistoryDetailInfo result = new ConfigHistoryDetailInfo();
         BeanUtils.copyProperties(historyInfo, result);
         injectHistoryBasicInfo(result, historyInfo);
         return result;
     }
     
-    private static void injectHistoryBasicInfo(ConfigHistoryBasicInfo historyBasicInfo, ConfigHistoryInfo historyInfo) {
+    private static void injectHistoryBasicInfo(ConfigHistoryBasicInfo historyBasicInfo,
+        ConfigHistoryInfo historyInfo) {
         historyBasicInfo.setNamespaceId(historyInfo.getTenant());
         historyBasicInfo.setGroupName(historyInfo.getGroup());
         historyBasicInfo.setCreateTime(historyInfo.getCreatedTime().getTime());

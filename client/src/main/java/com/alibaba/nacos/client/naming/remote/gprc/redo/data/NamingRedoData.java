@@ -25,7 +25,6 @@ import java.util.Objects;
  *
  * @author xiweng.yy
  */
-@SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
 public abstract class NamingRedoData<T> extends RedoData<T> {
     
     private final String serviceName;
@@ -55,7 +54,8 @@ public abstract class NamingRedoData<T> extends RedoData<T> {
             return false;
         }
         NamingRedoData<?> redoData = (NamingRedoData<?>) o;
-        return super.equals(o) && serviceName.equals(redoData.serviceName) && groupName.equals(redoData.groupName);
+        return super.equals(o) && serviceName.equals(redoData.serviceName)
+            && groupName.equals(redoData.groupName);
     }
     
     @Override

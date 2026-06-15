@@ -44,6 +44,9 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class NacosMaintainerClientHolderTest {
     
+    private static final String REMOTE_SERVER_CONTEXT_PATH_KEY =
+        "nacos.console.remote.server.context-path";
+    
     @Mock
     RemoteServerMemberManager memberManager;
     
@@ -71,8 +74,10 @@ class NacosMaintainerClientHolderTest {
     
     @Test
     void onEvent() {
-        NamingMaintainerService namingMaintainerService = maintainerClientHolder.getNamingMaintainerService();
-        ConfigMaintainerService configMaintainerService = maintainerClientHolder.getConfigMaintainerService();
+        NamingMaintainerService namingMaintainerService =
+            maintainerClientHolder.getNamingMaintainerService();
+        ConfigMaintainerService configMaintainerService =
+            maintainerClientHolder.getConfigMaintainerService();
         AiMaintainerService aiMaintainerService = maintainerClientHolder.getAiMaintainerService();
         assertNotNull(namingMaintainerService);
         assertNotNull(configMaintainerService);
@@ -81,15 +86,19 @@ class NacosMaintainerClientHolderTest {
         assertNotNull(maintainerClientHolder.getNamingMaintainerService());
         assertNotNull(maintainerClientHolder.getConfigMaintainerService());
         assertNotNull(maintainerClientHolder.getAiMaintainerService());
-        assertNotEquals(namingMaintainerService, maintainerClientHolder.getNamingMaintainerService());
-        assertNotEquals(configMaintainerService, maintainerClientHolder.getConfigMaintainerService());
+        assertNotEquals(namingMaintainerService,
+            maintainerClientHolder.getNamingMaintainerService());
+        assertNotEquals(configMaintainerService,
+            maintainerClientHolder.getConfigMaintainerService());
         assertNotEquals(aiMaintainerService, maintainerClientHolder.getAiMaintainerService());
     }
     
     @Test
     void onEventWithException() {
-        NamingMaintainerService namingMaintainerService = maintainerClientHolder.getNamingMaintainerService();
-        ConfigMaintainerService configMaintainerService = maintainerClientHolder.getConfigMaintainerService();
+        NamingMaintainerService namingMaintainerService =
+            maintainerClientHolder.getNamingMaintainerService();
+        ConfigMaintainerService configMaintainerService =
+            maintainerClientHolder.getConfigMaintainerService();
         AiMaintainerService aiMaintainerService = maintainerClientHolder.getAiMaintainerService();
         assertNotNull(namingMaintainerService);
         assertNotNull(configMaintainerService);
@@ -102,5 +111,28 @@ class NacosMaintainerClientHolderTest {
         assertEquals(namingMaintainerService, maintainerClientHolder.getNamingMaintainerService());
         assertEquals(configMaintainerService, maintainerClientHolder.getConfigMaintainerService());
         assertEquals(aiMaintainerService, maintainerClientHolder.getAiMaintainerService());
+    }
+    
+    @Test
+    void resolveRemoteContextPathWithDefaultValue() {
+        assertEquals("/nacos", NacosMaintainerClientHolder.resolveRemoteContextPath());
+    }
+    
+    @Test
+    void resolveRemoteContextPathShouldNormalizeAndTrim() {
+        MockEnvironment environment = new MockEnvironment();
+        environment.setProperty(Constants.Auth.NACOS_CORE_AUTH_ADMIN_ENABLED, "false");
+        environment.setProperty(REMOTE_SERVER_CONTEXT_PATH_KEY, "  nacos/custom/// ");
+        EnvUtil.setEnvironment(environment);
+        assertEquals("/nacos/custom", NacosMaintainerClientHolder.resolveRemoteContextPath());
+    }
+    
+    @Test
+    void resolveRemoteContextPathShouldKeepRootPath() {
+        MockEnvironment environment = new MockEnvironment();
+        environment.setProperty(Constants.Auth.NACOS_CORE_AUTH_ADMIN_ENABLED, "false");
+        environment.setProperty(REMOTE_SERVER_CONTEXT_PATH_KEY, " /// ");
+        EnvUtil.setEnvironment(environment);
+        assertEquals("/", NacosMaintainerClientHolder.resolveRemoteContextPath());
     }
 }

@@ -23,7 +23,6 @@ import java.util.Objects;
  *
  * @author xiweng.yy
  */
-@SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
 public abstract class RedoData<T> {
     
     /**
@@ -154,7 +153,8 @@ public abstract class RedoData<T> {
             return false;
         }
         RedoData<?> redoData = (RedoData<?>) o;
-        return registered == redoData.registered && unregistering == redoData.unregistering && Objects.equals(data,
+        return registered == redoData.registered && unregistering == redoData.unregistering
+            && Objects.equals(data,
                 redoData.data);
     }
     

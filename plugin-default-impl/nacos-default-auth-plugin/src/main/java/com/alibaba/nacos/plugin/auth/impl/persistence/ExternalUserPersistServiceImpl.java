@@ -21,13 +21,13 @@ import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.persistence.datasource.DataSourceService;
 import com.alibaba.nacos.persistence.datasource.DynamicDataSource;
 import com.alibaba.nacos.plugin.auth.impl.persistence.extrnal.AuthExternalPaginationHelperImpl;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -144,8 +144,9 @@ public class ExternalUserPersistServiceImpl implements UserPersistService {
         }
         
         try {
-            Page<User> pageInfo = helper.fetchPage(sqlCountRows + where, sqlFetchRows + where, params.toArray(), pageNo,
-                    pageSize, USER_ROW_MAPPER);
+            Page<User> pageInfo = helper.fetchPage(sqlCountRows + where, sqlFetchRows + where,
+                params.toArray(), pageNo,
+                pageSize, USER_ROW_MAPPER);
             if (pageInfo == null) {
                 pageInfo = new Page<>();
                 pageInfo.setTotalCount(0);
@@ -161,7 +162,8 @@ public class ExternalUserPersistServiceImpl implements UserPersistService {
     @Override
     public List<String> findUserLikeUsername(String username) {
         String sql = "SELECT username FROM users WHERE username LIKE ?";
-        List<String> users = this.jt.queryForList(sql, new String[] {String.format("%%%s%%", username)}, String.class);
+        List<String> users = this.jt.queryForList(sql,
+            new String[] {String.format("%%%s%%", username)}, String.class);
         return users;
     }
     
@@ -179,8 +181,9 @@ public class ExternalUserPersistServiceImpl implements UserPersistService {
         
         AuthPaginationHelper<User> helper = createPaginationHelper();
         try {
-            return helper.fetchPage(sqlCountRows + where, sqlFetchRows + where, params.toArray(), pageNo, pageSize,
-                    USER_ROW_MAPPER);
+            return helper.fetchPage(sqlCountRows + where, sqlFetchRows + where, params.toArray(),
+                pageNo, pageSize,
+                USER_ROW_MAPPER);
         } catch (CannotGetJdbcConnectionException e) {
             LOGGER.error("[db-error] " + e.toString(), e);
             throw e;

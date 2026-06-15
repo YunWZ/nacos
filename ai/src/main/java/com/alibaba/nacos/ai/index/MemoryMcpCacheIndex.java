@@ -16,6 +16,12 @@
 
 package com.alibaba.nacos.ai.index;
 
+import com.alibaba.nacos.ai.config.McpCacheIndexProperties;
+import com.alibaba.nacos.ai.model.mcp.McpServerIndexData;
+import com.alibaba.nacos.common.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,16 +32,32 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import com.alibaba.nacos.ai.config.McpCacheIndexProperties;
-import com.alibaba.nacos.ai.model.mcp.McpServerIndexData;
-import com.alibaba.nacos.common.utils.StringUtils;
-
 /**
  * Memory-based MCP cache index implementation with optimized locking.
+ *
+ * <p>
+ * TODO This Memory cache might include some design issues:
+ * <ul>
+ *     <li>
+ *         1. The read method in cache include LRU operation(write), which means read lock can't intercept write operation
+ *          in multiple threads reading and cause thread-safe problem.
+ *     </li>
+ *     <li>
+ *         2. For solve problem 1. Use {@code synchronized} wrapper {@link #removeFromLru} and {@link #moveToHead} method,
+ *         which may cause the read operation performance will be affected in high qps.
+ *     </li>
+ *     <li>
+ *         3. The next consider it whether keep the LRU behavior in next versions when qps improved. If keep it, the LRU cache should
+ *         be re-designed or use stabled high performance LRU cache such as guava.
+ *     </li>
+ * </ul>
+ * </p>
  *
  * @author misselvexu
  */
 public class MemoryMcpCacheIndex implements McpCacheIndex {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(MemoryMcpCacheIndex.class);
     
     private static final int DEFAULT_SHUTDOWN_TIMEOUT_SECONDS = 5;
     
@@ -97,7 +119,8 @@ public class MemoryMcpCacheIndex implements McpCacheIndex {
         
         // Schedule periodic cleanup
         this.cleanupScheduler.scheduleWithFixedDelay(this::cleanupExpiredEntries,
-                properties.getCleanupIntervalSeconds(), properties.getCleanupIntervalSeconds(), TimeUnit.SECONDS);
+            properties.getCleanupIntervalSeconds(), properties.getCleanupIntervalSeconds(),
+            TimeUnit.SECONDS);
     }
     
     @Override
@@ -107,28 +130,33 @@ public class MemoryMcpCacheIndex implements McpCacheIndex {
         }
         
         String key = buildNameKey(namespaceId, mcpName);
-        String id = nameKeyToId.get(key);
-        if (id == null) {
-            missCount.incrementAndGet();
-            return null;
-        }
-        
-        CacheNode node = idToEntry.get(id);
-        if (node == null || node.isExpired(properties.getExpireTimeSeconds())) {
-            // Clean up invalid mapping
-            nameKeyToId.remove(key, id);
-            if (node != null) {
-                removeFromLru(node);
-                idToEntry.remove(id, node);
+        readLock.lock();
+        try {
+            String id = nameKeyToId.get(key);
+            if (id == null) {
+                missCount.incrementAndGet();
+                return null;
             }
-            missCount.incrementAndGet();
-            return null;
+            
+            CacheNode node = idToEntry.get(id);
+            if (node == null || node.isExpired(properties.getExpireTimeSeconds())) {
+                // Clean up invalid mapping
+                nameKeyToId.remove(key, id);
+                if (node != null) {
+                    removeFromLru(node);
+                    idToEntry.remove(id, node);
+                }
+                missCount.incrementAndGet();
+                return null;
+            }
+            
+            // Update LRU position
+            moveToHead(node);
+            hitCount.incrementAndGet();
+            return id;
+        } finally {
+            readLock.unlock();
         }
-        
-        // Update LRU position
-        moveToHead(node);
-        hitCount.incrementAndGet();
-        return id;
     }
     
     @Override
@@ -146,26 +174,32 @@ public class MemoryMcpCacheIndex implements McpCacheIndex {
             return null;
         }
         
-        CacheNode node = idToEntry.get(mcpId);
-        if (node == null || node.isExpired(properties.getExpireTimeSeconds())) {
-            if (node != null) {
-                removeFromLru(node);
-                idToEntry.remove(mcpId, node);
-                cleanupInvalidMappings(mcpId);
+        readLock.lock();
+        try {
+            CacheNode node = idToEntry.get(mcpId);
+            if (node == null || node.isExpired(properties.getExpireTimeSeconds())) {
+                if (node != null) {
+                    removeFromLru(node);
+                    idToEntry.remove(mcpId, node);
+                    cleanupInvalidMappings(mcpId);
+                }
+                missCount.incrementAndGet();
+                return null;
             }
-            missCount.incrementAndGet();
-            return null;
+            
+            // Update LRU position
+            moveToHead(node);
+            hitCount.incrementAndGet();
+            return node.data;
+        } finally {
+            readLock.unlock();
         }
-        
-        // Update LRU position
-        moveToHead(node);
-        hitCount.incrementAndGet();
-        return node.data;
     }
     
     @Override
     public void updateIndex(String namespaceId, String mcpName, String mcpId) {
-        if (StringUtils.isBlank(namespaceId) || StringUtils.isBlank(mcpName) || StringUtils.isBlank(mcpId)) {
+        if (StringUtils.isBlank(namespaceId) || StringUtils.isBlank(mcpName)
+            || StringUtils.isBlank(mcpId)) {
             return;
         }
         
@@ -202,13 +236,18 @@ public class MemoryMcpCacheIndex implements McpCacheIndex {
             return;
         }
         
-        String key = buildNameKey(namespaceId, mcpName);
-        String id = nameKeyToId.remove(key);
-        if (id != null) {
-            CacheNode node = idToEntry.remove(id);
-            if (node != null) {
-                removeFromLru(node);
+        writeLock.lock();
+        try {
+            String key = buildNameKey(namespaceId, mcpName);
+            String id = nameKeyToId.remove(key);
+            if (id != null) {
+                CacheNode node = idToEntry.remove(id);
+                if (node != null) {
+                    removeFromLru(node);
+                }
             }
+        } finally {
+            writeLock.unlock();
         }
     }
     
@@ -218,11 +257,16 @@ public class MemoryMcpCacheIndex implements McpCacheIndex {
             return;
         }
         
-        CacheNode node = idToEntry.remove(mcpId);
-        if (node != null) {
-            removeFromLru(node);
+        writeLock.lock();
+        try {
+            CacheNode node = idToEntry.remove(mcpId);
+            if (node != null) {
+                removeFromLru(node);
+            }
+            cleanupInvalidMappings(mcpId);
+        } finally {
+            writeLock.unlock();
         }
-        cleanupInvalidMappings(mcpId);
     }
     
     @Override
@@ -260,7 +304,8 @@ public class MemoryMcpCacheIndex implements McpCacheIndex {
             shutdown = true;
             cleanupScheduler.shutdown();
             try {
-                if (!cleanupScheduler.awaitTermination(DEFAULT_SHUTDOWN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                if (!cleanupScheduler.awaitTermination(DEFAULT_SHUTDOWN_TIMEOUT_SECONDS,
+                    TimeUnit.SECONDS)) {
                     cleanupScheduler.shutdownNow();
                 }
             } catch (InterruptedException e) {
@@ -299,7 +344,7 @@ public class MemoryMcpCacheIndex implements McpCacheIndex {
                 }
             }
         } catch (Exception e) {
-            // Log error but don't throw
+            LOGGER.error("Clean up expired mcp id and name cache failed.", e);
         }
     }
     
@@ -322,14 +367,14 @@ public class MemoryMcpCacheIndex implements McpCacheIndex {
         head.next = node;
     }
     
-    private void removeFromLru(CacheNode node) {
+    private synchronized void removeFromLru(CacheNode node) {
         if (node.prev != null && node.next != null) {
             node.prev.next = node.next;
             node.next.prev = node.prev;
         }
     }
     
-    private void moveToHead(CacheNode node) {
+    private synchronized void moveToHead(CacheNode node) {
         // Remove from current position
         if (node.prev != null && node.next != null) {
             node.prev.next = node.next;
@@ -370,4 +415,4 @@ public class MemoryMcpCacheIndex implements McpCacheIndex {
             return (currentTimeSeconds - createTimeSeconds) >= expireTimeSeconds;
         }
     }
-} 
+}

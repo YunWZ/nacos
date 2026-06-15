@@ -23,10 +23,10 @@ import com.alibaba.nacos.istio.xds.NacosXdsService;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.ServerInterceptors;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 
 /**
@@ -34,18 +34,18 @@ import java.io.IOException;
  */
 @Service
 public class IstioServer {
-
+    
     private Server server;
-
+    
     @Autowired
     private IstioConfig istioConfig;
-
+    
     @Autowired
     private ServerInterceptor serverInterceptor;
-
+    
     @Autowired
     private NacosMcpService nacosMcpService;
-
+    
     @Autowired
     private NacosXdsService nacosXdsService;
     
@@ -56,7 +56,7 @@ public class IstioServer {
      */
     @PostConstruct
     public void start() throws IOException {
-
+        
         if (!istioConfig.isServerEnabled()) {
             Loggers.MAIN.info("The Nacos Istio server is disabled.");
             return;
@@ -64,19 +64,22 @@ public class IstioServer {
         
         Loggers.MAIN.info("Nacos Istio server, starting Nacos Istio server...");
         
-        server = ServerBuilder.forPort(istioConfig.getServerPort()).addService(ServerInterceptors.intercept(nacosMcpService, serverInterceptor))
-                .addService(ServerInterceptors.intercept(nacosXdsService, serverInterceptor)).build();
+        server = ServerBuilder.forPort(istioConfig.getServerPort())
+            .addService(ServerInterceptors.intercept(nacosMcpService, serverInterceptor))
+            .addService(ServerInterceptors.intercept(nacosXdsService, serverInterceptor))
+            .build();
         server.start();
-
+        
         Runtime.getRuntime().addShutdownHook(new Thread() {
+            
             @Override
             public void run() {
-
+                
                 IstioServer.this.stop();
             }
         });
     }
-
+    
     /**
      * Stop.
      */

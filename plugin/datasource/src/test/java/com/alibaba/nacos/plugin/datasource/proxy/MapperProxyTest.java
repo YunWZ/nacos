@@ -16,7 +16,6 @@
 
 package com.alibaba.nacos.plugin.datasource.proxy;
 
-import com.alibaba.nacos.plugin.datasource.enums.mysql.TrustedMysqlFunctionEnum;
 import com.alibaba.nacos.plugin.datasource.mapper.Mapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +36,7 @@ class MapperProxyTest {
     @Test
     void testCreateProxy() {
         Mapper mapper = new Mapper() {
+            
             @Override
             public String select(List<String> columns, List<String> where) {
                 return "select-test";
@@ -79,7 +79,7 @@ class MapperProxyTest {
             
             @Override
             public String getFunction(String functionName) {
-                return TrustedMysqlFunctionEnum.getFunctionByName(functionName);
+                return functionName;
             }
         };
         Mapper proxy = mapperProxy.createProxy(mapper);

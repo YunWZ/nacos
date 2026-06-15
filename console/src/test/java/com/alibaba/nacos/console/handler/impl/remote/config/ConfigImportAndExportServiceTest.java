@@ -16,12 +16,14 @@
 
 package com.alibaba.nacos.console.handler.impl.remote.config;
 
+import com.alibaba.nacos.api.common.NodeState;
 import com.alibaba.nacos.api.config.model.SameConfigPolicy;
+import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.exception.runtime.NacosRuntimeException;
 import com.alibaba.nacos.api.model.v2.Result;
 import com.alibaba.nacos.common.utils.JacksonUtils;
+import com.alibaba.nacos.console.handler.impl.remote.RemoteServerConnector;
 import com.alibaba.nacos.core.cluster.Member;
-import com.alibaba.nacos.core.cluster.NacosMemberManager;
 import com.alibaba.nacos.sys.env.EnvUtil;
 import org.apache.hc.client5.http.HttpResponseException;
 import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
@@ -62,7 +64,7 @@ import static org.mockito.Mockito.when;
 class ConfigImportAndExportServiceTest {
     
     @Mock
-    NacosMemberManager memberManager;
+    RemoteServerConnector remoteServerConnector;
     
     @Mock
     CloseableHttpClient httpClient;
@@ -74,18 +76,20 @@ class ConfigImportAndExportServiceTest {
     private ConfigurableEnvironment cachedEnvironment;
     
     @BeforeEach
-    void setUp() {
+    void setUp() throws NacosException {
         cachedEnvironment = EnvUtil.getEnvironment();
         MockEnvironment environment = new MockEnvironment();
         environment.setProperty("nacos.core.auth.admin.enabled", "false");
         EnvUtil.setEnvironment(environment);
-        service = new ConfigImportAndExportService(memberManager);
+        service = new ConfigImportAndExportService(remoteServerConnector);
         httpClientMock = Mockito.mockStatic(HttpClients.class);
         httpClientMock.when(HttpClients::createDefault).thenReturn(httpClient);
         Member member = new Member();
         member.setIp("127.0.0.1");
         member.setPort(8080);
-        when(memberManager.allMembers()).thenReturn(Collections.singleton(member));
+        member.setState(NodeState.UP);
+        Mockito.lenient().when(remoteServerConnector.randomOneHealthyMember()).thenReturn(member);
+        Mockito.lenient().when(remoteServerConnector.getServerContextPath()).thenReturn("/nacos");
     }
     
     @AfterEach
@@ -95,15 +99,17 @@ class ConfigImportAndExportServiceTest {
     }
     
     @Test
-    void importConfig() throws IOException {
+    void importConfig() throws IOException, NacosException {
         MultipartFile mockFile = Mockito.mock(MultipartFile.class);
         when(mockFile.getContentType()).thenReturn(MediaType.MULTIPART_FORM_DATA_VALUE);
         when(mockFile.getOriginalFilename()).thenReturn("file");
         InputStream mockInputStream = Mockito.mock(InputStream.class);
         when(mockFile.getInputStream()).thenReturn(mockInputStream);
-        when(httpClient.execute(any(ClassicHttpRequest.class), any(BasicHttpClientResponseHandler.class))).thenReturn(
+        when(httpClient.execute(any(ClassicHttpRequest.class),
+            any(BasicHttpClientResponseHandler.class))).thenReturn(
                 JacksonUtils.toJson(Result.success()));
-        Result<Map<String, Object>> actual = service.importConfig("user", "namespaceId", SameConfigPolicy.OVERWRITE,
+        Result<Map<String, Object>> actual =
+            service.importConfig("user", "namespaceId", SameConfigPolicy.OVERWRITE,
                 mockFile, "127.0.0.1", "app");
         assertEquals(0, actual.getCode());
     }
@@ -115,11 +121,13 @@ class ConfigImportAndExportServiceTest {
         when(mockFile.getOriginalFilename()).thenReturn("file");
         InputStream mockInputStream = Mockito.mock(InputStream.class);
         when(mockFile.getInputStream()).thenReturn(mockInputStream);
-        when(httpClient.execute(any(ClassicHttpRequest.class), any(BasicHttpClientResponseHandler.class))).thenThrow(
+        when(httpClient.execute(any(ClassicHttpRequest.class),
+            any(BasicHttpClientResponseHandler.class))).thenThrow(
                 new HttpResponseException(403, "test"));
         assertThrows(NacosRuntimeException.class,
-                () -> service.importConfig("user", "namespaceId", SameConfigPolicy.OVERWRITE, mockFile, "127.0.0.1",
-                        "app"));
+            () -> service.importConfig("user", "namespaceId", SameConfigPolicy.OVERWRITE, mockFile,
+                "127.0.0.1",
+                "app"));
     }
     
     @Test
@@ -129,20 +137,24 @@ class ConfigImportAndExportServiceTest {
         when(mockFile.getOriginalFilename()).thenReturn("file");
         InputStream mockInputStream = Mockito.mock(InputStream.class);
         when(mockFile.getInputStream()).thenReturn(mockInputStream);
-        when(httpClient.execute(any(ClassicHttpRequest.class), any(BasicHttpClientResponseHandler.class))).thenThrow(
+        when(httpClient.execute(any(ClassicHttpRequest.class),
+            any(BasicHttpClientResponseHandler.class))).thenThrow(
                 new IOException("test"));
         assertThrows(NacosRuntimeException.class,
-                () -> service.importConfig("user", "namespaceId", SameConfigPolicy.OVERWRITE, mockFile, "127.0.0.1",
-                        "app"), "Import config to server failed.");
+            () -> service.importConfig("user", "namespaceId", SameConfigPolicy.OVERWRITE, mockFile,
+                "127.0.0.1",
+                "app"),
+            "Import config to server failed.");
     }
     
     @Test
     void exportConfig() throws Exception {
         ResponseEntity<byte[]> mock = ResponseEntity.ok().body(new byte[0]);
         when(httpClient.execute(any(ClassicHttpRequest.class),
-                any(ConfigImportAndExportService.ExportHttpClientResponseHandler.class))).thenAnswer(
-                    invocation -> mock);
-        ResponseEntity<byte[]> actual = service.exportConfig("dataId", "group", "namespaceId", "appName",
+            any(ConfigImportAndExportService.ExportHttpClientResponseHandler.class))).thenAnswer(
+                invocation -> mock);
+        ResponseEntity<byte[]> actual =
+            service.exportConfig("dataId", "group", "namespaceId", "appName",
                 Collections.singletonList(1L));
         assertEquals(mock, actual);
     }
@@ -150,33 +162,35 @@ class ConfigImportAndExportServiceTest {
     @Test
     void exportConfigWithRequestException() throws Exception {
         when(httpClient.execute(any(ClassicHttpRequest.class),
-                any(ConfigImportAndExportService.ExportHttpClientResponseHandler.class))).thenThrow(
-                    new HttpResponseException(403, "test"));
+            any(ConfigImportAndExportService.ExportHttpClientResponseHandler.class))).thenThrow(
+                new HttpResponseException(403, "test"));
         assertThrows(NacosRuntimeException.class,
-                () -> service.exportConfig("dataId", "group", "namespaceId", "appName", Collections.singletonList(1L)));
+            () -> service.exportConfig("dataId", "group", "namespaceId", "appName",
+                Collections.singletonList(1L)));
     }
     
     @Test
     void exportConfigWithIoException() throws Exception {
         when(httpClient.execute(any(ClassicHttpRequest.class),
-                any(ConfigImportAndExportService.ExportHttpClientResponseHandler.class))).thenThrow(
-                    new IOException("test"));
+            any(ConfigImportAndExportService.ExportHttpClientResponseHandler.class))).thenThrow(
+                new IOException("test"));
         assertThrows(NacosRuntimeException.class,
-                () -> service.exportConfig("dataId", "group", "namespaceId", "appName", Collections.singletonList(1L)),
-                "Export config to server failed.");
+            () -> service.exportConfig("dataId", "group", "namespaceId", "appName",
+                Collections.singletonList(1L)),
+            "Export config to server failed.");
     }
     
     @Test
-    void exportHttpClientResponseHandlerHandleResponse() throws ProtocolException, IOException {
-        // remove lenient warning
-        memberManager.allMembers();
+    void exportHttpClientResponseHandlerHandleResponse()
+        throws ProtocolException, IOException, NacosException {
         ClassicHttpResponse mockResponse = Mockito.mock(ClassicHttpResponse.class);
         when(mockResponse.getHeader("Content-Disposition")).thenReturn(
-                new BasicHeader("Content-Disposition", "testDisposition"));
+            new BasicHeader("Content-Disposition", "testDisposition"));
         ByteArrayInputStream mockInputStream = new ByteArrayInputStream("test".getBytes());
         HttpEntity mockEntity = Mockito.mock(HttpEntity.class);
         when(mockEntity.getContent()).thenReturn(mockInputStream);
-        ConfigImportAndExportService.ExportHttpClientResponseHandler handler = new ConfigImportAndExportService.ExportHttpClientResponseHandler();
+        ConfigImportAndExportService.ExportHttpClientResponseHandler handler =
+            new ConfigImportAndExportService.ExportHttpClientResponseHandler();
         when(mockResponse.getEntity()).thenReturn(mockEntity);
         ResponseEntity<byte[]> actual = handler.handleResponse(mockResponse);
         assertTrue(actual.getStatusCode().is2xxSuccessful());
@@ -186,12 +200,12 @@ class ConfigImportAndExportServiceTest {
     }
     
     @Test
-    void exportHttpClientResponseHandlerHandleResponseWithException() throws ProtocolException {
-        // remove lenient warning
-        memberManager.allMembers();
+    void exportHttpClientResponseHandlerHandleResponseWithException()
+        throws ProtocolException, NacosException {
         ClassicHttpResponse mockResponse = Mockito.mock(ClassicHttpResponse.class);
         when(mockResponse.getHeader("Content-Disposition")).thenThrow(new ProtocolException());
-        ConfigImportAndExportService.ExportHttpClientResponseHandler handler = new ConfigImportAndExportService.ExportHttpClientResponseHandler();
+        ConfigImportAndExportService.ExportHttpClientResponseHandler handler =
+            new ConfigImportAndExportService.ExportHttpClientResponseHandler();
         assertThrows(NacosRuntimeException.class, () -> handler.handleResponse(mockResponse));
     }
 }

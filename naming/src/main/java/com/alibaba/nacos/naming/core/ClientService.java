@@ -24,6 +24,7 @@ import com.alibaba.nacos.api.naming.pojo.maintainer.ClientSummaryInfo;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Client service.
@@ -98,8 +99,9 @@ public interface ClientService {
      * @deprecated with removing 2.x http api. use {@link #getPublishedClientList(String, String, String, String, Integer)} replaced
      */
     @Deprecated
-    List<ObjectNode> getPublishedClientList(String namespaceId, String groupName, String serviceName, boolean ephemeral,
-            String ip, Integer port);
+    List<ObjectNode> getPublishedClientList(String namespaceId, String groupName,
+        String serviceName, boolean ephemeral,
+        String ip, Integer port);
     
     /**
      * Retrieves a list of clients that have published a specific service.
@@ -111,8 +113,9 @@ public interface ClientService {
      * @param port        The port number of the client (optional filter).
      * @return A list of {@link ClientPublisherInfo} with clientId
      */
-    List<ClientPublisherInfo> getPublishedClientList(String namespaceId, String groupName, String serviceName,
-            String ip, Integer port);
+    List<ClientPublisherInfo> getPublishedClientList(String namespaceId, String groupName,
+        String serviceName,
+        String ip, Integer port);
     
     /**
      * Retrieves a list of clients that have subscribed to a specific service. For 2.x http api.
@@ -127,8 +130,9 @@ public interface ClientService {
      * @deprecated @deprecated with removing 2.x http api. use {@link #getSubscribeClientList(String, String, String, String, Integer)} replaced
      */
     @Deprecated
-    List<ObjectNode> getSubscribeClientList(String namespaceId, String groupName, String serviceName, boolean ephemeral,
-            String ip, Integer port);
+    List<ObjectNode> getSubscribeClientList(String namespaceId, String groupName,
+        String serviceName, boolean ephemeral,
+        String ip, Integer port);
     
     /**
      * Retrieves a list of clients that have subscribed to a specific service.
@@ -140,8 +144,9 @@ public interface ClientService {
      * @param port        The port number of the client (optional filter).
      * @return A list of {@link ClientSubscriberInfo} with clientId
      */
-    List<ClientSubscriberInfo> getSubscribeClientList(String namespaceId, String groupName, String serviceName,
-            String ip, Integer port);
+    List<ClientSubscriberInfo> getSubscribeClientList(String namespaceId, String groupName,
+        String serviceName,
+        String ip, Integer port);
     
     /**
      * Determines the responsible server for handling requests from a specific client based on its IP and port.
@@ -150,5 +155,5 @@ public interface ClientService {
      * @param port The port number of the client.
      * @return The responsible server information in JSON format.
      */
-    ObjectNode getResponsibleServer4Client(String ip, String port);
+    Map<String, Object> getResponsibleServer4Client(String ip, String port);
 }

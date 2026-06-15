@@ -26,8 +26,36 @@ import org.junit.jupiter.api.Test;
 import java.nio.ByteBuffer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class ProtoMessageUtilTest {
+    
+    @Test
+    void testConstructor() {
+        new ProtoMessageUtil();
+    }
+    
+    @Test
+    void testParseInvalidBytes() {
+        byte[] invalidBytes = new byte[] {1, 2, 3};
+        try {
+            ProtoMessageUtil.parse(invalidBytes);
+            fail("Should throw ConsistencyException");
+        } catch (Exception e) {
+            assertTrue(e instanceof com.alibaba.nacos.consistency.exception.ConsistencyException);
+        }
+    }
+    
+    @Test
+    void testParseWithCorruptRequestTypeField() {
+        byte[] corruptBytes = new byte[] {(byte) ProtoMessageUtil.REQUEST_TYPE_FIELD_TAG,
+            (byte) ProtoMessageUtil.REQUEST_TYPE_READ, (byte) 0x80};
+        try {
+            ProtoMessageUtil.parse(corruptBytes);
+        } catch (Exception ignored) {
+        }
+    }
     
     @Test
     void testProto() throws Exception {
@@ -49,8 +77,9 @@ class ProtoMessageUtilTest {
         requestTypeFieldBytes[1] = ProtoMessageUtil.REQUEST_TYPE_READ;
         
         byte[] dataBytes = testCase.toByteArray();
-        ByteBuffer byteBuffer = (ByteBuffer) ByteBuffer.allocate(requestTypeFieldBytes.length + dataBytes.length).put(requestTypeFieldBytes)
-                .put(dataBytes).position(0);
+        ByteBuffer byteBuffer = (ByteBuffer) ByteBuffer
+            .allocate(requestTypeFieldBytes.length + dataBytes.length).put(requestTypeFieldBytes)
+            .put(dataBytes).position(0);
         
         Object actual = ProtoMessageUtil.parse(byteBuffer.array());
         assertEquals(ReadRequest.class, testCase.getClass());
@@ -69,8 +98,9 @@ class ProtoMessageUtilTest {
         requestTypeFieldBytes[1] = ProtoMessageUtil.REQUEST_TYPE_WRITE;
         
         byte[] dataBytes = testCase.toByteArray();
-        ByteBuffer byteBuffer = (ByteBuffer) ByteBuffer.allocate(requestTypeFieldBytes.length + dataBytes.length).put(requestTypeFieldBytes)
-                .put(dataBytes).position(0);
+        ByteBuffer byteBuffer = (ByteBuffer) ByteBuffer
+            .allocate(requestTypeFieldBytes.length + dataBytes.length).put(requestTypeFieldBytes)
+            .put(dataBytes).position(0);
         
         Object actual = ProtoMessageUtil.parse(byteBuffer.array());
         assertEquals(WriteRequest.class, testCase.getClass());
@@ -105,7 +135,8 @@ class ProtoMessageUtilTest {
         ByteString data = ByteString.copyFrom("data".getBytes());
         String group = "test";
         
-        GetRequest getRequest = GetRequest.newBuilder().setGroup(group).setData(data).putExtendInfo("k", "v").build();
+        GetRequest getRequest =
+            GetRequest.newBuilder().setGroup(group).setData(data).putExtendInfo("k", "v").build();
         ReadRequest readRequest = ProtoMessageUtil.convertToReadRequest(getRequest);
         
         assertEquals(group, readRequest.getGroup());
@@ -118,7 +149,8 @@ class ProtoMessageUtilTest {
     @Test
     void testConvertToWriteRequest() {
         ByteString data = ByteString.copyFrom("data".getBytes());
-        Log log = Log.newBuilder().setKey("key").setGroup("group").setData(data).setOperation("o").putExtendInfo("k", "v").build();
+        Log log = Log.newBuilder().setKey("key").setGroup("group").setData(data).setOperation("o")
+            .putExtendInfo("k", "v").build();
         WriteRequest writeRequest = ProtoMessageUtil.convertToWriteRequest(log);
         
         assertEquals(1, writeRequest.getExtendInfoCount());

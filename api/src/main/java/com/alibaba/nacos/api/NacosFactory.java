@@ -85,8 +85,11 @@ public class NacosFactory {
      * @param serverAddr server address
      * @return NamingMaintainService
      * @throws NacosException Exception
+     * @deprecated use {@link com.alibaba.nacos.maintainer.client.naming.NamingMaintainerFactory} in nacos-maintainer-client artifact tp replaced.
      */
-    public static NamingMaintainService createMaintainService(String serverAddr) throws NacosException {
+    @Deprecated
+    public static NamingMaintainService createMaintainService(String serverAddr)
+        throws NacosException {
         return NamingMaintainFactory.createMaintainService(serverAddr);
     }
     
@@ -96,8 +99,11 @@ public class NacosFactory {
      * @param properties server address
      * @return NamingMaintainService
      * @throws NacosException Exception
+     * @deprecated use {@link com.alibaba.nacos.maintainer.client.naming.NamingMaintainerFactory} in nacos-maintainer-client artifact tp replaced.
      */
-    public static NamingMaintainService createMaintainService(Properties properties) throws NacosException {
+    @Deprecated
+    public static NamingMaintainService createMaintainService(Properties properties)
+        throws NacosException {
         return NamingMaintainFactory.createMaintainService(properties);
     }
     

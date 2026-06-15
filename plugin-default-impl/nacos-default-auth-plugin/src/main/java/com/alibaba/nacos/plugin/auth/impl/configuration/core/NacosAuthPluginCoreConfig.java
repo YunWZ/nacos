@@ -31,6 +31,7 @@ import com.alibaba.nacos.plugin.auth.impl.token.TokenManagerDelegate;
 import com.alibaba.nacos.plugin.auth.impl.token.impl.CachedJwtTokenManager;
 import com.alibaba.nacos.plugin.auth.impl.token.impl.JwtTokenManager;
 import com.alibaba.nacos.plugin.auth.impl.users.NacosUserService;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -39,8 +40,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.authentication.configuration.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import javax.annotation.PostConstruct;
 
 /**
  * Spring security config.
@@ -53,7 +52,8 @@ public class NacosAuthPluginCoreConfig {
     
     private final ControllerMethodsCache methodsCache;
     
-    public NacosAuthPluginCoreConfig(NacosUserService userDetailsService, ControllerMethodsCache methodsCache) {
+    public NacosAuthPluginCoreConfig(NacosUserService userDetailsService,
+        ControllerMethodsCache methodsCache) {
         this.userDetailsService = userDetailsService;
         this.methodsCache = methodsCache;
     }
@@ -71,9 +71,11 @@ public class NacosAuthPluginCoreConfig {
     @Conditional(value = {ConditionOnInnerDatasource.class, ConditionOnNacosAuth.class})
     public GlobalAuthenticationConfigurerAdapter authenticationConfigurer() {
         return new GlobalAuthenticationConfigurerAdapter() {
+            
             @Override
-            public void init(AuthenticationManagerBuilder auth) throws Exception {
-                if (AuthSystemTypes.NACOS.name().equalsIgnoreCase(NacosAuthConfigHolder.getInstance()
+            public void init(AuthenticationManagerBuilder auth) {
+                if (AuthSystemTypes.NACOS.name()
+                    .equalsIgnoreCase(NacosAuthConfigHolder.getInstance()
                         .getNacosAuthConfigByScope(NacosServerAuthConfig.NACOS_SERVER_AUTH_SCOPE)
                         .getNacosAuthSystemType())) {
                     auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
@@ -91,18 +93,20 @@ public class NacosAuthPluginCoreConfig {
     @ConditionalOnMissingBean
     @Conditional(value = ConditionOnNacosAuth.class)
     public IAuthenticationManager defaultAuthenticationManager(NacosUserService userDetailsService,
-            TokenManagerDelegate jwtTokenManager, NacosRoleService roleService) {
+        TokenManagerDelegate jwtTokenManager, NacosRoleService roleService) {
         return new DefaultAuthenticationManager(userDetailsService, jwtTokenManager, roleService);
     }
     
     @Bean
-    @ConditionalOnProperty(value = TokenManagerDelegate.NACOS_AUTH_TOKEN_CACHING_ENABLED, havingValue = "false", matchIfMissing = true)
+    @ConditionalOnProperty(value = TokenManagerDelegate.NACOS_AUTH_TOKEN_CACHING_ENABLED,
+        havingValue = "false", matchIfMissing = true)
     public TokenManager tokenManager(AuthConfigs authConfigs) {
         return new JwtTokenManager(authConfigs);
     }
     
     @Bean
-    @ConditionalOnProperty(value = TokenManagerDelegate.NACOS_AUTH_TOKEN_CACHING_ENABLED, havingValue = "true")
+    @ConditionalOnProperty(value = TokenManagerDelegate.NACOS_AUTH_TOKEN_CACHING_ENABLED,
+        havingValue = "true")
     public TokenManager cachedTokenManager(AuthConfigs authConfigs) {
         return new CachedJwtTokenManager(new JwtTokenManager(authConfigs));
     }

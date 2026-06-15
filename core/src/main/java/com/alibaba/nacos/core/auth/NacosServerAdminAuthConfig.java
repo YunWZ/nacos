@@ -16,12 +16,12 @@
 
 package com.alibaba.nacos.core.auth;
 
+import com.alibaba.nacos.api.common.ApiType;
 import com.alibaba.nacos.api.exception.runtime.NacosRuntimeException;
 import com.alibaba.nacos.auth.config.AuthErrorCode;
 import com.alibaba.nacos.auth.config.NacosAuthConfig;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.core.config.AbstractDynamicConfig;
-import com.alibaba.nacos.plugin.auth.constant.ApiType;
 import com.alibaba.nacos.plugin.auth.constant.Constants;
 import com.alibaba.nacos.sys.env.EnvUtil;
 import org.slf4j.Logger;
@@ -66,11 +66,12 @@ public class NacosServerAdminAuthConfig extends AbstractDynamicConfig implements
             return;
         }
         if (StringUtils.isEmpty(nacosAuthSystemType)) {
-            throw new NacosRuntimeException(AuthErrorCode.INVALID_TYPE.getCode(), AuthErrorCode.INVALID_TYPE.getMsg());
+            throw new NacosRuntimeException(AuthErrorCode.INVALID_TYPE.getCode(),
+                AuthErrorCode.INVALID_TYPE.getMsg());
         }
         if (StringUtils.isEmpty(serverIdentityKey) || StringUtils.isEmpty(serverIdentityValue)) {
             throw new NacosRuntimeException(AuthErrorCode.EMPTY_IDENTITY.getCode(),
-                    AuthErrorCode.EMPTY_IDENTITY.getMsg());
+                AuthErrorCode.EMPTY_IDENTITY.getMsg());
         }
     }
     
@@ -112,10 +113,14 @@ public class NacosServerAdminAuthConfig extends AbstractDynamicConfig implements
     @Override
     protected void getConfigFromEnv() {
         try {
-            authEnabled = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_ADMIN_ENABLED, Boolean.class, true);
-            nacosAuthSystemType = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SYSTEM_TYPE, "");
-            serverIdentityKey = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SERVER_IDENTITY_KEY, "");
-            serverIdentityValue = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SERVER_IDENTITY_VALUE, "");
+            authEnabled = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_ADMIN_ENABLED,
+                Boolean.class, true);
+            nacosAuthSystemType =
+                EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SYSTEM_TYPE, "");
+            serverIdentityKey =
+                EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SERVER_IDENTITY_KEY, "");
+            serverIdentityValue =
+                EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SERVER_IDENTITY_VALUE, "");
         } catch (Exception e) {
             LOGGER.warn("Upgrade auth config from env failed, use old value", e);
         }
@@ -128,8 +133,9 @@ public class NacosServerAdminAuthConfig extends AbstractDynamicConfig implements
     
     @Override
     public String toString() {
-        return "NacosServerAdminAuthConfig{" + "authEnabled=" + authEnabled + ", nacosAuthSystemType='"
-                + nacosAuthSystemType + '\'' + ", serverIdentityKey='" + serverIdentityKey + '\''
-                + ", serverIdentityValue='" + serverIdentityValue + '\'' + '}';
+        return "NacosServerAdminAuthConfig{" + "authEnabled=" + authEnabled
+            + ", nacosAuthSystemType='"
+            + nacosAuthSystemType + '\'' + ", serverIdentityKey='" + serverIdentityKey + '\''
+            + ", serverIdentityValue='" + serverIdentityValue + '\'' + '}';
     }
 }

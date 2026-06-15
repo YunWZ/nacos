@@ -16,10 +16,10 @@
 
 package com.alibaba.nacos.console.config;
 
+import com.alibaba.nacos.api.common.ApiType;
 import com.alibaba.nacos.auth.config.NacosAuthConfig;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.core.config.AbstractDynamicConfig;
-import com.alibaba.nacos.plugin.auth.constant.ApiType;
 import com.alibaba.nacos.plugin.auth.constant.Constants;
 import com.alibaba.nacos.sys.env.EnvUtil;
 
@@ -68,7 +68,8 @@ public class NacosConsoleAuthConfig extends AbstractDynamicConfig implements Nac
     
     @Override
     public boolean isSupportServerIdentity() {
-        return StringUtils.isNotBlank(serverIdentityKey) && StringUtils.isNotBlank(serverIdentityValue);
+        return StringUtils.isNotBlank(serverIdentityKey)
+            && StringUtils.isNotBlank(serverIdentityValue);
     }
     
     @Override
@@ -83,10 +84,13 @@ public class NacosConsoleAuthConfig extends AbstractDynamicConfig implements Nac
     
     @Override
     protected void getConfigFromEnv() {
-        authEnabled = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_CONSOLE_ENABLED, Boolean.class, true);
+        authEnabled = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_CONSOLE_ENABLED,
+            Boolean.class, true);
         nacosAuthSystemType = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SYSTEM_TYPE, "");
-        serverIdentityKey = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SERVER_IDENTITY_KEY, "");
-        serverIdentityValue = EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SERVER_IDENTITY_VALUE, "");
+        serverIdentityKey =
+            EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SERVER_IDENTITY_KEY, "");
+        serverIdentityValue =
+            EnvUtil.getProperty(Constants.Auth.NACOS_CORE_AUTH_SERVER_IDENTITY_VALUE, "");
     }
     
     @Override
@@ -97,6 +101,6 @@ public class NacosConsoleAuthConfig extends AbstractDynamicConfig implements Nac
     @Override
     public String toString() {
         return "NacosConsoleAuthConfig{" + "authEnabled=" + authEnabled + ", nacosAuthSystemType='"
-                + nacosAuthSystemType + '\'' + '}';
+            + nacosAuthSystemType + '\'' + '}';
     }
 }

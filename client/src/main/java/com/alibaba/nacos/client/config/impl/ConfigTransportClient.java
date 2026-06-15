@@ -24,6 +24,7 @@ import com.alibaba.nacos.client.env.NacosClientProperties;
 import com.alibaba.nacos.client.security.SecurityProxy;
 import com.alibaba.nacos.client.utils.AppNameUtils;
 import com.alibaba.nacos.client.utils.ClientBasicParamUtil;
+import com.alibaba.nacos.common.executor.NameThreadFactory;
 import com.alibaba.nacos.common.utils.ConvertUtils;
 import com.alibaba.nacos.common.utils.MD5Utils;
 import com.alibaba.nacos.common.utils.StringUtils;
@@ -32,7 +33,9 @@ import com.alibaba.nacos.plugin.auth.api.RequestResource;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -41,7 +44,6 @@ import java.util.concurrent.TimeUnit;
  * @author liuzunfei
  * @version $Id: ConfigTransportClient.java, v 0.1 2020年08月24日 2:01 PM liuzunfei Exp $
  */
-@SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
 public abstract class ConfigTransportClient {
     
     private static final String CONFIG_INFO_HEADER = "exConfigInfo";
@@ -52,7 +54,7 @@ public abstract class ConfigTransportClient {
     
     String tenant;
     
-    private ScheduledExecutorService executor;
+    private ThreadPoolExecutor executor;
     
     final ConfigServerListManager serverListManager;
     
@@ -62,13 +64,22 @@ public abstract class ConfigTransportClient {
     
     private final long securityInfoRefreshIntervalMills = TimeUnit.SECONDS.toMillis(5);
     
+    private ScheduledExecutorService loginScheduledExecutor;
+    
     protected SecurityProxy securityProxy;
     
+    /**
+     * Shut down to ensure resource release.
+     */
     public void shutdown() throws NacosException {
         securityProxy.shutdown();
+        if (loginScheduledExecutor != null && !loginScheduledExecutor.isShutdown()) {
+            loginScheduledExecutor.shutdown();
+        }
     }
     
-    public ConfigTransportClient(NacosClientProperties properties, ConfigServerListManager serverListManager) {
+    public ConfigTransportClient(NacosClientProperties properties,
+        ConfigServerListManager serverListManager) {
         
         String encodeTmp = properties.getProperty(PropertyKeyConst.ENCODE);
         if (StringUtils.isBlank(encodeTmp)) {
@@ -81,7 +92,7 @@ public abstract class ConfigTransportClient {
         this.serverListManager = serverListManager;
         this.properties = properties.asProperties();
         this.securityProxy = new SecurityProxy(serverListManager,
-                ConfigHttpClientManager.getInstance().getNacosRestTemplate());
+            ConfigHttpClientManager.getInstance().getNacosRestTemplate());
     }
     
     /**
@@ -93,7 +104,8 @@ public abstract class ConfigTransportClient {
      * @return resource
      */
     protected RequestResource buildResource(String tenant, String group, String dataId) {
-        return RequestResource.configBuilder().setNamespace(tenant).setGroup(group).setResource(dataId).build();
+        return RequestResource.configBuilder().setNamespace(tenant).setGroup(group)
+            .setResource(dataId).build();
     }
     
     protected Map<String, String> getSecurityHeaders(RequestResource resource) throws Exception {
@@ -120,14 +132,15 @@ public abstract class ConfigTransportClient {
     }
     
     private void initMaxRetry(Properties properties) {
-        maxRetry = ConvertUtils.toInt(String.valueOf(properties.get(PropertyKeyConst.MAX_RETRY)), Constants.MAX_RETRY);
+        maxRetry = ConvertUtils.toInt(String.valueOf(properties.get(PropertyKeyConst.MAX_RETRY)),
+            Constants.MAX_RETRY);
     }
     
-    public void setExecutor(ScheduledExecutorService executor) {
+    public void setExecutor(ThreadPoolExecutor executor) {
         this.executor = executor;
     }
     
-    public ScheduledExecutorService getExecutor() {
+    public ThreadPoolExecutor getExecutor() {
         return this.executor;
     }
     
@@ -136,8 +149,11 @@ public abstract class ConfigTransportClient {
      */
     public void start() throws NacosException {
         securityProxy.login(this.properties);
-        this.executor.scheduleWithFixedDelay(() -> securityProxy.login(properties), 0,
-                this.securityInfoRefreshIntervalMills, TimeUnit.MILLISECONDS);
+        this.loginScheduledExecutor =
+            Executors.newSingleThreadScheduledExecutor(
+                new NameThreadFactory("com.alibaba.nacos.client.login-executor"));
+        this.loginScheduledExecutor.scheduleWithFixedDelay(() -> securityProxy.login(properties), 0,
+            this.securityInfoRefreshIntervalMills, TimeUnit.MILLISECONDS);
         startInternal();
     }
     
@@ -208,8 +224,9 @@ public abstract class ConfigTransportClient {
      * @return content.
      * @throws NacosException throw where query fail .
      */
-    public abstract ConfigResponse queryConfig(String dataId, String group, String tenat, long readTimeous,
-            boolean notify) throws NacosException;
+    public abstract ConfigResponse queryConfig(String dataId, String group, String tenat,
+        long readTimeous,
+        boolean notify) throws NacosException;
     
     /**
      * publish config.
@@ -227,8 +244,10 @@ public abstract class ConfigTransportClient {
      * @return success or not.
      * @throws NacosException throw where publish fail.
      */
-    public abstract boolean publishConfig(String dataId, String group, String tenant, String appName, String tag,
-            String betaIps, String content, String encryptedDataKey, String casMd5, String type) throws NacosException;
+    public abstract boolean publishConfig(String dataId, String group, String tenant,
+        String appName, String tag,
+        String betaIps, String content, String encryptedDataKey, String casMd5, String type)
+        throws NacosException;
     
     /**
      * remove config.
@@ -240,6 +259,7 @@ public abstract class ConfigTransportClient {
      * @return success or not.
      * @throws NacosException throw where publish fail.
      */
-    public abstract boolean removeConfig(String dataid, String group, String tenat, String tag) throws NacosException;
+    public abstract boolean removeConfig(String dataid, String group, String tenat, String tag)
+        throws NacosException;
     
 }

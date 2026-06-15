@@ -247,6 +247,14 @@ public enum ErrorCode {
     
     MCP_SERVER_VERSION_EXIST(50002, "MCP server version has existed"),
     
+    MCP_SERVER_REF_ENDPOINT_SERVICE_NOT_FOUND(50003, "MCP server ref endpoint service not found"),
+    
+    AGENT_NOT_FOUND(50100, "Agent not found"),
+    
+    AGENT_VERSION_NOT_FOUND(50101, "Agent version not found"),
+    
+    AGENT_VERSION_EXIST(50102, "Agent version already existed"),
+    
     /**
      * Config use 100001 ~ 100999.
      **/
@@ -262,7 +270,8 @@ public enum ErrorCode {
     
     FUZZY_WATCH_PATTERN_OVER_LIMIT(50310, "fuzzy watch pattern over limit"),
     
-    FUZZY_WATCH_PATTERN_MATCH_COUNT_OVER_LIMIT(50311, "fuzzy watch pattern matched count over limit");
+    FUZZY_WATCH_PATTERN_MATCH_COUNT_OVER_LIMIT(50311,
+        "fuzzy watch pattern matched count over limit");
     
     private final Integer code;
     

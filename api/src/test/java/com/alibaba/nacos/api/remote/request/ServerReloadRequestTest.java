@@ -31,7 +31,6 @@ class ServerReloadRequestTest extends BasicRequestTest {
         request.setReloadServer("1.1.1.1");
         request.setRequestId("1");
         String json = mapper.writeValueAsString(request);
-        System.out.println(json);
         assertNotNull(json);
         assertTrue(json.contains("\"reloadCount\":10"));
         assertTrue(json.contains("\"reloadServer\":\"1.1.1.1\""));
@@ -41,7 +40,8 @@ class ServerReloadRequestTest extends BasicRequestTest {
     
     @Test
     void testDeserialize() throws Exception {
-        String json = "{\"headers\":{},\"requestId\":\"1\",\"reloadCount\":10,\"reloadServer\":\"1.1.1.1\","
+        String json =
+            "{\"headers\":{},\"requestId\":\"1\",\"reloadCount\":10,\"reloadServer\":\"1.1.1.1\","
                 + "\"module\":\"internal\"}";
         ServerReloadRequest result = mapper.readValue(json, ServerReloadRequest.class);
         assertNotNull(result);

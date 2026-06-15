@@ -17,6 +17,7 @@
 
 package com.alibaba.nacos.core.auth;
 
+import com.alibaba.nacos.api.common.ApiType;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
@@ -33,7 +34,6 @@ import com.alibaba.nacos.plugin.auth.api.AuthResult;
 import com.alibaba.nacos.plugin.auth.api.IdentityContext;
 import com.alibaba.nacos.plugin.auth.api.Permission;
 import com.alibaba.nacos.plugin.auth.api.Resource;
-import com.alibaba.nacos.plugin.auth.constant.ApiType;
 import com.alibaba.nacos.plugin.auth.constant.Constants;
 import com.alibaba.nacos.sys.env.EnvUtil;
 import org.junit.jupiter.api.AfterEach;
@@ -108,6 +108,8 @@ class RemoteRequestAuthFilterTest {
         when(authConfig.isAuthEnabled()).thenReturn(false);
         Response actual = authFilter.filter(request, requestMeta, MockRequestHandler.class);
         assertNull(actual);
+        assertEquals(ApiType.OPEN_API.name(),
+            RequestContextHolder.getContext().getAuthContext().getApiType());
     }
     
     @Test
@@ -117,9 +119,10 @@ class RemoteRequestAuthFilterTest {
         assertNotNull(actual);
         assertEquals(ResponseCode.FAIL.getCode(), actual.getResultCode());
         assertEquals(403, actual.getErrorCode());
-        assertEquals("Invalid server identity key or value, Please make sure set `nacos.core.auth.server.identity.key`"
-                        + " and `nacos.core.auth.server.identity.value`, or open `nacos.core.auth.enable.userAgentAuthWhite`",
-                actual.getMessage());
+        assertEquals(
+            "Invalid server identity key or value, Please make sure set `nacos.core.auth.server.identity.key`"
+                + " and `nacos.core.auth.server.identity.value`, or open `nacos.core.auth.enable.userAgentAuthWhite`",
+            actual.getMessage());
     }
     
     @Test
@@ -163,10 +166,13 @@ class RemoteRequestAuthFilterTest {
         GrpcProtocolAuthService protocolAuthService = injectMockPlugins();
         when(protocolAuthService.enableAuth(any(Secured.class))).thenReturn(true);
         doReturn(new IdentityContext()).when(protocolAuthService).parseIdentity(eq(request));
-        doReturn(Resource.EMPTY_RESOURCE).when(protocolAuthService).parseResource(eq(request), any(Secured.class));
-        when(protocolAuthService.validateIdentity(any(IdentityContext.class), any(Resource.class))).thenReturn(
+        doReturn(Resource.EMPTY_RESOURCE).when(protocolAuthService).parseResource(eq(request),
+            any(Secured.class));
+        when(protocolAuthService.validateIdentity(any(IdentityContext.class), any(Resource.class)))
+            .thenReturn(
                 AuthResult.successResult());
-        when(protocolAuthService.validateAuthority(any(IdentityContext.class), any(Permission.class))).thenReturn(
+        when(protocolAuthService.validateAuthority(any(IdentityContext.class),
+            any(Permission.class))).thenReturn(
                 AuthResult.successResult());
         Response actual = authFilter.filter(request, requestMeta, MockRequestHandler.class);
         assertNull(actual);
@@ -179,8 +185,10 @@ class RemoteRequestAuthFilterTest {
         GrpcProtocolAuthService protocolAuthService = injectMockPlugins();
         when(protocolAuthService.enableAuth(any(Secured.class))).thenReturn(true);
         doReturn(new IdentityContext()).when(protocolAuthService).parseIdentity(eq(request));
-        doReturn(Resource.EMPTY_RESOURCE).when(protocolAuthService).parseResource(eq(request), any(Secured.class));
-        when(protocolAuthService.validateIdentity(any(IdentityContext.class), any(Resource.class))).thenReturn(
+        doReturn(Resource.EMPTY_RESOURCE).when(protocolAuthService).parseResource(eq(request),
+            any(Secured.class));
+        when(protocolAuthService.validateIdentity(any(IdentityContext.class), any(Resource.class)))
+            .thenReturn(
                 AuthResult.failureResult(403, "test"));
         Response actual = authFilter.filter(request, requestMeta, MockRequestHandler.class);
         assertNotNull(actual);
@@ -195,10 +203,13 @@ class RemoteRequestAuthFilterTest {
         GrpcProtocolAuthService protocolAuthService = injectMockPlugins();
         when(protocolAuthService.enableAuth(any(Secured.class))).thenReturn(true);
         doReturn(new IdentityContext()).when(protocolAuthService).parseIdentity(eq(request));
-        doReturn(Resource.EMPTY_RESOURCE).when(protocolAuthService).parseResource(eq(request), any(Secured.class));
-        when(protocolAuthService.validateIdentity(any(IdentityContext.class), any(Resource.class))).thenReturn(
+        doReturn(Resource.EMPTY_RESOURCE).when(protocolAuthService).parseResource(eq(request),
+            any(Secured.class));
+        when(protocolAuthService.validateIdentity(any(IdentityContext.class), any(Resource.class)))
+            .thenReturn(
                 AuthResult.successResult());
-        when(protocolAuthService.validateAuthority(any(IdentityContext.class), any(Permission.class))).thenReturn(
+        when(protocolAuthService.validateAuthority(any(IdentityContext.class),
+            any(Permission.class))).thenReturn(
                 AuthResult.failureResult(403, "test"));
         Response actual = authFilter.filter(request, requestMeta, MockRequestHandler.class);
         assertNotNull(actual);

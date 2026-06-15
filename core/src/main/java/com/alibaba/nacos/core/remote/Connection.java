@@ -28,7 +28,6 @@ import java.util.Map;
  * @author liuzunfei
  * @version $Id: Connection.java, v 0.1 2020年07月13日 7:08 PM liuzunfei Exp $
  */
-@SuppressWarnings("PMD.AbstractClassShouldStartWithAbstractNamingRule")
 public abstract class Connection implements Requester {
     
     private boolean traced = false;
@@ -98,7 +97,7 @@ public abstract class Connection implements Requester {
     
     @Override
     public String toString() {
-        return "Connection{" + "traced=" + traced + ", abilities=" + abilityTable + ", metaInfo=" + metaInfo + '}';
+        return "Connection{" + "traced=" + traced + ", abilities=" + abilityTable + ", metaInfo="
+            + metaInfo + '}';
     }
 }
-

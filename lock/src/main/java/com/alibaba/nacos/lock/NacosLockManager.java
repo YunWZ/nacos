@@ -24,6 +24,7 @@ import com.alibaba.nacos.lock.model.LockKey;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -39,12 +40,14 @@ public class NacosLockManager implements LockManager {
     
     private final Map<String, LockFactory> factoryMap;
     
-    private final ConcurrentHashMap<LockKey, AtomicLockService> atomicLockMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<LockKey, AtomicLockService> atomicLockMap =
+        new ConcurrentHashMap<>();
     
     public NacosLockManager() {
         Collection<LockFactory> factories = NacosServiceLoader.load(LockFactory.class);
         factoryMap = factories.stream()
-                .collect(Collectors.toConcurrentMap(LockFactory::getLockType, lockFactory -> lockFactory));
+            .collect(
+                Collectors.toConcurrentMap(LockFactory::getLockType, lockFactory -> lockFactory));
     }
     
     @Override
@@ -62,7 +65,16 @@ public class NacosLockManager implements LockManager {
     }
     
     @Override
-    public ConcurrentHashMap<LockKey, AtomicLockService> showLocks() {
+    public Map<LockKey, AtomicLockService> showLocks() {
+        return Collections.unmodifiableMap(atomicLockMap);
+    }
+    
+    /**
+     * Return the raw mutable lock map for internal use (snapshot load/save).
+     *
+     * @return the mutable lock map
+     */
+    public ConcurrentHashMap<LockKey, AtomicLockService> getRawLockMap() {
         return atomicLockMap;
     }
     

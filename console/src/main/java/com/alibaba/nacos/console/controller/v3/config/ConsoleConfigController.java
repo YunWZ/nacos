@@ -17,7 +17,9 @@
 
 package com.alibaba.nacos.console.controller.v3.config;
 
+import com.alibaba.nacos.api.annotation.Since;
 import com.alibaba.nacos.api.annotation.NacosApi;
+import com.alibaba.nacos.api.common.ApiType;
 import com.alibaba.nacos.api.config.ConfigType;
 import com.alibaba.nacos.api.config.model.ConfigBasicInfo;
 import com.alibaba.nacos.api.config.model.ConfigDetailInfo;
@@ -44,7 +46,6 @@ import com.alibaba.nacos.core.model.form.AggregationForm;
 import com.alibaba.nacos.core.model.form.PageForm;
 import com.alibaba.nacos.core.paramcheck.ExtractorManager;
 import com.alibaba.nacos.plugin.auth.constant.ActionTypes;
-import com.alibaba.nacos.plugin.auth.constant.ApiType;
 import com.alibaba.nacos.plugin.auth.constant.SignType;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -91,6 +92,7 @@ public class ConsoleConfigController {
      * @return Result containing detailed configuration information.
      * @throws NacosException If a Nacos-specific error occurs.
      */
+    @Since("3.0.0")
     @GetMapping
     @Secured(action = ActionTypes.READ, signType = SignType.CONFIG, apiType = ApiType.CONSOLE_API)
     public Result<ConfigDetailInfo> getConfigDetail(ConfigFormV3 configForm) throws NacosException {
@@ -109,16 +111,19 @@ public class ConsoleConfigController {
      * @return Result containing success status.
      * @throws NacosException If a Nacos-specific error occurs.
      */
+    @Since("3.0.0")
     @PostMapping()
     @Secured(action = ActionTypes.WRITE, signType = SignType.CONFIG, apiType = ApiType.CONSOLE_API)
-    public Result<Boolean> publishConfig(HttpServletRequest request, ConfigFormV3 configForm) throws NacosException {
+    public Result<Boolean> publishConfig(HttpServletRequest request, ConfigFormV3 configForm)
+        throws NacosException {
         // check required field
         configForm.validateWithContent();
-        final boolean namespaceTransferred = NamespaceUtil.isNeedTransferNamespace(configForm.getNamespaceId());
-        configForm.setNamespaceId(NamespaceUtil.processNamespaceParameter(configForm.getNamespaceId()));
+        configForm
+            .setNamespaceId(NamespaceUtil.processNamespaceParameter(configForm.getNamespaceId()));
         
         // check param
-        ParamUtils.checkParam(configForm.getDataId(), configForm.getGroup(), "datumId", configForm.getContent());
+        ParamUtils.checkParam(configForm.getDataId(), configForm.getGroup(), "datumId",
+            configForm.getContent());
         ParamUtils.checkParamV2(configForm.getTag());
         
         if (StringUtils.isBlank(configForm.getSrcUser())) {
@@ -130,10 +135,10 @@ public class ConsoleConfigController {
         
         ConfigRequestInfo configRequestInfo = new ConfigRequestInfo();
         configRequestInfo.setSrcIp(RequestUtil.getRemoteIp(request));
+        configRequestInfo.setSrcType(Constants.HTTP);
         configRequestInfo.setRequestIpApp(RequestUtil.getAppName(request));
         configRequestInfo.setBetaIps(request.getHeader("betaIps"));
         configRequestInfo.setCasMd5(request.getHeader("casMd5"));
-        configRequestInfo.setNamespaceTransferred(namespaceTransferred);
         
         return Result.success(configProxy.publishConfig(configForm, configRequestInfo));
     }
@@ -141,14 +146,16 @@ public class ConsoleConfigController {
     /**
      * Delete configuration.
      *
-     * @param request     HTTP servlet request.
-     * @param configForm  Config form.
+     * @param request    HTTP servlet request.
+     * @param configForm Config form.
      * @return Result containing success status.
      * @throws NacosException If a Nacos-specific error occurs.
      */
+    @Since("3.0.0")
     @DeleteMapping
     @Secured(action = ActionTypes.WRITE, signType = SignType.CONFIG, apiType = ApiType.CONSOLE_API)
-    public Result<Boolean> deleteConfig(HttpServletRequest request, ConfigFormV3 configForm) throws NacosException {
+    public Result<Boolean> deleteConfig(HttpServletRequest request, ConfigFormV3 configForm)
+        throws NacosException {
         configForm.validate();
         //fix issue #9783
         String namespaceId = NamespaceUtil.processNamespaceParameter(configForm.getNamespaceId());
@@ -160,7 +167,8 @@ public class ConsoleConfigController {
         String clientIp = RequestUtil.getRemoteIp(request);
         String srcUser = RequestUtil.getSrcUserName(request);
         
-        return Result.success(configProxy.deleteConfig(dataId, groupName, namespaceId, tag, clientIp, srcUser));
+        return Result.success(
+            configProxy.deleteConfig(dataId, groupName, namespaceId, tag, clientIp, srcUser));
     }
     
     /**
@@ -171,10 +179,12 @@ public class ConsoleConfigController {
      * @return Result containing success status.
      * @throws NacosException If a Nacos-specific error occurs.
      */
+    @Since("3.0.0")
     @DeleteMapping("/batchDelete")
     @Secured(action = ActionTypes.WRITE, signType = SignType.CONFIG, apiType = ApiType.CONSOLE_API)
-    public Result<Boolean> batchDeleteConfigs(HttpServletRequest request, @RequestParam(value = "ids") List<Long> ids)
-            throws NacosException {
+    public Result<Boolean> batchDeleteConfigs(HttpServletRequest request,
+        @RequestParam(value = "ids") List<Long> ids)
+        throws NacosException {
         String clientIp = RequestUtil.getRemoteIp(request);
         String srcUser = RequestUtil.getSrcUserName(request);
         
@@ -191,11 +201,12 @@ public class ConsoleConfigController {
      * @throws IOException      If an I/O error occurs.
      * @throws NacosException   If a Nacos-specific error occurs.
      */
+    @Since("3.0.0")
     @GetMapping("/list")
     @Secured(action = ActionTypes.READ, signType = SignType.CONFIG, apiType = ApiType.CONSOLE_API)
     @ExtractorManager.Extractor(httpExtractor = ConfigBlurSearchHttpParamExtractor.class)
     public Result<Page<ConfigBasicInfo>> getConfigList(ConfigFormV3 configForm, PageForm pageForm)
-            throws IOException, ServletException, NacosException {
+        throws IOException, ServletException, NacosException {
         configForm.blurSearchValidate();
         pageForm.validate();
         Map<String, Object> configAdvanceInfo = new HashMap<>(100);
@@ -215,7 +226,8 @@ public class ConsoleConfigController {
         String groupName = configForm.getGroupName();
         
         return Result.success(
-                configProxy.getConfigList(pageNo, pageSize, dataId, groupName, namespaceId, configAdvanceInfo));
+            configProxy.getConfigList(pageNo, pageSize, dataId, groupName, namespaceId,
+                configAdvanceInfo));
     }
     
     /**
@@ -228,11 +240,14 @@ public class ConsoleConfigController {
      * @return Result containing the configuration list by content.
      * @throws NacosException If a Nacos-specific error occurs.
      */
+    @Since("3.0.0")
     @GetMapping("/searchDetail")
     @Secured(action = ActionTypes.READ, signType = SignType.CONFIG, apiType = ApiType.CONSOLE_API)
     @ExtractorManager.Extractor(httpExtractor = ConfigBlurSearchHttpParamExtractor.class)
-    public Result<Page<ConfigBasicInfo>> getConfigListByContent(ConfigFormV3 configForm, PageForm pageForm,
-            String configDetail, @RequestParam(defaultValue = "blur") String search) throws NacosException {
+    public Result<Page<ConfigBasicInfo>> getConfigListByContent(ConfigFormV3 configForm,
+        PageForm pageForm,
+        String configDetail, @RequestParam(defaultValue = "blur") String search)
+        throws NacosException {
         configForm.blurSearchValidate();
         pageForm.validate();
         Map<String, Object> configAdvanceInfo = new HashMap<>(100);
@@ -255,59 +270,70 @@ public class ConsoleConfigController {
         String groupName = configForm.getGroupName();
         
         return Result.success(
-                configProxy.getConfigListByContent(search, pageNo, pageSize, dataId, groupName, namespaceId,
-                        configAdvanceInfo));
+            configProxy.getConfigListByContent(search, pageNo, pageSize, dataId, groupName,
+                namespaceId,
+                configAdvanceInfo));
     }
     
     /**
      * Subscribe to configured client information.
      *
-     * @param configForm        config form
-     * @param aggregationForm   aggregation form
+     * @param configForm      config form
+     * @param aggregationForm aggregation form
      * @return Result containing listener status.
      * @throws Exception If an error occurs during the operation.
      */
+    @Since("3.0.0")
     @GetMapping("/listener")
     @Secured(action = ActionTypes.READ, signType = SignType.CONFIG, apiType = ApiType.CONSOLE_API)
-    public Result<ConfigListenerInfo> getListeners(ConfigFormV3 configForm, AggregationForm aggregationForm)
-            throws Exception {
+    public Result<ConfigListenerInfo> getListeners(ConfigFormV3 configForm,
+        AggregationForm aggregationForm)
+        throws Exception {
         configForm.validate();
         aggregationForm.validate();
         String namespaceId = NamespaceUtil.processNamespaceParameter(configForm.getNamespaceId());
         String groupName = configForm.getGroupName();
         String dataId = configForm.getDataId();
         return Result.success(
-                configProxy.getListeners(dataId, groupName, namespaceId, aggregationForm.isAggregation()));
+            configProxy.getListeners(dataId, groupName, namespaceId,
+                aggregationForm.isAggregation()));
     }
     
     /**
      * Get subscribe information from client side.
      */
+    @Since("3.0.0")
     @GetMapping("/listener/ip")
-    @Secured(resource = Constants.LISTENER_CONTROLLER_PATH, action = ActionTypes.READ, signType = SignType.CONFIG, apiType = ApiType.CONSOLE_API)
+    @Secured(resource = Constants.LISTENER_CONTROLLER_PATH, action = ActionTypes.READ,
+        signType = SignType.CONFIG, apiType = ApiType.CONSOLE_API)
     public Result<ConfigListenerInfo> getAllSubClientConfigByIp(@RequestParam("ip") String ip,
-            @RequestParam(value = "all", required = false) boolean all,
-            @RequestParam(value = "namespaceId", required = false) String namespaceId, AggregationForm aggregationForm)
-            throws NacosException {
+        @RequestParam(value = "all", required = false) boolean all,
+        @RequestParam(value = "namespaceId", required = false) String namespaceId,
+        AggregationForm aggregationForm)
+        throws NacosException {
         namespaceId = NamespaceUtil.processNamespaceParameter(namespaceId);
         return Result.success(
-                configProxy.getAllSubClientConfigByIp(ip, all, namespaceId, aggregationForm.isAggregation()));
+            configProxy.getAllSubClientConfigByIp(ip, all, namespaceId,
+                aggregationForm.isAggregation()));
     }
     
     /**
      * New version export config adds metadata.yml file to record config metadata.
      *
-     * @param configForm  config form
-     * @param ids         List of config IDs.
+     * @param configForm config form
+     * @param ids        List of config IDs.
      * @return ResponseEntity containing the exported configuration.
      * @throws Exception If an error occurs during the export.
      */
+    @Since("3.0.0")
     @GetMapping("/export2")
     @Secured(action = ActionTypes.READ, signType = SignType.CONFIG, apiType = ApiType.CONSOLE_API)
     public ResponseEntity<byte[]> exportConfigV2(ConfigFormV3 configForm,
-            @RequestParam(value = "ids", required = false) List<Long> ids) throws Exception {
+        @RequestParam(value = "ids", required = false) List<Long> ids) throws Exception {
         configForm.blurSearchValidate();
-        ids.removeAll(Collections.singleton(null));
+        if (ids != null) {
+            ids.removeAll(Collections.singleton(null));
+        }
         String namespaceId = NamespaceUtil.processNamespaceParameter(configForm.getNamespaceId());
         String dataId = configForm.getDataId();
         String groupName = configForm.getGroupName();
@@ -327,13 +353,15 @@ public class ConsoleConfigController {
      * @return Result containing a map of the import status.
      * @throws NacosException If a Nacos-specific error occurs.
      */
+    @Since("3.0.0")
     @PostMapping("/import")
     @Secured(action = ActionTypes.WRITE, signType = SignType.CONFIG, apiType = ApiType.CONSOLE_API)
     public Result<Map<String, Object>> importAndPublishConfig(HttpServletRequest request,
-            @RequestParam(required = false) String srcUser,
-            @RequestParam(value = "namespaceId", required = false) String namespaceId,
-            @RequestParam(value = "policy", defaultValue = "ABORT") SameConfigPolicy policy, MultipartFile file)
-            throws NacosException {
+        @RequestParam(required = false) String srcUser,
+        @RequestParam(value = "namespaceId", required = false) String namespaceId,
+        @RequestParam(value = "policy", defaultValue = "ABORT") SameConfigPolicy policy,
+        MultipartFile file)
+        throws NacosException {
         namespaceId = NamespaceUtil.processNamespaceParameter(namespaceId);
         
         if (StringUtils.isBlank(srcUser)) {
@@ -342,7 +370,8 @@ public class ConsoleConfigController {
         final String srcIp = RequestUtil.getRemoteIp(request);
         String requestIpApp = RequestUtil.getAppName(request);
         
-        return configProxy.importAndPublishConfig(srcUser, namespaceId, policy, file, srcIp, requestIpApp);
+        return configProxy.importAndPublishConfig(srcUser, namespaceId, policy, file, srcIp,
+            requestIpApp);
     }
     
     /**
@@ -356,13 +385,17 @@ public class ConsoleConfigController {
      * @return Result containing a map of the clone status.
      * @throws NacosException If a Nacos-specific error occurs.
      */
+    @Since("3.0.0")
     @PostMapping("/clone")
-    @Secured(action = ActionTypes.WRITE, signType = SignType.CONFIG, apiType = ApiType.CONSOLE_API)
+    @Secured(action = ActionTypes.WRITE, signType = SignType.CONFIG, apiType = ApiType.CONSOLE_API,
+        tags = {
+            com.alibaba.nacos.plugin.auth.constant.Constants.Tag.SECURED_SPECIAL_TAGS})
     public Result<Map<String, Object>> cloneConfig(HttpServletRequest request,
-            @RequestParam(required = false) String srcUser,
-            @RequestParam(value = "targetNamespaceId") String namespaceId,
-            @RequestBody List<SameNamespaceCloneConfigBean> configBeansList,
-            @RequestParam(value = "policy", defaultValue = "ABORT") SameConfigPolicy policy) throws NacosException {
+        @RequestParam(required = false) String srcUser,
+        @RequestParam(value = "targetNamespaceId") String namespaceId,
+        @RequestBody List<SameNamespaceCloneConfigBean> configBeansList,
+        @RequestParam(value = "policy", defaultValue = "ABORT") SameConfigPolicy policy)
+        throws NacosException {
         configBeansList.removeAll(Collections.singleton(null));
         namespaceId = NamespaceUtil.processNamespaceParameter(namespaceId);
         if (StringUtils.isBlank(srcUser)) {
@@ -371,7 +404,8 @@ public class ConsoleConfigController {
         final String srcIp = RequestUtil.getRemoteIp(request);
         String requestIpApp = RequestUtil.getAppName(request);
         
-        return configProxy.cloneConfig(srcUser, namespaceId, configBeansList, policy, srcIp, requestIpApp);
+        return configProxy.cloneConfig(srcUser, namespaceId, configBeansList, policy, srcIp,
+            requestIpApp);
     }
     
     /**
@@ -382,10 +416,11 @@ public class ConsoleConfigController {
      * @return Result indicating the outcome of the operation.
      * @throws NacosException If a Nacos-specific error occurs.
      */
+    @Since("3.0.0")
     @DeleteMapping("/beta")
     @Secured(action = ActionTypes.WRITE, signType = SignType.CONFIG)
     public Result<Boolean> stopBeta(HttpServletRequest httpServletRequest, ConfigFormV3 configForm)
-            throws NacosException {
+        throws NacosException {
         configForm.validate();
         String remoteIp = getRemoteIp(httpServletRequest);
         String requestIpApp = RequestUtil.getAppName(httpServletRequest);
@@ -393,10 +428,11 @@ public class ConsoleConfigController {
         String groupName = configForm.getGroupName();
         String namespaceId = NamespaceUtil.processNamespaceParameter(configForm.getNamespaceId());
         String srcUser = RequestUtil.getSrcUserName(httpServletRequest);
-        boolean success = configProxy.removeBetaConfig(dataId, groupName, namespaceId, remoteIp, requestIpApp, srcUser);
+        boolean success = configProxy.removeBetaConfig(dataId, groupName, namespaceId, remoteIp,
+            requestIpApp, srcUser);
         if (!success) {
             return Result.failure(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), false);
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), false);
         }
         return Result.success(true);
     }
@@ -404,10 +440,11 @@ public class ConsoleConfigController {
     /**
      * Execute to query beta operation.
      *
-     * @param configForm  config form
+     * @param configForm config form
      * @return Result containing the ConfigInfo4Beta details.
      * @throws NacosException If a Nacos-specific error occurs.
      */
+    @Since("3.0.0")
     @GetMapping("/beta")
     @Secured(action = ActionTypes.READ, signType = SignType.CONFIG)
     public Result<ConfigGrayInfo> queryBeta(ConfigFormV3 configForm) throws NacosException {
@@ -419,5 +456,3 @@ public class ConsoleConfigController {
     }
     
 }
-
-

@@ -27,6 +27,7 @@ import com.alibaba.nacos.client.naming.event.NamingFuzzyWatchNotifyEvent;
 import com.alibaba.nacos.client.naming.remote.gprc.NamingGrpcClientProxy;
 import com.alibaba.nacos.client.utils.LogUtils;
 import com.alibaba.nacos.common.executor.NameThreadFactory;
+import com.alibaba.nacos.common.lifecycle.Closeable;
 import com.alibaba.nacos.common.notify.Event;
 import com.alibaba.nacos.common.notify.NotifyCenter;
 import com.alibaba.nacos.common.notify.listener.SmartSubscriber;
@@ -58,7 +59,7 @@ import static com.alibaba.nacos.api.model.v2.ErrorCode.FUZZY_WATCH_PATTERN_OVER_
  *
  * @author tanyongquan
  */
-public class NamingFuzzyWatchServiceListHolder extends SmartSubscriber {
+public class NamingFuzzyWatchServiceListHolder extends SmartSubscriber implements Closeable {
     
     private static final Logger LOGGER = LogUtils.logger(NamingFuzzyWatchServiceListHolder.class);
     
@@ -92,7 +93,10 @@ public class NamingFuzzyWatchServiceListHolder extends SmartSubscriber {
     /**
      * shut down.
      */
+    @Override
     public void shutdown() {
+        // deregister subscriber which registered in constructor
+        NotifyCenter.deregisterSubscriber(this);
         if (executorService != null && !executorService.isShutdown()) {
             executorService.shutdown();
         }
@@ -101,11 +105,10 @@ public class NamingFuzzyWatchServiceListHolder extends SmartSubscriber {
     /**
      * start.
      */
-    @SuppressWarnings("PMD.ThreadPoolCreationRule")
     public void start() {
         
         executorService = Executors.newSingleThreadScheduledExecutor(
-                new NameThreadFactory("com.alibaba.nacos.client.naming.fuzzy.watch.Worker"));
+            new NameThreadFactory("com.alibaba.nacos.client.naming.fuzzy.watch.Worker"));
         executorService.submit(() -> {
             while (!executorService.isShutdown() && !executorService.isTerminated()) {
                 try {
@@ -140,23 +143,30 @@ public class NamingFuzzyWatchServiceListHolder extends SmartSubscriber {
      *
      * @param watcher watcher to be added
      */
-    public NamingFuzzyWatchContext registerFuzzyWatcher(String groupKeyPattern, FuzzyWatchEventWatcher watcher) {
+    public NamingFuzzyWatchContext registerFuzzyWatcher(String groupKeyPattern,
+        FuzzyWatchEventWatcher watcher) {
         if (!namingGrpcClientProxy.isAbilitySupportedByServer(AbilityKey.SERVER_FUZZY_WATCH)) {
             throw new NacosRuntimeException(NacosException.SERVER_NOT_IMPLEMENTED,
-                    "Request Nacos server version is too low, not support fuzzy watch feature.");
+                "Request Nacos server version is too low, not support fuzzy watch feature.");
         }
-        NamingFuzzyWatchContext namingFuzzyWatchContext = initFuzzyWatchContextIfNeed(groupKeyPattern);
+        NamingFuzzyWatchContext namingFuzzyWatchContext =
+            initFuzzyWatchContextIfNeed(groupKeyPattern);
         namingFuzzyWatchContext.setDiscard(false);
         synchronized (namingFuzzyWatchContext) {
-            FuzzyWatchEventWatcherWrapper fuzzyWatchEventWatcherWrapper = new FuzzyWatchEventWatcherWrapper(watcher);
-            if (namingFuzzyWatchContext.getFuzzyWatchEventWatcherWrappers().add(fuzzyWatchEventWatcherWrapper)) {
-                LOGGER.info(" [add-watcher-ok] groupKeyPattern={}, watcher={},uuid={} ", groupKeyPattern, watcher,
-                        fuzzyWatchEventWatcherWrapper.getUuid());
+            FuzzyWatchEventWatcherWrapper fuzzyWatchEventWatcherWrapper =
+                new FuzzyWatchEventWatcherWrapper(watcher);
+            if (namingFuzzyWatchContext.getFuzzyWatchEventWatcherWrappers()
+                .add(fuzzyWatchEventWatcherWrapper)) {
+                LOGGER.info(" [add-watcher-ok] groupKeyPattern={}, watcher={},uuid={} ",
+                    groupKeyPattern, watcher,
+                    fuzzyWatchEventWatcherWrapper.getUuid());
                 Set<String> receivedServiceKeys = namingFuzzyWatchContext.getReceivedServiceKeys();
                 if (CollectionUtils.isNotEmpty(receivedServiceKeys)) {
                     for (String serviceKey : receivedServiceKeys) {
-                        NamingFuzzyWatchNotifyEvent namingFuzzyWatchNotifyEvent = NamingFuzzyWatchNotifyEvent.build(
-                                notifierEventScope, groupKeyPattern, serviceKey, ADD_SERVICE, FUZZY_WATCH_INIT_NOTIFY,
+                        NamingFuzzyWatchNotifyEvent namingFuzzyWatchNotifyEvent =
+                            NamingFuzzyWatchNotifyEvent.build(
+                                notifierEventScope, groupKeyPattern, serviceKey,
+                                ADD_SERVICE, FUZZY_WATCH_INIT_NOTIFY,
                                 fuzzyWatchEventWatcherWrapper.getUuid());
                         NotifyCenter.publishEvent(namingFuzzyWatchNotifyEvent);
                     }
@@ -179,9 +189,10 @@ public class NamingFuzzyWatchServiceListHolder extends SmartSubscriber {
                 if (fuzzyMatchContextMap.containsKey(groupKeyPattern)) {
                     return fuzzyMatchContextMap.get(groupKeyPattern);
                 }
-                LOGGER.info("[fuzzy-watch] init fuzzy watch context for pattern {}", groupKeyPattern);
+                LOGGER.info("[fuzzy-watch] init fuzzy watch context for pattern {}",
+                    groupKeyPattern);
                 fuzzyMatchContextMap.putIfAbsent(groupKeyPattern,
-                        new NamingFuzzyWatchContext(notifierEventScope, groupKeyPattern));
+                    new NamingFuzzyWatchContext(notifierEventScope, groupKeyPattern));
                 notifyFuzzyWatchSync();
             }
         }
@@ -198,7 +209,8 @@ public class NamingFuzzyWatchServiceListHolder extends SmartSubscriber {
         if (namingFuzzyWatchContext == null) {
             return;
         }
-        if (namingFuzzyWatchContext.isDiscard() && namingFuzzyWatchContext.getFuzzyWatchEventWatcherWrappers()
+        if (namingFuzzyWatchContext.isDiscard()
+            && namingFuzzyWatchContext.getFuzzyWatchEventWatcherWrappers()
                 .isEmpty()) {
             LOGGER.info("[fuzzy-watch] remove fuzzy watch context for pattern {}", groupKeyPattern);
             fuzzyMatchContextMap.remove(groupKeyPattern);
@@ -227,7 +239,8 @@ public class NamingFuzzyWatchServiceListHolder extends SmartSubscriber {
         long now = System.currentTimeMillis();
         
         // Determine whether a full synchronization is needed
-        boolean needAllSync = now - fuzzyWatchLastAllSyncTime.get() >= FUZZY_LISTEN_ALL_SYNC_INTERNAL;
+        boolean needAllSync =
+            now - fuzzyWatchLastAllSyncTime.get() >= FUZZY_LISTEN_ALL_SYNC_INTERNAL;
         
         List<NamingFuzzyWatchContext> needSyncContexts = new ArrayList<>();
         // Iterate through all fuzzy listen contexts
@@ -255,7 +268,7 @@ public class NamingFuzzyWatchServiceListHolder extends SmartSubscriber {
     
     public void resetConsistenceStatus() {
         fuzzyMatchContextMap.values()
-                .forEach(fuzzyWatcherContext -> fuzzyWatcherContext.setConsistentWithServer(false));
+            .forEach(fuzzyWatcherContext -> fuzzyWatcherContext.setConsistentWithServer(false));
     }
     
     /**
@@ -267,7 +280,8 @@ public class NamingFuzzyWatchServiceListHolder extends SmartSubscriber {
      * @param contextLists The map of contexts to execute fuzzy listen operations for.
      * @throws NacosException If an error occurs during the execution of fuzzy listen configuration changes.
      */
-    private void doExecuteNamingFuzzyWatch(List<NamingFuzzyWatchContext> contextLists) throws NacosException {
+    private void doExecuteNamingFuzzyWatch(List<NamingFuzzyWatchContext> contextLists)
+        throws NacosException {
         // Return if the context map is null or empty
         if (CollectionUtils.isEmpty(contextLists)) {
             return;
@@ -281,7 +295,7 @@ public class NamingFuzzyWatchServiceListHolder extends SmartSubscriber {
                 
                 // Execute the fuzzy listen operation
                 NamingFuzzyWatchResponse listenResponse = namingGrpcClientProxy.fuzzyWatchRequest(
-                        configFuzzyWatchRequest);
+                    configFuzzyWatchRequest);
                 if (listenResponse != null && listenResponse.isSuccess()) {
                     
                     if (configFuzzyWatchRequest.getWatchType().equals(WATCH_TYPE_CANCEL_WATCH)) {
@@ -296,10 +310,12 @@ public class NamingFuzzyWatchServiceListHolder extends SmartSubscriber {
                 // Log error and retry after a short delay
                 
                 if (FUZZY_WATCH_PATTERN_OVER_LIMIT.getCode() == e.getErrCode()
-                        || FUZZY_WATCH_PATTERN_MATCH_COUNT_OVER_LIMIT.getCode() == e.getErrCode()) {
-                    LOGGER.error(" fuzzy watch pattern over limit,pattern ->{} ,fuzzy watch will be suppressed,msg={}",
-                            entry.getGroupKeyPattern(), e.getErrMsg());
-                    NamingFuzzyWatchLoadEvent namingFuzzyWatchLoadEvent = NamingFuzzyWatchLoadEvent.buildEvent(
+                    || FUZZY_WATCH_PATTERN_MATCH_COUNT_OVER_LIMIT.getCode() == e.getErrCode()) {
+                    LOGGER.error(
+                        " fuzzy watch pattern over limit,pattern ->{} ,fuzzy watch will be suppressed,msg={}",
+                        entry.getGroupKeyPattern(), e.getErrMsg());
+                    NamingFuzzyWatchLoadEvent namingFuzzyWatchLoadEvent =
+                        NamingFuzzyWatchLoadEvent.buildEvent(
                             e.getErrCode(), entry.getGroupKeyPattern(), notifierEventScope);
                     NotifyCenter.publishEvent(namingFuzzyWatchLoadEvent);
                     
@@ -320,13 +336,16 @@ public class NamingFuzzyWatchServiceListHolder extends SmartSubscriber {
         
     }
     
-    private NamingFuzzyWatchRequest buildFuzzyWatchNamingRequest(NamingFuzzyWatchContext namingFuzzyWatchContext) {
+    private NamingFuzzyWatchRequest buildFuzzyWatchNamingRequest(
+        NamingFuzzyWatchContext namingFuzzyWatchContext) {
         NamingFuzzyWatchRequest namingFuzzyWatchRequest = new NamingFuzzyWatchRequest();
         namingFuzzyWatchRequest.setInitializing(namingFuzzyWatchContext.isInitializing());
         namingFuzzyWatchRequest.setNamespace(namingGrpcClientProxy.getNamespaceId());
-        namingFuzzyWatchRequest.setReceivedGroupKeys(namingFuzzyWatchContext.getReceivedServiceKeys());
+        namingFuzzyWatchRequest
+            .setReceivedGroupKeys(namingFuzzyWatchContext.getReceivedServiceKeys());
         namingFuzzyWatchRequest.setGroupKeyPattern(namingFuzzyWatchContext.getGroupKeyPattern());
-        if (namingFuzzyWatchContext.isDiscard() && namingFuzzyWatchContext.getFuzzyWatchEventWatcherWrappers()
+        if (namingFuzzyWatchContext.isDiscard()
+            && namingFuzzyWatchContext.getFuzzyWatchEventWatcherWrappers()
                 .isEmpty()) {
             namingFuzzyWatchRequest.setWatchType(WATCH_TYPE_CANCEL_WATCH);
         } else {
@@ -357,7 +376,8 @@ public class NamingFuzzyWatchServiceListHolder extends SmartSubscriber {
             if (namingFuzzyWatchContext == null) {
                 return;
             }
-            namingFuzzyWatchContext.notifyFuzzyWatchers(serviceKey, changedType, syncType, watchUuid);
+            namingFuzzyWatchContext.notifyFuzzyWatchers(serviceKey, changedType, syncType,
+                watchUuid);
         }
         if (event instanceof NamingFuzzyWatchLoadEvent) {
             if (!event.scope().equals(notifierEventScope)) {
@@ -366,7 +386,7 @@ public class NamingFuzzyWatchServiceListHolder extends SmartSubscriber {
             
             NamingFuzzyWatchLoadEvent overLimitEvent = (NamingFuzzyWatchLoadEvent) event;
             NamingFuzzyWatchContext namingFuzzyWatchContext = fuzzyMatchContextMap.get(
-                    overLimitEvent.getGroupKeyPattern());
+                overLimitEvent.getGroupKeyPattern());
             if (namingFuzzyWatchContext == null) {
                 return;
             }

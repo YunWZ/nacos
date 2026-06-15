@@ -21,9 +21,8 @@ import com.alibaba.nacos.common.remote.PayloadRegistry;
 import com.alibaba.nacos.core.remote.tls.RpcServerSslContextRefresherHolder;
 import com.alibaba.nacos.core.utils.Loggers;
 import com.alibaba.nacos.sys.env.EnvUtil;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 /**
  * abstract rpc server .
@@ -43,7 +42,8 @@ public abstract class BaseRpcServer {
     @PostConstruct
     public void start() throws Exception {
         String serverName = getClass().getSimpleName();
-        Loggers.REMOTE.info("Nacos {} Rpc server starting at port {}", serverName, getServicePort());
+        Loggers.REMOTE.info("Nacos {} Rpc server starting at port {}", serverName,
+            getServicePort());
         
         startServer();
         

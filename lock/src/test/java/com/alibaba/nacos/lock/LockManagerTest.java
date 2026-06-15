@@ -64,17 +64,19 @@ public class LockManagerTest {
         Field factoryMap = NacosLockManager.class.getDeclaredField("factoryMap");
         factoryMap.setAccessible(true);
         Map<String, LockFactory> map = (Map<String, LockFactory>) factoryMap.get(lockManager);
-        assertEquals(2, map.size());
+        assertEquals(4, map.size());
     }
     
     @Test
     public void testClientLockFactory() {
-        AtomicLockService lock = lockManager.getMutexLock(new LockKey(ClientLockFactory.TYPE, "key"));
+        AtomicLockService lock =
+            lockManager.getMutexLock(new LockKey(ClientLockFactory.TYPE, "key"));
         assertEquals(ClientAtomicLock.class, lock.getClass());
         assertEquals("key", lock.getKey());
         
         LockInfo lockInfo = new ClientLockFactory.ClientLockInstance();
         lockInfo.setParams(new HashMap() {
+            
             {
                 put("nacosClientId", "123456");
             }

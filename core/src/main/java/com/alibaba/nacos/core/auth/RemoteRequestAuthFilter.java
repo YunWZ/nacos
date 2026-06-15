@@ -16,6 +16,7 @@
 
 package com.alibaba.nacos.core.auth;
 
+import com.alibaba.nacos.api.common.ApiType;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.remote.request.Request;
 import com.alibaba.nacos.api.remote.request.RequestMeta;
@@ -34,7 +35,6 @@ import com.alibaba.nacos.plugin.auth.api.AuthResult;
 import com.alibaba.nacos.plugin.auth.api.IdentityContext;
 import com.alibaba.nacos.plugin.auth.api.Permission;
 import com.alibaba.nacos.plugin.auth.api.Resource;
-import com.alibaba.nacos.plugin.auth.constant.ApiType;
 import com.alibaba.nacos.plugin.auth.constant.Constants;
 import com.alibaba.nacos.plugin.auth.exception.AccessException;
 import org.springframework.stereotype.Component;
@@ -59,21 +59,25 @@ public class RemoteRequestAuthFilter extends AbstractRequestFilter {
     public RemoteRequestAuthFilter(InnerApiAuthEnabled innerApiAuthEnabled) {
         this.innerApiAuthEnabled = innerApiAuthEnabled;
         this.authConfig = NacosAuthConfigHolder.getInstance()
-                .getNacosAuthConfigByScope(NacosServerAuthConfig.NACOS_SERVER_AUTH_SCOPE);
+            .getNacosAuthConfigByScope(NacosServerAuthConfig.NACOS_SERVER_AUTH_SCOPE);
         this.protocolAuthService = new GrpcProtocolAuthService(authConfig);
         this.protocolAuthService.initialize();
     }
     
     @Override
-    public Response filter(Request request, RequestMeta meta, Class handlerClazz) throws NacosException {
+    public Response filter(Request request, RequestMeta meta, Class handlerClazz)
+        throws NacosException {
         
         try {
             
             Method method = getHandleMethod(handlerClazz);
             if (method.isAnnotationPresent(Secured.class)) {
                 Secured secured = method.getAnnotation(Secured.class);
+                RequestContext requestContext = RequestContextHolder.getContext();
+                requestContext.getAuthContext().setApiType(secured.apiType().name());
                 // During Upgrading, Old Nacos server might not with server identity for some Inner API, follow old version logic.
-                if (ApiType.INNER_API.equals(secured.apiType()) && !innerApiAuthEnabled.isEnabled()) {
+                if (ApiType.INNER_API.equals(secured.apiType())
+                    && !innerApiAuthEnabled.isEnabled()) {
                     return null;
                 }
                 // Inner API must do check server identity. So judge api type not inner api and whether auth is enabled.
@@ -81,13 +85,16 @@ public class RemoteRequestAuthFilter extends AbstractRequestFilter {
                     return null;
                 }
                 if (Loggers.AUTH.isDebugEnabled()) {
-                    Loggers.AUTH.debug("auth start, request: {}", request.getClass().getSimpleName());
+                    Loggers.AUTH.debug("auth start, request: {}",
+                        request.getClass().getSimpleName());
                 }
-                ServerIdentityResult identityResult = protocolAuthService.checkServerIdentity(request, secured);
+                ServerIdentityResult identityResult =
+                    protocolAuthService.checkServerIdentity(request, secured);
                 switch (identityResult.getStatus()) {
                     case FAIL:
                         Response defaultResponseInstance = getDefaultResponseInstance(handlerClazz);
-                        defaultResponseInstance.setErrorInfo(NacosException.NO_RIGHT, identityResult.getMessage());
+                        defaultResponseInstance.setErrorInfo(NacosException.NO_RIGHT,
+                            identityResult.getMessage());
                         return defaultResponseInstance;
                     case MATCHED:
                         return null;
@@ -102,7 +109,6 @@ public class RemoteRequestAuthFilter extends AbstractRequestFilter {
                 Resource resource = protocolAuthService.parseResource(request, secured);
                 IdentityContext identityContext = protocolAuthService.parseIdentity(request);
                 AuthResult result = protocolAuthService.validateIdentity(identityContext, resource);
-                RequestContext requestContext = RequestContextHolder.getContext();
                 requestContext.getAuthContext().setIdentityContext(identityContext);
                 requestContext.getAuthContext().setResource(resource);
                 requestContext.getAuthContext().setAuthResult(result);
@@ -110,22 +116,25 @@ public class RemoteRequestAuthFilter extends AbstractRequestFilter {
                     throw new AccessException(result.format());
                 }
                 String action = secured.action().toString();
-                result = protocolAuthService.validateAuthority(identityContext, new Permission(resource, action));
+                result = protocolAuthService.validateAuthority(identityContext,
+                    new Permission(resource, action));
                 if (!result.isSuccess()) {
                     throw new AccessException(result.format());
                 }
             }
         } catch (AccessException e) {
             if (Loggers.AUTH.isDebugEnabled()) {
-                Loggers.AUTH.debug("access denied, request: {}, reason: {}", request.getClass().getSimpleName(),
-                        e.getErrMsg());
+                Loggers.AUTH.debug("access denied, request: {}, reason: {}",
+                    request.getClass().getSimpleName(),
+                    e.getErrMsg());
             }
             Response defaultResponseInstance = getDefaultResponseInstance(handlerClazz);
             defaultResponseInstance.setErrorInfo(NacosException.NO_RIGHT, e.getErrMsg());
             return defaultResponseInstance;
         } catch (Exception e) {
             Response defaultResponseInstance = getDefaultResponseInstance(handlerClazz);
-            defaultResponseInstance.setErrorInfo(NacosException.SERVER_ERROR, ExceptionUtil.getAllExceptionMsg(e));
+            defaultResponseInstance.setErrorInfo(NacosException.SERVER_ERROR,
+                ExceptionUtil.getAllExceptionMsg(e));
             return defaultResponseInstance;
         }
         

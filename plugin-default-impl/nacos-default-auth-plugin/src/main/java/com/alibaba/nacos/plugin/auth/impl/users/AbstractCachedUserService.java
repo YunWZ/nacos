@@ -19,6 +19,7 @@ package com.alibaba.nacos.plugin.auth.impl.users;
 import com.alibaba.nacos.api.model.Page;
 import com.alibaba.nacos.common.utils.StringUtils;
 import com.alibaba.nacos.core.utils.Loggers;
+import com.alibaba.nacos.plugin.auth.impl.constant.AuthConstants;
 import com.alibaba.nacos.plugin.auth.impl.persistence.User;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -32,7 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class AbstractCachedUserService implements NacosUserService {
     
-    private Map<String, User> userMap = new ConcurrentHashMap<>();
+    private volatile Map<String, User> userMap = new ConcurrentHashMap<>();
     
     protected AbstractCachedUserService() {
     }
@@ -58,7 +59,19 @@ public abstract class AbstractCachedUserService implements NacosUserService {
             Loggers.AUTH.warn("[LOAD-USERS] load failed", e);
         }
     }
-
+    
+    /**
+     * Reject reserved system usernames from being created or deleted.
+     *
+     * @param username the username to check
+     */
+    protected void rejectReservedUsername(String username) {
+        if (AuthConstants.ANONYMOUS_USER.equals(username)) {
+            throw new IllegalArgumentException(
+                "username '" + AuthConstants.ANONYMOUS_USER + "' is reserved by the system");
+        }
+    }
+    
     /**
      * [ISSUE #13625] check username and password is blank.
      */
@@ -66,6 +79,7 @@ public abstract class AbstractCachedUserService implements NacosUserService {
         if (StringUtils.isBlank(username)) {
             throw new IllegalArgumentException("username is blank");
         }
+        rejectReservedUsername(username);
         if (StringUtils.isBlank(password)) {
             throw new IllegalArgumentException("password is blank");
         }
